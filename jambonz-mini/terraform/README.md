@@ -8,7 +8,7 @@ This terraform configuration a small jambonz platform suitable for testing and d
 - an Elasticache redis instance
 - an Aurora serverless mysql database.
 
-The jambonz instance is based on an AMI that is created from [this packer script](./packer).
+The jambonz instance is based on an AMI that is created from [this packer script](../packer).
 
 ## Running the terraform script
 
