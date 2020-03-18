@@ -39,10 +39,10 @@
       }
     },
     "tags": {
-      "role": "jambonz"
+      "Name": "jambonz-mini"
     },
     "run_tags": {
-      "role": "jambonz"
+      "Name": "jambonz-mini"
     }
   }],
   "provisioners": [

@@ -227,9 +227,16 @@ resource "aws_eip" "jambonz" {
   depends_on = [aws_rds_cluster.jambonz]
 }
 
+# select the most recent jambonz-mini AMI
+data "aws_ami" "jambonz" {
+  most_recent      = true
+  name_regex       = "^jambonz-mini"
+  owners           = ["376029039784"]
+}
+
 # create the EC2 instance that will run jambonz
 resource "aws_instance" "jambonz" {
-  ami                    = var.ami_id
+  ami                    = aws_ami.jambonz.id
   instance_type          = var.ec2_instance_type
   private_ip             = var.jambonz_mini_private_ip
   subnet_id              = aws_subnet.jambonz.id

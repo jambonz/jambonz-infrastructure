@@ -13,9 +13,7 @@ sudo sed -i -e 's@^# log_level:.*@log_level: warning@g' /etc/datadog-agent/datad
 sudo tee -a /etc/datadog-agent/datadog.yaml > /dev/null <<EOT
 tags:
   env_name:$DATADOG_ENV_NAME
-  role:media-gateway
-  partner:lima
-  channel:voice
+  role:jambonz-feature-server
 EOT
 
 systemctl enable datadog-agent
