@@ -79,6 +79,7 @@ resource "aws_instance" "jambonz-sbc-sip-server" {
   user_data              = templatefile("${path.module}/sbc-sip-server.ecosystem.config.js.tmpl", {
     VPC_CIDR                = var.vpc_cidr_block
     JAMBONES_FEATURE_SERVER_FOR_API_CALLS = var.jambonz_sbc_sip_private_ips[0]
+    JAMBONES_FEATURE_SERVER_IPS = join(",", var.jambonz_feature_server_private_ips)
     JAMBONES_SBC_SIP_IPS    = join(",", var.jambonz_sbc_sip_private_ips)
     JAMBONES_RTPENGINE_IPS  = join(",", local.rtpengine_hostports)
     JAMBONES_MYSQL_HOST     = aws_rds_cluster.jambonz.endpoint
