@@ -4,22 +4,7 @@ This repository contains [packer](packer.io) and [terraform](terraform.io) scrip
 
 There are 3 different deployment alternatives:
 
-- a "jambonz mini" deployment, consisting of a single server
-- a "jambonz small" deployment, consisting of one server for SBC functionality and a second server for feature server functionality
-- a "jambonz standard" deployment, which provides redundancy and scalability and a fully-exploded functional architecture consisting of one set of instances for SBC SIP signaling, a second set of instance for SBC media handling, and a third set of instances for feature server.
-
-## jambonz standard
-
-A "standard" jambonz deployment consists of 3 instance types:
-- An [SBC SIP server](./packer/jambonz-sbc-sip)
-- An [SBC RTP server](./packer/jambonz-sbc-rtp)
-- A [feature server](./packer/jambonz-feature-server)
-
-The terraform script creates a deployment consisting of:
-- a VPC
-- 2 public subnets in different availability zones
-- an SBC SIP server, an SBC RTP server and a feature server in each availbility zone
-- security groups to filter and block traffic
-- a redis Elasticache database
-- an Aurora serverless database
+- a ["jambonz mini"](./terraform/jambonz-mini) deployment, consisting of a [single server](./packer/jambonz-mini)
+- a ["jambonz small"](./terraform/jambonz-small) deployment, consisting of one server for [SBC functionality](./packer/jambonz-sbc-sip-rtp) and a second server for [feature server functionality](./packer/jambonz-feature-server).
+- a ["jambonz standard"](./terraform/jambonz-standard) deployment, which provides redundancy and scalability and a fully-exploded functional architecture consisting instances for [SBC SIP signaling](./packer/jambonz-sbc-sip), a second set of instance for [SBC media handling](./packer/jambonz-sbc-rtp), and a third set of instances for [feature server](./packer/jambonz-feature-server).
 
