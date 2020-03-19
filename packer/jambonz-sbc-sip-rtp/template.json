@@ -1,0 +1,98 @@
+{
+  "variables": {
+    "region": "us-east-1",
+    "ssh_username": "admin",
+    "ami_description": "jambonz SBC SIP+RTP", 
+    "drachtio_version": "v0.8.4",
+    "instance_type": "t2.medium",
+    "rtp_engine_version": "mr7.4.1.5",
+    "rtp_engine_min_port": "40000",
+    "rtp_engine_max_port": "60000"
+
+  },
+  "builders": [{
+    "type": "amazon-ebs",
+    "region": "{{user `region`}}",
+    "source_ami_filter": {
+      "filters": {
+        "virtualization-type": "hvm",
+        "name": "debian-stretch-hvm-x86_64-gp2-*",
+        "root-device-type": "ebs"
+      },
+      "owners": ["379101102735"],
+      "most_recent": true
+    },
+    "instance_type": "{{user `instance_type`}}",
+    "ssh_username": "{{user `ssh_username`}}",
+    "ami_name": "jambonz-sbc-sip-rtp-{{isotime |clean_resource_name }}",
+    "ami_description": "{{user `ami_description`}}",
+    "launch_block_device_mappings": [
+      {
+        "device_name": "xvda",
+        "volume_size": 40,
+        "volume_type": "gp2",
+        "delete_on_termination": true
+      }
+    ],
+    "security_group_filter": {
+      "filters": {
+        "tag:Class": "packer"
+      }
+    },
+    "tags": {
+      "Name": "jambonz-sbc-sip"
+    },
+    "run_tags": {
+      "Name": "jambonz-sbc-sip"
+    }
+  }],
+  "provisioners": [
+    {
+      "type": "shell",
+      "inline": [
+        "while [ ! -f /var/lib/cloud/instance/boot-finished ]; do echo 'Waiting for cloud-init...'; sleep 1; done",
+        "sudo apt-get update",
+        "sudo apt-get -y install python gcc g++ make cmake build-essential git autoconf automake mysql-client redis-tools \\",
+        "curl telnet libtool libtool-bin libssl-dev libcurl4-openssl-dev libz-dev systemd-coredump liblz4-tool \\",
+        "iptables-dev libavformat-dev liblua5.1-0-dev libavfilter-dev libavcodec-dev libswresample-dev \\",
+        "libevent-dev libpcap-dev libxmlrpc-core-c3-dev markdown libjson-glib-dev lsb-release \\",
+        "libhiredis-dev gperf libspandsp-dev default-libmysqlclient-dev htop dnsutils gdb \\",
+        "gnupg2 wget pkg-config ca-certificates libjpeg-dev libsqlite3-dev libpcre3-dev libldns-dev \\",
+        "libspeex-dev libspeexdsp-dev libedit-dev libtiff-dev yasm valgrind libswscale-dev haveged \\",
+        "libopus-dev libsndfile-dev libshout3-dev libmpg123-dev libmp3lame-dev libopusfile-dev fail2ban",
+        "sudo chmod a+w /usr/local/src"
+      ]
+    },
+    {
+      "type": "file",
+      "source": "files/",
+      "destination": "/tmp"
+    },
+    {
+      "type": "shell",
+      "script": "scripts/install_chrony.sh"
+    },
+    {
+      "type": "shell",
+      "execute_command": "chmod +x {{ .Path }}; sudo '{{ .Path }}' {{user `rtp_engine_version`}}",
+      "script": "scripts/install_rtpengine.sh"
+    },
+    {
+      "type": "shell",
+      "script": "scripts/install_nodejs.sh"
+    },
+    {
+      "type": "shell",
+      "execute_command": "chmod +x {{ .Path }}; sudo '{{ .Path }}' {{user `drachtio_version`}}",
+      "script": "scripts/install_drachtio.sh"
+    },
+    {
+      "type": "shell",
+      "script": "scripts/install_app.sh"
+    },
+    {
+      "type": "shell",
+      "script": "scripts/install_fail2ban.sh"
+    }
+  ]
+}

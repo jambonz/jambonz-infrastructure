@@ -49,3 +49,8 @@ terraform apply -var='key_name=aws-dhorton-key' \
 ```
 
 (Note: those are not valid keys of course, just for explanatory purposes).
+
+If you want to destroy the resources created, then:
+```
+terraform destroy
+```

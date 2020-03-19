@@ -1,0 +1,44 @@
+#!/bin/bash
+cat << EOF > /home/admin/apps/ecosystem.config.js
+module.exports = {
+  apps : [
+  {
+    name: 'jambonz-feature-server',
+    cwd: '/home/admin/apps/jambonz-feature-server',
+    script: 'app.js',
+    instance_var: 'INSTANCE_ID',
+    out_file: '/home/admin/.pm2/logs/jambonz-feature-server.log',
+    err_file: '/home/admin/.pm2/logs/jambonz-feature-server.log',
+    exec_mode: 'fork',
+    instances: 1,
+    autorestart: true,
+    watch: false,
+    max_memory_restart: '1G',
+    env: {
+      NODE_ENV: 'production',
+      GOOGLE_APPLICATION_CREDENTIALS: '/home/admin/credentials/gcp.json',
+      AWS_ACCESS_KEY_ID: '${AWS_ACCESS_KEY_ID}',
+      AWS_SECRET_ACCESS_KEY: '${AWS_SECRET_ACCESS_KEY}',
+      AWS_REGION: '${AWS_REGION}',
+      ENABLE_DATADOG_METRICS: 0,
+      ENABLE_DATADOG_METRICS: 0,
+      JAMBONES_NETWORK_CIDR: '${VPC_CIDR}',
+      JAMBONES_MYSQL_HOST: '${JAMBONES_MYSQL_HOST}',
+      JAMBONES_MYSQL_USER: '${JAMBONES_MYSQL_USER}',
+      JAMBONES_MYSQL_PASSWORD: '${JAMBONES_MYSQL_PASSWORD}',
+      JAMBONES_MYSQL_DATABASE: 'jambones',
+      JAMBONES_MYSQL_CONNECTION_LIMIT: 10,
+      JAMBONES_REDIS_HOST: '${JAMBONES_REDIS_HOST}',
+      JAMBONES_REDIS_PORT: 6379,
+      JAMBONES_LOGLEVEL: 'debug',
+      HTTP_PORT: 3000,
+      DRACHTIO_HOST: '127.0.0.1',
+      DRACHTIO_PORT: 9022,
+      DRACHTIO_SECRET: 'cymru',
+      JAMBONES_SBCS: '${JAMBONES_SBC_SIP_IPS}',
+      JAMBONES_FEATURE_SERVERS: '127.0.0.1:9022:cymru',
+      JAMBONES_FREESWITCH: '127.0.0.1:8021:JambonzR0ck$'
+		}
+  }]
+};
+EOF
