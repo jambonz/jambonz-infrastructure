@@ -1,6 +1,6 @@
 # jambonz infrastructure
 
-This repository contains [packer](packer.io) and [terraform](terraform.io) scripts for deploying ja,mbonz on AWS.  Packer scripts build the necessary AMIs, and terraform scripts create the full AWS infrastructure using those AMIs.
+This repository contains [packer](packer.io) and [terraform](terraform.io) scripts for deploying jambonz on AWS hosted infrastructure.  Packer scripts build the necessary AMIs, and terraform scripts create the full AWS infrastructure using those AMIs.
 
 There are 3 different deployment alternatives:
 

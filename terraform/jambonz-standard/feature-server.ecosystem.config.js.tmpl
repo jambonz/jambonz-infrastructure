@@ -20,6 +20,7 @@ module.exports = {
       AWS_ACCESS_KEY_ID: '${AWS_ACCESS_KEY_ID}',
       AWS_SECRET_ACCESS_KEY: '${AWS_SECRET_ACCESS_KEY}',
       AWS_REGION: '${AWS_REGION}',
+      AWS_SNS_TOPIC_ARM: '${AWS_SNS_TOPIC_ARN}',
       ENABLE_DATADOG_METRICS: 0,
       ENABLE_DATADOG_METRICS: 0,
       JAMBONES_NETWORK_CIDR: '${VPC_CIDR}',
@@ -38,7 +39,7 @@ module.exports = {
       JAMBONES_SBCS: '${JAMBONES_SBC_SIP_IPS}',
       JAMBONES_FEATURE_SERVERS: '127.0.0.1:9022:cymru',
       JAMBONES_FREESWITCH: '127.0.0.1:8021:JambonzR0ck$'
-		}
+    }
   }]
 };
 EOF

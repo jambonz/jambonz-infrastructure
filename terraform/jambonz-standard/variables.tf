@@ -1,6 +1,6 @@
 variable "region" {
   description = "the aws region in which to create the VPC"
-  default = "us-east-1"
+  default = "us-west-2"
 }
 variable "vpc_cidr_block" {
   description = "the CIDR block for the whole VPC"
@@ -9,8 +9,8 @@ variable "vpc_cidr_block" {
 variable "public_subnets" {
   type = map(string)
   default = {
-    "us-east-1a" = "172.31.32.0/24"
-    "us-east-1b" = "172.31.33.0/24"
+    "us-west-2a" = "172.31.32.0/24"
+    "us-west-2b" = "172.31.33.0/24"
   }
 }
 variable "jambonz_sbc_sip_private_ips" {
@@ -40,4 +40,12 @@ variable "aws_access_key_id_runtime" {
 variable "aws_secret_access_key_runtime" {
   description = "AWS secret access key jambonz will use to access AWS Polly TTS"
   default = "your-aws-secret_access-key"
+}
+variable "sns_topic" {
+  description = "AWS SNS topic for autoscale events"
+  default = "jambonz-fs-lifecycle-events"
+}
+variable "ms_teams_fqdn" {
+  description = "Microsoft Teams FQDN"
+  default = ""
 }

@@ -213,11 +213,19 @@ resource "aws_security_group" "allow_jambonz_feature_server" {
   }
 
   ingress {
-    description = "http"
+    description = "http from sbc/api servers"
     from_port   = 3000
     to_port     = 3000
     protocol    = "tcp"
     cidr_blocks = [aws_vpc.jambonz.cidr_block]
+  }
+
+  ingress {
+    description = "http from aws sns"
+    from_port   = 3001
+    to_port     = 3001
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
   }
 
   ingress {
