@@ -21,7 +21,7 @@ The feature servers make use of AWS SNS lifecycle notifications to scale-in grac
 If you want to temporarily take a feature server out of rotation (not receiving any calls from the SBCs), there is a two step process to do so:
 
 1. Using the AWS console or cli, select the instance of the autoscale group and put it into Standby state.
-2. Once the instance is in standby state, ssh into the instance and send a SIGHUP signal to the node.js process running the feature server application.  This will cause the feature server to send an OPTIONS request to the SBC indicating that it is out of service.
+2. Once the instance is in standby state, ssh into the instance and again send a SIGHUP signal to the node.js process running the feature server application.  This will cause the feature server to send an OPTIONS request to the SBC indicating that it is out of service.
 
 At that point, you need to wait for any calls in progress on the feature to dry up.  Once they do, you can then perform your maintenance or troubleshooting as needed.
 
