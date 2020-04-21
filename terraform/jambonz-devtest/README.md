@@ -1,11 +1,11 @@
-# terraform for a jambonz "small" system
+# terraform for a jambonz devlopment or test system
 
-This terraform configuration generates a jambonz deployment consisting of two AMIs:
+This terraform configuration generates a jambonz deployment consisting of one SBC server and an autoscale group of feature servers (initially with a single feature server), and an SNS notification topic to signal lifecycle events when a feature server is terminating due to a scale-in operation.  Feel free to edit the autoscale group parameters in the AWS console or cli once it has been created.
+:
 
-- an SBC server (SIP + RTP)
-- a feature server
+The SBC server is assigned an elastic IP.
 
-Each instance is assigned an elastic IP.
+### databases
 
 It also creates an Elasticache redis instance and an Aurora serverless mysql database, along with the necessary security groups.
 
@@ -14,9 +14,9 @@ It also creates an Elasticache redis instance and an Aurora serverless mysql dat
 There are several changes you will need to make before running the script.
 
 
-1.  This script creates a VPC in the us-east-1 region.  You may prefer to run in a different region: if so, edit the variables.tf file accordingly.
+1.  This script creates a VPC in the us-west-2 region.  You may prefer to run in a different region: if so, edit the variables.tf file accordingly.
 
-2.  If you _do_ want to run in a different region, you need to make sure the AMIs that the terraform script deploys are available in your preferred region. That means either you run the packer scripts yourself and create the AMIs, or you contact me and ask me to copy the AMIs into your preferred region.  If you create the AMIs yourself you will need to change the "owner" attribute in the ami filter in jambonz.tf to your own aws id.
+2.  If you _do_ want to run in a different region, you need to make sure the 3 AMIs that the terraform script deploys are available in your preferred region. That means either you run the packer scripts yourself and create the AMIs, or you contact me and ask me to copy the AMIs into your preferred region.  If you create the AMIs yourself you will need to change the "owner" attribute in the ami filter in jambonz.tf to your own aws id.
 
 3.  You will need to download a json service key file from google cloud in order to use the speech services.  Copy that file into the credentials folder in this project with the name gcp.json before you run terraform, since that is where the terraform script expects to find it and what it expects to be named.
 
