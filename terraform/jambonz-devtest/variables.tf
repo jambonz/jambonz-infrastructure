@@ -13,21 +13,13 @@ variable "public_subnets" {
     "us-west-2b" = "172.31.33.0/24"
   }
 }
-variable "jambonz_sbc_sip_private_ips" {
+variable "jambonz_sbc_sip_rtp_private_ips" {
   type = list(string)
-  default = ["172.31.32.10", "172.31.33.10"]
-}
-variable "jambonz_sbc_rtp_private_ips" {
-  type = list(string)
-  default = ["172.31.32.20", "172.31.33.20"]
-}
-variable "jambonz_feature_server_private_ips" {
-  type = list(string)
-  default = ["172.31.32.100", "172.31.33.100"]
+  default = ["172.31.32.10"]
 }
 variable "ec2_instance_type" {
   description = "the EC2 instance type to use for the jambonz server"
-  default = "t2.micro"
+  default = "t2.medium"
 }
 variable "key_name" {
   description = "name of an aws keypair that you have downloaded and wish to use to access the jambonz instance via ssh"
@@ -48,4 +40,8 @@ variable "sns_topic" {
 variable "ms_teams_fqdn" {
   description = "Microsoft Teams FQDN"
   default = ""
+}
+variable "cluster_id" {
+  description = "short cluster identifier"
+  default = "jb"
 }

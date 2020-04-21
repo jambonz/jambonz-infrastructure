@@ -36,7 +36,7 @@ resource "aws_default_route_table" "jambonz" {
   }
 }
 
-# create a public subnet
+# create public subnets
 resource "aws_subnet" "jambonz" {
   for_each          = var.public_subnets
 

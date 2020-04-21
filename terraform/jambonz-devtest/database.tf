@@ -20,10 +20,9 @@ resource "aws_rds_cluster" "jambonz" {
   preferred_backup_window = "07:00-09:00"
 
   scaling_configuration {
-    auto_pause               = true
+    auto_pause               = false
     min_capacity             = 1
     max_capacity             = 2
-    seconds_until_auto_pause = 300
   }
 }
 
