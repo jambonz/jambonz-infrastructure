@@ -10,9 +10,9 @@ There are two supported deployment configurations:
 - a [production](./terraform/jambonz-standard) deployment; this configuration consists of two SBCs with [SIP](./packer/jambonz-sbc-sip) and [RTP](./packer/jambonz-sbc-rtp) handling separated onto different servers (i.e. 4 servers in total for SBC processing), and [feature servers](./packer/jambonz-feature-server) in an autoscale group.
 
 #### autoscaling feature servers
-Both the devtest and production deployments create a single feature server in an autoscale group.  
+Both the devtest and production deployments create a single feature server in an autoscale group.
 
-There is initially no scaling policy applied, but after running the terraform script and creating the infrastructure you can use the AWS console to apply a scaling policy (e.g. scale up when cpu > 60%) or a schedule (e.g. run 3 feature servers during the day and only one overnight) if you wish.
+There is initially no scaling policy applied, but after running the terraform script and creating the infrastructure you can use the AWS console to apply a scaling policy (e.g. scale up when cpu > 60%) or a schedule (e.g. run 3 feature servers during the day and only one overnight) or modify the static configuration to alter the desired/min/max instances as you wish.
 
 #### graceful scale-in
 The feature servers make use of AWS SNS lifecycle notifications to scale-in gracefully, allowing calls in progress to complete before shutting down.  A maximum of 15 minutes is given for calls to complete; after that period any remaining calls will be torn down.  This duration interval can be edited in the autoscale group configuration via the AWS console or cli if desired.
