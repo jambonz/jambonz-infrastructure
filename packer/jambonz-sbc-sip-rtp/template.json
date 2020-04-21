@@ -40,10 +40,10 @@
       }
     },
     "tags": {
-      "Name": "jambonz-sbc-sip"
+      "Name": "jambonz-sbc-sip-rtp"
     },
     "run_tags": {
-      "Name": "jambonz-sbc-sip"
+      "Name": "jambonz-sbc-sip-rtp"
     }
   }],
   "provisioners": [
