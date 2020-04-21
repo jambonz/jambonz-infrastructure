@@ -23,7 +23,7 @@ If you want to temporarily take a feature server out of rotation (not receiving 
 1. Using the AWS console or cli, select the instance within the autoscale group and put it into Standby state.
 2. Once the instance is in standby state, ssh into the instance and again send a SIGHUP signal to the node.js process running the feature server application.  This will cause the feature server to send an OPTIONS request to the SBC indicating that it is out of service.
 
-At that point, you need to wait for any calls in progress on the feature to dry up.  Once they do, you can then perform your maintenance or troubleshooting as needed.
+At that point, you need to wait for any calls in progress on the feature server to dry up.  Watch the logs via `pm2 log` to see when the call count goes to zero.  Once they do, you can then perform your maintenance or troubleshooting as needed.
 
 To bring the feature back into service once the maintenance is complete, do the following:
 
