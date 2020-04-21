@@ -1,7 +1,6 @@
-# terraform for a jambonz devlopment or test system
+# terraform for a jambonz development / test system
 
-This terraform configuration generates a jambonz deployment consisting of one SBC server and an autoscale group of feature servers (initially with a single feature server), and an SNS notification topic to signal lifecycle events when a feature server is terminating due to a scale-in operation.  Feel free to edit the autoscale group parameters in the AWS console or cli once it has been created.
-:
+This terraform configuration generates a jambonz deployment consisting of one SBC server and an autoscale group of feature servers (initially containing a single feature server), and an SNS notification topic to signal lifecycle events when a feature server is terminating due to a scale-in operation.  Feel free to edit the autoscale group parameters in the AWS console or cli once it has been created.
 
 The SBC server is assigned an elastic IP.
 
