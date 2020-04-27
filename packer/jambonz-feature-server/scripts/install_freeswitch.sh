@@ -81,6 +81,7 @@ sudo make cd-sounds-install cd-moh-install
 sudo cp /tmp/acl.conf.xml /usr/local/freeswitch/conf/autoload_configs
 sudo cp /tmp/event_socket.conf.xml /usr/local/freeswitch/conf/autoload_configs
 sudo cp /tmp/switch.conf.xml /usr/local/freeswitch/conf/autoload_configs
+sudo cp /tmp/conference.conf.xml /usr/local/freeswitch/conf/autoload_configs
 sudo rm -Rf /usr/local/freeswitch/conf/dialplan/*
 sudo rm -Rf /usr/local/freeswitch/conf/sip_profiles/*
 sudo cp /tmp/mrf_dialplan.xml /usr/local/freeswitch/conf/dialplan

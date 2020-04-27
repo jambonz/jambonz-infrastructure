@@ -31,7 +31,7 @@ resource "aws_instance" "jambonz-sbc-sip-server" {
   })
   key_name               = var.key_name
   monitoring             = true
-
+  
   depends_on = [aws_internet_gateway.jambonz, aws_elasticache_cluster.jambonz, aws_rds_cluster.jambonz]
 
   tags = {
