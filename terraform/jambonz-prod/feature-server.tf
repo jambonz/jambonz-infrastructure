@@ -84,6 +84,7 @@ resource "aws_launch_configuration" "jambonz-feature-server" {
     AWS_SECRET_ACCESS_KEY   = var.aws_secret_access_key_runtime
     AWS_REGION              = var.region
     AWS_SNS_TOPIC_ARN       = aws_sns_topic.jambonz-sns-topic.arn
+    GCP_CREDENTIALS         = file("${path.module}/credentials/gcp.json")
   })
 
   lifecycle {

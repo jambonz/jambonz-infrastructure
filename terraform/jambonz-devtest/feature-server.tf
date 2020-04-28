@@ -3,19 +3,6 @@ resource "aws_sns_topic" "jambonz-sns-topic" {
   name = var.sns_topic
 }
 
-# create an IAM role that allows publishing to the SNS topic
-#data "aws_iam_policy_document" "jambonz_sns_publish" {
-#  statement {
-#    actions = [
-#      "sns:Publish"
-#    ]
-
-#    resources = [
-#      aws_sns_topic.jambonz-sns-topic.arn
-#    ]
-#  }
-#}
-
 resource "aws_iam_role" "jambonz_sns_publish" {
   name = "jambonz_sns_publish"
 
@@ -84,6 +71,7 @@ resource "aws_launch_configuration" "jambonz-feature-server" {
     AWS_SECRET_ACCESS_KEY   = var.aws_secret_access_key_runtime
     AWS_REGION              = var.region
     AWS_SNS_TOPIC_ARN       = aws_sns_topic.jambonz-sns-topic.arn
+    GCP_CREDENTIALS         = file("${path.module}/credentials/gcp.json")
   })
 
   lifecycle {

@@ -1,4 +1,9 @@
 #!/bin/bash
+PUBLIC_IP=`curl -s http://169.254.169.254/latest/meta-data/public-ipv4`
+echo "REACT_APP_API_BASE_URL=http://$PUBLIC_IP:3000/v1" > /home/admin/apps/jambonz-webapp/.env.local
+cd  /home/admin/apps/jambonz-webapp/
+sudo -u admin bash -c "npm run build"
+
 cat << EOF > /home/admin/apps/ecosystem.config.js
 module.exports = {
   apps : [
@@ -48,7 +53,7 @@ module.exports = {
       JAMBONES_INBOUND_ROUTE: '127.0.0.1:4002',
       JAMBONES_OUTBOUND_ROUTE: '127.0.0.1:4003',
       JAMBONZ_TAGGED_INBOUND: 1,
-      JAMBONES_NETWORK_CIDR: '${VPC_CIDR}',
+      JAMBONES_NETWORK_CIDR: '${VPC_CIDR}'
 		}
   },
   {
@@ -139,6 +144,22 @@ module.exports = {
       JAMBONES_CLUSTER_ID: '${JAMBONES_CLUSTER_ID}',
       MS_TEAMS_SIP_PROXY_IPS: '52.114.148.0, 52.114.132.46, 52.114.75.24, 52.114.76.76, 52.114.7.24, 52.114.14.70'
 		}
+  },
+  {
+    name: 'jambonz-webapp',
+    script: 'npm',
+    cwd: '/home/admin/apps/jambonz-webapp',
+    args: 'run serve'
   }]
 };
 EOF
+
+# create admin account
+JAMBONES_MYSQL_HOST=${JAMBONES_MYSQL_HOST} \
+JAMBONES_MYSQL_USER=${JAMBONES_MYSQL_USER} \
+JAMBONES_MYSQL_PASSWORD=${JAMBONES_MYSQL_PASSWORD} \
+JAMBONES_MYSQL_DATABASE=jambones /home/admin/apps/jambonz-api-server/db/reset_admin_password.js
+
+# restart everything because we've updated the ecosystem file
+sudo -u admin bash -c "pm2 delete /home/admin/apps/ecosystem.config.js"
+sudo -u admin bash -c "pm2 start /home/admin/apps/ecosystem.config.js"

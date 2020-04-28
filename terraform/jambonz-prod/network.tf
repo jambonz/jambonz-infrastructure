@@ -138,9 +138,17 @@ resource "aws_security_group" "allow_jambonz_sbc_sip" {
   }
 
   ingress {
-    description = "http"
+    description = "http api"
     from_port   = 3000
     to_port     = 3000
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    description = "http webapp"
+    from_port   = 3001
+    to_port     = 3001
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
