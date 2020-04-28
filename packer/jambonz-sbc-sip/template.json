@@ -70,6 +70,10 @@
     },
     {
       "type": "shell",
+      "script": "scripts/install_apiban.sh"
+    },
+    {
+      "type": "shell",
       "script": "scripts/install_nodejs.sh"
     },
     {
