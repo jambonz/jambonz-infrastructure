@@ -35,7 +35,7 @@ drachtio tag or branch to build
 ```
 
 ```
-"rtp_engine_version": "mr7.4.1.5",
+"rtp_engine_version": "mr8.3.1.4",
 ```
 rtpengine version
 
