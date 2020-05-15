@@ -1,10 +1,10 @@
 # create an SNS notification topic
 resource "aws_sns_topic" "jambonz-sns-topic" {
-  name = var.sns_topic
+  name = "${var.prefix}-fs-lifecycle-events"
 }
 
 resource "aws_iam_role" "jambonz_sns_publish" {
-  name = "jambonz_sns_publish"
+  name = "${var.prefix}_sns_publish"
 
   assume_role_policy = <<EOF
 {
@@ -81,7 +81,7 @@ resource "aws_launch_configuration" "jambonz-feature-server" {
 
 # create a placement group to spread feature server instances
 resource "aws_placement_group" "jambonz-feature-server" {
-  name = "jambonz-feature-server"
+  name = "${var.prefix}-feature-server"
   strategy = "spread"
 }
 
@@ -98,7 +98,7 @@ resource "aws_autoscaling_group" "jambonz-feature-server" {
   
   tag {
     key                 = "Name"
-    value               = "jambonz-feature-server"
+    value               = "${var.prefix}-feature-server"
     propagate_at_launch = true
   }
 

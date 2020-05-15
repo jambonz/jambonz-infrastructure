@@ -21,9 +21,17 @@ variable "ec2_instance_type" {
   description = "the EC2 instance type to use for the jambonz server"
   default = "t2.medium"
 }
+variable "prefix" {
+  description = "name of VPC and other identifiers - lower case letters only"
+  default = "jambonz"
+}
 variable "key_name" {
   description = "name of an aws keypair that you have downloaded and wish to use to access the jambonz instance via ssh"
   default = "your-key-here"
+}
+variable "ssh_key_path" {
+  description = "path to your aws keypair on your local machine"
+  default = "/path/to/key.pem"
 }
 variable "aws_access_key_id_runtime" {
   description = "AWS access key jambonz will use to access AWS Polly TTS"

@@ -12,7 +12,6 @@ It also creates an Elasticache redis instance and an Aurora serverless mysql dat
 
 There are several changes you will need to make before running the script.
 
-
 1.  This script creates a VPC in the us-west-2 region.  You may prefer to run in a different region: if so, edit the variables.tf file accordingly.
 
 2.  If you _do_ want to run in a different region, you need to make sure the 3 AMIs that the terraform script deploys are available in your preferred region. That means either you run the packer scripts yourself and create the AMIs, or you contact me and ask me to copy the AMIs into your preferred region.  If you create the AMIs yourself you will need to change the "owner" attribute in the ami filter in jambonz.tf to your own aws id.

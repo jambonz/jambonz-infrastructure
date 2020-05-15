@@ -8,7 +8,7 @@ resource "aws_vpc" "jambonz" {
   cidr_block = var.vpc_cidr_block
 
   tags = {
-    Name = "jambonz"
+    Name = var.prefix
   }
 }
 
@@ -17,7 +17,7 @@ resource "aws_internet_gateway" "jambonz" {
   vpc_id = aws_vpc.jambonz.id
 
   tags = {
-    Name = "jambonz"
+    Name = var.prefix
   }
 }
 
@@ -32,7 +32,7 @@ resource "aws_default_route_table" "jambonz" {
   }
 
   tags = {
-    Name = "jambonz default route table"
+    Name = "${var.prefix} default route table"
   }
 }
 
@@ -45,7 +45,7 @@ resource "aws_subnet" "jambonz" {
   cidr_block        = each.value
 
   tags = {
-    Name = "jambonz"
+    Name = var.prefix
   }
 }
 
@@ -77,7 +77,7 @@ resource "aws_security_group" "allow_redis" {
   }
 
   tags = {
-    Name = "allow_redis"
+    Name = "${var.prefix}_allow_redis"
   }
 }
 
@@ -103,7 +103,7 @@ resource "aws_security_group" "allow_mysql" {
   }
 
   tags = {
-    Name = "allow_mysql"
+    Name = "${var.prefix}_allow_mysql"
   }
 }
 
@@ -178,7 +178,7 @@ resource "aws_security_group" "allow_jambonz_sbc_sip_rtp" {
   }
 
   tags = {
-    Name = "allow_jambonz_sbc_sip"
+    Name = "allow_${var.prefix}_sbc_sip"
   }
 }
 
@@ -260,7 +260,7 @@ resource "aws_security_group" "allow_jambonz_feature_server" {
   }
 
   tags = {
-    Name = "allow_jambonz_feature_server"
+    Name = "allow_${var.prefix}_feature_server"
   }
 }
 
