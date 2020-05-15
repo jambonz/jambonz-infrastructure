@@ -48,7 +48,7 @@ resource "null_resource" "seed" {
   connection {
     type      = "ssh"
     user      = "admin"
-    private_key = file("~/aws/aws-dhorton-paris.pem")
+    private_key = file("${var.ssh_key_path}")
     host      = element(aws_eip.jambonz-sbc-sip-rtp.*.public_ip, 0)
   }
 
