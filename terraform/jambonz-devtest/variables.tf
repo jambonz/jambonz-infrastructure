@@ -1,3 +1,7 @@
+variable "prefix" {
+  description = "name of VPC and other identifiers - lower case letters only"
+  default = "jambonz"
+}
 variable "region" {
   description = "the aws region in which to create the VPC"
   default = "us-west-2"
@@ -20,10 +24,6 @@ variable "jambonz_sbc_sip_rtp_private_ips" {
 variable "ec2_instance_type" {
   description = "the EC2 instance type to use for the jambonz server"
   default = "t2.medium"
-}
-variable "prefix" {
-  description = "name of VPC and other identifiers - lower case letters only"
-  default = "jambonz"
 }
 variable "key_name" {
   description = "name of an aws keypair that you have downloaded and wish to use to access the jambonz instance via ssh"

@@ -1,51 +1,78 @@
 # terraform for a jambonz development / test system
 
-This terraform configuration generates a jambonz deployment consisting of one SBC server and an autoscale group of feature servers (initially containing a single feature server), and an SNS notification topic to signal lifecycle events when a feature server is terminating due to a scale-in operation.  Feel free to edit the autoscale group parameters in the AWS console or cli once it has been created.
+This terraform configuration generates a jambonz deployment suitable for testing or trial deployments.
 
-The SBC server is assigned an elastic IP.
+The deployment generated consists of:
 
-### databases
+- a VPC along with public subnets, internet gateway, routing table and the like.
+- 2 EC2 instances: 1 SBC and 1 feature server (the SBC is assigned an elastic IP)
+- an autoscale group containing the feature server
+- an SNS topic that is used to notify autoscale lifecycle events to the feature server
+- an aurora mysql serverless database
+- an elasticache redis server
 
-It also creates an Elasticache redis instance and an Aurora serverless mysql database, along with the necessary security groups.
+## Running the script
 
-## Before running the terraform script
+### Prerequisites
 
-There are several changes you will need to make before running the script.
+Before running the terraform script you will need to have done the following:
 
-1.  This script creates a VPC in the us-west-2 region.  You may prefer to run in a different region: if so, edit the variables.tf file accordingly.
+1. Provisioned accounts on AWS and GCP
+1. (AWS) Created a keypair in your target region and downloaded the .pem file to your local machine.
+1. (AWS) Generated an access key id and secret access key
+1. (GCP) Created a project, enabled both text to speech and speech to text APIs, created a service account for the project and downloaded the json key file for the service account.
+1. Copied the the GCP json key file into the `credentials\` folder in your local copy of this project.
+1. Reviewed and edited the [variables.tf](./variables.tf) file in your local copy of this project to specify your desired AWS region, availability zones, EC2 instance type, and your AWS keys (alternatively, these can be specified on the command line when running the script).
 
-2.  If you _do_ want to run in a different region, you need to make sure the 3 AMIs that the terraform script deploys are available in your preferred region. That means either you run the packer scripts yourself and create the AMIs, or you contact me and ask me to copy the AMIs into your preferred region.  If you create the AMIs yourself you will need to change the "owner" attribute in the ami filter in jambonz.tf to your own aws id.
+### It's go time!
 
-3.  You will need to download a json service key file from google cloud in order to use the speech services.  Copy that file into the credentials folder in this project with the name gcp.json before you run terraform, since that is where the terraform script expects to find it and what it expects to be named.
+After [installing terraform](https://learn.hashicorp.com/terraform/getting-started/install.html) install the dependencies on your local machine:
 
-4.  Also create an AWS access key id and secret access key in order to use AWS polly.  Either provide these in the variables.tf file or override on the command line.
-
-In general, feel free to customize the terraform scripts to your needs.  They are documented and fairly self-explanatory.
-
-## Running the terraform script
-
-Please review and edit the [variables.tf](./variables.tf) file as appropriate, given the suggestions above.  
-
-Then install the depedencies:
 ```
 terraform init
 ```
 
-If you've made changes to the script, test it out:
+Testing out the script is a good idea, particularly if you've made changes:
 ```
 terraform plan
 ```
 
-When you are ready to run it, do terraform apply, optionally passing any command-line arguments that you want to override variables.tf:
+When you are ready to run it, do terraform apply, optionally passing any command-line arguments that you want to override variables.tf.
+
+So, if you edit variables.tf to put in your selections:
+
 ```
-terraform apply -var='key_name=aws-dhorton-key' \
--var 'aws_access_key_id_runtime=KASYJH6IPHQPOLMVLWID' \
--var 'aws_secret_access_key_runtime=WkjfaufgzHSHDYKQ+/+1tMPO4/DM9ADWO+asdfasdf'
+terraform apply 
 ```
 
-(Note: those are not valid keys of course, just for explanatory purposes).
+or, if you prefer command-line arguments, you might do:
 
-If you want to destroy the resources created, then:
 ```
-terraform destroy
+terraform apply 
+-var='region=eu-west-3' \
+-var='public_subnets={"eu-west-3a": "172.31.32.0/24", "eu-west-3b": "172.31.33.0/24"}' \
+-var='aws_access_key_id_runtime=XXXX' \
+-var='aws_secret_access_key_runtime=YYYYY' \
+-var='ssh_key_path=~/aws/aws-dhorton-paris.pem' \
+-var='key_name=aws-dhorton-paris'
 ```
+
+Enter 'yes' at the confirmation prompt, and very shortly you will be the proud owner of a brand-new jambonz cluster!
+
+(Note: to destroy the cluster, simply run `terraform destroy`).
+
+### Next steps
+
+After creating the cluster, get the elastic IP of your SBC server and navigate to:
+
+```
+http://your-elastic-ip:3001
+```
+ in your web browser to bring up the provisioning GUI.  
+ 
+ Log in with admin/admin.
+ 
+ You'll be asked to change the password and then walked through a simple configuration of your account, applications, sip trunks and phone numbers.  
+ 
+ Once done, you are ready to test!
+

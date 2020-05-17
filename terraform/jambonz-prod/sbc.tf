@@ -35,7 +35,7 @@ resource "aws_instance" "jambonz-sbc-sip-server" {
   depends_on = [aws_internet_gateway.jambonz, aws_elasticache_cluster.jambonz, aws_rds_cluster.jambonz]
 
   tags = {
-    Name = "jambonz-sbc-sip-server"  
+    Name = "${var.prefix}-sbc-sip-server"  
   }
 }
 
@@ -65,7 +65,7 @@ resource "aws_instance" "jambonz-sbc-rtp-server" {
   depends_on = [aws_internet_gateway.jambonz]
 
   tags = {
-    Name = "jambonz-sbc-rtp-server"  
+    Name = "${var.prefix}-sbc-rtp-server"  
   }
 }
 
@@ -77,6 +77,7 @@ resource "null_resource" "seed" {
   connection {
     type      = "ssh"
     user      = "admin"
+    private_key = file("${var.ssh_key_path}")
     host      = element(aws_eip.jambonz-sbc-sip.*.public_ip, 0)
   }
 

@@ -1,12 +1,12 @@
 # create a subnet group for aurora mysql
 resource "aws_db_subnet_group" "jambonz" {
-  name       = "jambonz-mysql-subnet"
+  name       = "${var.prefix}-mysql-subnet"
   subnet_ids = local.my_subnet_ids
 }
 
 # create aurora database
 resource "aws_rds_cluster" "jambonz" {
-  cluster_identifier      = "aurora-cluster-jambonz"
+  cluster_identifier      = "aurora-cluster-${var.prefix}"
   engine                  = "aurora"
   engine_version          = "5.6.10a"
   engine_mode             = "serverless"
@@ -36,7 +36,7 @@ resource "aws_elasticache_subnet_group" "jambonz" {
 resource "aws_elasticache_cluster" "jambonz" {
   cluster_id           = "jambonz"
   engine               = "redis"
-  node_type            = "cache.t2.micro"
+  node_type            = "cache.t2.medium"
   num_cache_nodes      = 1
   subnet_group_name    = "jambonz-cache-subnet"
   security_group_ids   = [aws_security_group.allow_redis.id]
