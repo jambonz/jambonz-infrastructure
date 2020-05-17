@@ -27,7 +27,7 @@ variable "jambonz_sbc_rtp_private_ips" {
 }
 variable "ec2_instance_type" {
   description = "the EC2 instance type to use for the jambonz servers"
-  default = "c5n.large"
+  default = "t2.medium"
 }
 variable "key_name" {
   description = "name of an aws keypair that you have downloaded and wish to use to access the jambonz instance via ssh"
