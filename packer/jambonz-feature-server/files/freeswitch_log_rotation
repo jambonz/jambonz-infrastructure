@@ -7,7 +7,7 @@
 #  <param name="rollover" value="0"/>
 
 #number of days of logs to keep
-NUMBERDAYS=30
+NUMBERDAYS=5
 FSPATH=/usr/local/freeswitch/
 
 $FSPATH/bin/fs_cli -x "fsctl send_sighup" |grep '+OK' >/tmp/rotateFSlogs

@@ -3,9 +3,9 @@
     "region": "us-east-1",
     "ssh_username": "admin",
     "ami_description": "jambonz SBC SIP+RTP", 
-    "drachtio_version": "v0.8.4",
+    "drachtio_version": "v0.8.5",
     "instance_type": "t2.medium",
-    "rtp_engine_version": "mr8.3.1.4",
+    "rtp_engine_version": "mr8.4.1.1",
     "rtp_engine_min_port": "40000",
     "rtp_engine_max_port": "60000"
 
