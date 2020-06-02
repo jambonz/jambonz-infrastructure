@@ -4,7 +4,8 @@
     "ssh_username": "admin",
     "ami_description": "jambonz SBC SIP", 
     "instance_type": "t2.medium",
-    "drachtio_version": "v0.8.5"
+    "drachtio_version": "v0.8.5",
+    "jambonz_version": "master"
   },
   "builders": [{
     "type": "amazon-ebs",
@@ -70,6 +71,10 @@
     },
     {
       "type": "shell",
+      "script": "scripts/install_datadog.sh"
+    },
+    {
+      "type": "shell",
       "script": "scripts/install_apiban.sh"
     },
     {
@@ -83,6 +88,7 @@
     },
     {
       "type": "shell",
+      "execute_command": "chmod +x {{ .Path }}; sudo '{{ .Path }}' {{user `jambonz_version`}}",
       "script": "scripts/install_app.sh"
     },
     {

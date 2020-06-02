@@ -4,7 +4,8 @@
     "ssh_username": "admin",
     "ami_description": "jambonz feature server", 
     "instance_type": "t2.medium",
-    "drachtio_version": "v0.8.5"
+    "drachtio_version": "v0.8.5",
+    "jambonz_version": "master"
   },
   "builders": [{
     "type": "amazon-ebs",
@@ -48,7 +49,7 @@
       "inline": [
         "while [ ! -f /var/lib/cloud/instance/boot-finished ]; do echo 'Waiting for cloud-init...'; sleep 1; done",
         "sudo apt-get update",
-        "sudo apt-get -y install python gcc g++ make cmake build-essential git autoconf automake mysql-client redis-tools \\",
+        "sudo apt-get -y install python lsof gcc g++ make cmake build-essential git autoconf automake mysql-client redis-tools \\",
         "curl telnet libtool libtool-bin libssl-dev libcurl4-openssl-dev libz-dev systemd-coredump liblz4-tool \\",
         "iptables-dev libavformat-dev liblua5.1-0-dev libavfilter-dev libavcodec-dev libswresample-dev \\",
         "libevent-dev libpcap-dev libxmlrpc-core-c3-dev markdown libjson-glib-dev lsb-release \\",
@@ -70,6 +71,10 @@
     },
     {
       "type": "shell",
+      "script": "scripts/install_datadog.sh"
+    },
+    {
+      "type": "shell",
       "script": "scripts/install_nodejs.sh"
     },
     {
@@ -83,6 +88,7 @@
     },
     {
       "type": "shell",
+      "execute_command": "chmod +x {{ .Path }}; sudo '{{ .Path }}' {{user `jambonz_version`}}",
       "script": "scripts/install_app.sh"
     }
   ]

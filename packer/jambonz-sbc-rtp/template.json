@@ -50,7 +50,7 @@
       "inline": [
         "while [ ! -f /var/lib/cloud/instance/boot-finished ]; do echo 'Waiting for cloud-init...'; sleep 1; done",
         "sudo apt-get update",
-        "sudo apt-get -y install python gcc g++ make cmake build-essential git autoconf automake mysql-client redis-tools \\",
+        "sudo apt-get -y install python lsof gcc g++ make cmake build-essential git autoconf automake mysql-client redis-tools \\",
         "curl telnet libtool libtool-bin libssl-dev libcurl4-openssl-dev libz-dev systemd-coredump liblz4-tool \\",
         "iptables-dev libavformat-dev liblua5.1-0-dev libavfilter-dev libavcodec-dev libswresample-dev \\",
         "libevent-dev libpcap-dev libxmlrpc-core-c3-dev markdown libjson-glib-dev lsb-release \\",
@@ -69,6 +69,10 @@
     {
       "type": "shell",
       "script": "scripts/install_chrony.sh"
+    },
+    {
+      "type": "shell",
+      "script": "scripts/install_datadog.sh"
     },
     {
       "type": "shell",
