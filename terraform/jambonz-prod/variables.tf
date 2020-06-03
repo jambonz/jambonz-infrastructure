@@ -57,3 +57,15 @@ variable "cluster_id" {
   description = "short cluster identifier"
   default = "jb"
 }
+variable "datadog_api_key" {
+  description = "datadog api key - only supply if you wish to install datadog monitoring"
+  default = ""
+}
+variable "datadog_site" {
+  description = "datadog site"
+  default = "datadoghq.com"
+}
+variable "datadog_env_name" {
+  description = "environment identifier"
+  default = "prod"
+}

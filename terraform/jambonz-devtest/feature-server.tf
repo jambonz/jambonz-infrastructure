@@ -71,9 +71,9 @@ resource "aws_launch_configuration" "jambonz-feature-server" {
     AWS_SECRET_ACCESS_KEY   = var.aws_secret_access_key_runtime
     AWS_REGION              = var.region
     AWS_SNS_TOPIC_ARN       = aws_sns_topic.jambonz_sns_topic.arn
-    GCP_CREDENTIALS         = file("${path.module}/credentials/gcp.json"),
-    DATADOG_API_KEY         = var.datadog_api_key,
-    DATADOG_SITE            = var.datadog_site,
+    GCP_CREDENTIALS         = file("${path.module}/credentials/gcp.json")
+    DATADOG_API_KEY         = var.datadog_api_key
+    DATADOG_SITE            = var.datadog_site
     DATADOG_ENV_NAME         = var.datadog_env_name
   })
 
