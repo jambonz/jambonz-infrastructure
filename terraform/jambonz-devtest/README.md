@@ -48,7 +48,7 @@ terraform apply
 or, if you prefer command-line arguments, you might do:
 
 ```
-terraform apply 
+terraform apply \
 -var='region=eu-west-3' \
 -var='public_subnets={"eu-west-3a": "172.31.32.0/24", "eu-west-3b": "172.31.33.0/24"}' \
 -var='aws_access_key_id_runtime=XXXX' \

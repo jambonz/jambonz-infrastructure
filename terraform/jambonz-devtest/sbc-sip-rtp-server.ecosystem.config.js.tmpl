@@ -1,9 +1,19 @@
 #!/bin/bash
 PUBLIC_IP=`curl -s http://169.254.169.254/latest/meta-data/public-ipv4`
+ENABLE_DATADOG_METRICS=0
+if [ "${DATADOG_API_KEY}" ] ; then
+  ENABLE_DATADOG_METRICS=1
+fi
+
+echo "running jambonz user data script"
+
+# jambonz webapp
+echo "building webapp.."
 echo "REACT_APP_API_BASE_URL=http://$PUBLIC_IP:3000/v1" > /home/admin/apps/jambonz-webapp/.env.local
 cd  /home/admin/apps/jambonz-webapp/
-sudo -u admin bash -c "npm run build"
+npm run build
 
+echo "writing /home/admin/apps/ecosystem.config.js.."
 cat << EOF > /home/admin/apps/ecosystem.config.js
 module.exports = {
   apps : [
@@ -70,7 +80,7 @@ module.exports = {
     max_memory_restart: '1G',
     env: {
       NODE_ENV: 'production',
-      ENABLE_DATADOG_METRICS: 0,
+      ENABLE_DATADOG_METRICS: $ENABLE_DATADOG_METRICS,
       JAMBONES_LOGLEVEL: 'info',
       DRACHTIO_HOST: '127.0.0.1',
       DRACHTIO_PORT: 9022,
@@ -99,7 +109,7 @@ module.exports = {
     env: {
       NODE_ENV: 'production',
       JAMBONES_LOGLEVEL: 'info',
-      ENABLE_DATADOG_METRICS: 0,
+      ENABLE_DATADOG_METRICS: $ENABLE_DATADOG_METRICS,
       DRACHTIO_HOST: '127.0.0.1',
       DRACHTIO_PORT: 9022,
       DRACHTIO_SECRET: 'cymru',
@@ -129,7 +139,7 @@ module.exports = {
     env: {
       NODE_ENV: 'production',
       JAMBONES_LOGLEVEL: 'info',
-      ENABLE_DATADOG_METRICS: 0,
+      ENABLE_DATADOG_METRICS: $ENABLE_DATADOG_METRICS,
       DRACHTIO_HOST: '127.0.0.1',
       DRACHTIO_PORT: 9022,
       DRACHTIO_SECRET: 'cymru',
@@ -154,12 +164,29 @@ module.exports = {
 };
 EOF
 
-# create admin account
-JAMBONES_MYSQL_HOST=${JAMBONES_MYSQL_HOST} \
-JAMBONES_MYSQL_USER=${JAMBONES_MYSQL_USER} \
-JAMBONES_MYSQL_PASSWORD=${JAMBONES_MYSQL_PASSWORD} \
-JAMBONES_MYSQL_DATABASE=jambones /home/admin/apps/jambonz-api-server/db/reset_admin_password.js
+echo "finished writing config file"
 
 # restart everything because we've updated the ecosystem file
 sudo -u admin bash -c "pm2 delete /home/admin/apps/ecosystem.config.js"
 sudo -u admin bash -c "pm2 start /home/admin/apps/ecosystem.config.js"
+
+# install datadog if a datadog api key was provided
+if [ "${DATADOG_API_KEY}" ] ; then
+  echo "installing datadog.."
+
+  sed -i -e 's@^api_key:.*@'"api_key: ${DATADOG_API_KEY}"'@g' /etc/datadog-agent/datadog.yaml
+  sed -i -e 's@^# site:.*@'"site: ${DATADOG_SITE}"'@g' /etc/datadog-agent/datadog.yaml
+  sed -i -e 's@^# log_level:.*@log_level: warning@g' /etc/datadog-agent/datadog.yaml
+
+  tee -a /etc/datadog-agent/datadog.yaml > /dev/null <<EOT
+tags:
+  env_name:${DATADOG_ENV_NAME}
+  role:sbc
+EOT
+
+  systemctl enable datadog-agent
+  systemctl start datadog-agent
+  
+fi
+
+echo "user data script completed"

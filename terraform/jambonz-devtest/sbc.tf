@@ -27,7 +27,10 @@ resource "aws_instance" "jambonz-sbc-sip-rtp-server" {
     JAMBONES_MYSQL_PASSWORD = aws_rds_cluster.jambonz.master_password
     JAMBONES_REDIS_HOST     = aws_elasticache_cluster.jambonz.cache_nodes.0.address
     MS_TEAMS_FQDN           = var.ms_teams_fqdn
-    JAMBONES_CLUSTER_ID     = var.cluster_id
+    JAMBONES_CLUSTER_ID     = var.cluster_id,
+    DATADOG_API_KEY         = var.datadog_api_key,
+    DATADOG_SITE            = var.datadog_site,
+    DATADOG_ENV_NAME        = var.datadog_env_name
   })
   key_name               = var.key_name
   monitoring             = true
@@ -56,7 +59,8 @@ resource "null_resource" "seed" {
     inline = [
       "mysql -h ${aws_rds_cluster.jambonz.endpoint} -u admin -D jambones -pJambonzR0ck$ < /home/admin/apps/jambonz-api-server/db/jambones-sql.sql",
       "mysql -h ${aws_rds_cluster.jambonz.endpoint} -u admin -D jambones -pJambonzR0ck$ < /home/admin/apps/jambonz-api-server/db/create-admin-token.sql",
-      "mysql -h ${aws_rds_cluster.jambonz.endpoint} -u admin -D jambones -pJambonzR0ck$ < /home/admin/apps/jambonz-api-server/db/create-default-account.sql"
+      "mysql -h ${aws_rds_cluster.jambonz.endpoint} -u admin -D jambones -pJambonzR0ck$ < /home/admin/apps/jambonz-api-server/db/create-default-account.sql",
+      "JAMBONES_MYSQL_HOST=${aws_rds_cluster.jambonz.endpoint} JAMBONES_MYSQL_USER=admin JAMBONES_MYSQL_PASSWORD=JambonzR0ck$ JAMBONES_MYSQL_DATABASE=jambones /home/admin/apps/jambonz-api-server/db/reset_admin_password.js"
     ]
   }
 

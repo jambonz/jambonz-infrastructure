@@ -1,5 +1,5 @@
 # create an SNS notification topic
-resource "aws_sns_topic" "jambonz-sns-topic" {
+resource "aws_sns_topic" "jambonz_sns_topic" {
   name = "${var.prefix}-fs-lifecycle-events"
 }
 
@@ -70,8 +70,11 @@ resource "aws_launch_configuration" "jambonz-feature-server" {
     AWS_ACCESS_KEY_ID       = var.aws_access_key_id_runtime
     AWS_SECRET_ACCESS_KEY   = var.aws_secret_access_key_runtime
     AWS_REGION              = var.region
-    AWS_SNS_TOPIC_ARN       = aws_sns_topic.jambonz-sns-topic.arn
-    GCP_CREDENTIALS         = file("${path.module}/credentials/gcp.json")
+    AWS_SNS_TOPIC_ARN       = aws_sns_topic.jambonz_sns_topic.arn
+    GCP_CREDENTIALS         = file("${path.module}/credentials/gcp.json"),
+    DATADOG_API_KEY         = var.datadog_api_key,
+    DATADOG_SITE            = var.datadog_site,
+    DATADOG_ENV_NAME         = var.datadog_env_name
   })
 
   lifecycle {
@@ -105,6 +108,9 @@ resource "aws_autoscaling_group" "jambonz-feature-server" {
   lifecycle {
     create_before_destroy = true
   }
+
+  depends_on = [aws_sns_topic.jambonz_sns_topic]
+
 }
 
 # create lifecycle hooks
@@ -114,6 +120,9 @@ resource "aws_autoscaling_lifecycle_hook" "jambonz-scale-in" {
   default_result         = "CONTINUE"
   heartbeat_timeout      = 900
   lifecycle_transition   = "autoscaling:EC2_INSTANCE_TERMINATING"
-  notification_target_arn = aws_sns_topic.jambonz-sns-topic.arn
+  notification_target_arn = aws_sns_topic.jambonz_sns_topic.arn
   role_arn                = aws_iam_role.jambonz_sns_publish.arn
+
+  depends_on = [aws_sns_topic.jambonz_sns_topic]
+
 }
