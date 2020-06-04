@@ -1,6 +1,6 @@
 # create an SNS notification topic
 resource "aws_sns_topic" "jambonz_sns_topic" {
-  name = "${var.prefix}-fs-lifecycle-events"
+#  name = "${var.prefix}-fs-lifecycle-events"
 }
 
 resource "aws_iam_role" "jambonz_sns_publish" {
@@ -41,7 +41,7 @@ resource "aws_iam_policy" "allow_jambonz_sns_publish" {
 EOF
 }
 
-resource "aws_iam_role_policy_attachment" "sns-publish-policy-attachment" {
+resource "aws_iam_role_policy_attachment" "sns_publish_policy_attachment" {
     role = aws_iam_role.jambonz_sns_publish.name
     policy_arn = aws_iam_policy.allow_jambonz_sns_publish.arn
 }
@@ -122,7 +122,4 @@ resource "aws_autoscaling_lifecycle_hook" "jambonz-scale-in" {
   lifecycle_transition   = "autoscaling:EC2_INSTANCE_TERMINATING"
   notification_target_arn = aws_sns_topic.jambonz_sns_topic.arn
   role_arn                = aws_iam_role.jambonz_sns_publish.arn
-
-  depends_on = [aws_sns_topic.jambonz_sns_topic]
-
 }
