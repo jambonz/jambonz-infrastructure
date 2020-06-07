@@ -57,8 +57,10 @@ EOF
 
 echo "finished writing config file"
 
-sudo -u admin bash -c "pm2 delete /home/admin/apps/ecosystem.config.js"
 sudo -u admin bash -c "pm2 start /home/admin/apps/ecosystem.config.js"
+sudo env PATH=$PATH:/usr/bin /usr/lib/node_modules/pm2/bin/pm2 startup systemd -u admin --hp /home/admin
+sudo -u admin bash -c "pm2 save"
+sudo systemctl enable pm2-admin.service
 
 # install datadog if a datadog api key was provided
 if [ "${DATADOG_API_KEY}" ] ; then
