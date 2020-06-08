@@ -40,7 +40,7 @@
       "Name": "jambonz-feature-server"
     },
     "run_tags": {
-      "Name": "jambonz-feature-server"
+      "Name": "jambonz-feature-server-build"
     }
   }],
   "provisioners": [

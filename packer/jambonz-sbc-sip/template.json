@@ -40,7 +40,7 @@
       "Name": "jambonz-sbc-sip"
     },
     "run_tags": {
-      "Name": "jambonz-sbc-sip"
+      "Name": "jambonz-sbc-sip-build"
     }
   }],
   "provisioners": [

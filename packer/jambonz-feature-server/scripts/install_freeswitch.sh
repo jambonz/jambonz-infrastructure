@@ -24,7 +24,7 @@ sudo mkdir -p build && cd build && sudo cmake .. -DCMAKE_BUILD_TYPE=RelWithDebIn
 
 # build libfvad
 cd /usr/local/src/libfvad
-sudo autoreconf -i && sudo ./configure && sudo make && sudo make install
+sudo autoreconf -i && sudo ./configure && sudo make -j 4 && sudo make install
 
 # patch freeswitch
 # basic patches
@@ -60,7 +60,7 @@ cd grpc
 git submodule update --init --recursive
 cd third_party/protobuf && ./autogen.sh && ./configure && sudo make install
 cd /usr/local/src/grpc
-export LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH && make && sudo make install 
+export LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH && make -j 4 && sudo make install 
 
 # checkout and build googleapis
 echo "building googleapis"
@@ -68,14 +68,14 @@ cd /usr/local/src/freeswitch/libs
 git clone https://github.com/davehorton/googleapis -b dialogflow-v2-support
 cd googleapis
 git submodule update --init --recursive
-LANGUAGE=cpp make
+LANGUAGE=cpp make -j 4
 
 # build freeswitch
 echo "building freeswitch"
 cd /usr/local/src/freeswitch
 sudo ./bootstrap.sh -j
 sudo ./configure --with-lws=yes --with-grpc=yes
-sudo make
+sudo make -j 4
 sudo make install
 sudo make cd-sounds-install cd-moh-install
 sudo cp /tmp/acl.conf.xml /usr/local/freeswitch/conf/autoload_configs
@@ -96,8 +96,3 @@ sudo systemctl enable freeswitch
 sudo cp /tmp/freeswitch_log_rotation /etc/cron.daily/freeswitch_log_rotation
 sudo chown root:root /etc/cron.daily/freeswitch_log_rotation
 sudo chmod a+x /etc/cron.daily/freeswitch_log_rotation
-
-
-
-
-

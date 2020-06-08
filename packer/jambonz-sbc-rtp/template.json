@@ -41,7 +41,7 @@
       "Name": "jambonz-sbc-rtp"
     },
     "run_tags": {
-      "Name": "jambonz-sbc-rtp"
+      "Name": "jambonz-sbc-rtp-build"
     }
   }],
   "provisioners": [

@@ -139,9 +139,9 @@ resource "aws_security_group" "allow_jambonz_sbc_sip" {
 
   ingress {
     description = "sip tls for teams"
-    from_port   = 5060
-    to_port     = 5060
-    protocol    = "udp"
+    from_port   = 5061
+    to_port     = 5061
+    protocol    = "tcp"
     cidr_blocks = ["52.114.148.0/32", "52.114.132.46/32", "52.114.75.24/32", "52.114.76.76/32", "52.114.7.24/32", "52.114.14.70/32"]
   }
 

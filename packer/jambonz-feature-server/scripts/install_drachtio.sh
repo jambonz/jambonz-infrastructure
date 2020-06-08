@@ -8,7 +8,7 @@ cd /usr/local/src
 git clone https://github.com/davehorton/drachtio-server.git -b ${VERSION}
 cd drachtio-server
 git submodule update --init --recursive
-./autogen.sh && mkdir -p build && cd $_ && ../configure CPPFLAGS='-DNDEBUG' && make && sudo make install
+./autogen.sh && mkdir -p build && cd $_ && ../configure CPPFLAGS='-DNDEBUG' && make -j 4 && sudo make install
 sudo mv /tmp/drachtio.conf.xml /etc
 sudo mv /tmp/drachtio.service /etc/systemd/system
 sudo mv /tmp/vimrc.local /etc/vim/vimrc.local
