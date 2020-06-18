@@ -4,7 +4,7 @@
     "ssh_username": "admin",
     "ami_description": "jambonz feature server", 
     "instance_type": "t2.medium",
-    "drachtio_version": "v0.8.5",
+    "drachtio_version": "develop",
     "jambonz_version": "master"
   },
   "builders": [{
