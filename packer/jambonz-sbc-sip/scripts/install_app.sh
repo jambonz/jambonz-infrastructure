@@ -9,7 +9,6 @@ cd apps
 git clone https://github.com/jambonz/sbc-outbound.git -b ${VERSION}
 git clone https://github.com/jambonz/sbc-inbound.git -b ${VERSION}
 git clone https://github.com/jambonz/sbc-registrar.git -b ${VERSION}
-git clone https://github.com/jambonz/sbc-api-server.git -b ${VERSION}
 git clone https://github.com/jambonz/sbc-call-router.git -b ${VERSION}
 git clone https://github.com/jambonz/jambonz-api-server.git -b ${VERSION}
 git clone https://github.com/jambonz/jambonz-webapp.git -b ${VERSION}
