@@ -177,7 +177,7 @@ if [ "${DATADOG_API_KEY}" ] ; then
 
   sed -i -e 's@^api_key:.*@'"api_key: ${DATADOG_API_KEY}"'@g' /etc/datadog-agent/datadog.yaml
   sed -i -e 's@^# site:.*@'"site: ${DATADOG_SITE}"'@g' /etc/datadog-agent/datadog.yaml
-  sed -i -e 's@^# log_level:.*@log_level: warning@g' /etc/datadog-agent/datadog.yaml
+  sed -i -e 's@^# log_level:.*@log_level: warn@g' /etc/datadog-agent/datadog.yaml
 
   tee -a /etc/datadog-agent/datadog.yaml > /dev/null <<EOT
 tags:
