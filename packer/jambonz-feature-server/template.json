@@ -3,7 +3,7 @@
     "region": "us-east-1",
     "ssh_username": "admin",
     "ami_description": "jambonz feature server", 
-    "instance_type": "t2.medium",
+    "instance_type": "t2.xlarge",
     "drachtio_version": "develop",
     "jambonz_version": "master"
   },
