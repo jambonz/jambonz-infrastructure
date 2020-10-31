@@ -35,11 +35,11 @@ variable "ssh_key_path" {
 }
 variable "aws_access_key_id_runtime" {
   description = "AWS access key jambonz will use to access AWS Polly TTS"
-  default = "AKIAJH6IPHQPOLMVLVWQ"
+  default = "your key"
 }
 variable "aws_secret_access_key_runtime" {
   description = "AWS secret access key jambonz will use to access AWS Polly TTS"
-  default = "WycWsihQzDY2KQ+/+1tMPO4/DM9ADWOd86+kC5DC"
+  default = "your secret access key"
 }
 variable "sns_topic" {
   description = "AWS SNS topic for autoscale events"
@@ -56,7 +56,7 @@ variable "cluster_id" {
 
 variable "datadog_api_key" {
   description = "datadog api key - only supply if you wish to install datadog monitoring"
-  default = "88e5d83b6a857cc5dca140b432df583f"
+  default = "your dd key"
 }
 variable "datadog_site" {
   description = "datadog site"
