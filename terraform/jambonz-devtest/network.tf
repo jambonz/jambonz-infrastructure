@@ -107,89 +107,6 @@ resource "aws_security_group" "allow_mysql" {
   }
 }
 
-# create a security group to allow sip, rtp and http to the sbc sip+rtp server
-resource "aws_security_group" "allow_jambonz_sbc_sip_rtp" {
-  name        = "allow_jambonz_sbc_sip_rtp"
-  description = "Allow traffic to jambonz sbc sip rtp server"
-  vpc_id      = aws_vpc.jambonz.id
-
-  ingress {
-    description = "ssh"
-    from_port   = 22
-    to_port     = 22
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  ingress {
-    description = "sip from everywhere"
-    from_port   = 5060
-    to_port     = 5060
-    protocol    = "udp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  ingress {
-    description = "sip tls for teams"
-    from_port   = 5061
-    to_port     = 5061
-    protocol    = "tcp"
-    cidr_blocks = ["52.114.148.0/32", "52.114.132.46/32", "52.114.75.24/32", "52.114.76.76/32", "52.114.7.24/32", "52.114.14.70/32"]
-  }
-
-  ingress {
-    description = "sip from everywhere"
-    from_port   = 5060
-    to_port     = 5060
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  ingress {
-    description = "rtp from everywhere"
-    from_port   = 40000
-    to_port     = 60000
-    protocol    = "udp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  ingress {
-    description = "rtpengine ng protocol from VPC"
-    from_port   = 22222
-    to_port     = 22222
-    protocol    = "udp"
-    cidr_blocks = [aws_vpc.jambonz.cidr_block]
-  }
-
-
-  ingress {
-    description = "http api"
-    from_port   = 3000
-    to_port     = 3000
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  ingress {
-    description = "http webapp"
-    from_port   = 3001
-    to_port     = 3001
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  tags = {
-    Name = "allow_${var.prefix}_sbc_sip"
-  }
-}
-
 # create a security group to allow ssh to feature server
 resource "aws_security_group" "allow_jambonz_feature_server" {
   name        = "allow_jambonz_feature_server"
@@ -271,4 +188,96 @@ resource "aws_security_group" "allow_jambonz_feature_server" {
     Name = "allow_${var.prefix}_feature_server"
   }
 }
+
+# create a security group to allow sip, rtp and http to the sbc sip+rtp server
+resource "aws_security_group" "allow_jambonz_sbc_sip_rtp" {
+  name        = "allow_jambonz_sbc_sip_rtp"
+  description = "Allow traffic to jambonz sbc sip rtp server"
+  vpc_id      = aws_vpc.jambonz.id
+
+  ingress {
+    description = "ssh"
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    description = "sip from everywhere"
+    from_port   = 5060
+    to_port     = 5060
+    protocol    = "udp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    description = "sip tls for teams"
+    from_port   = 5061
+    to_port     = 5061
+    protocol    = "tcp"
+    cidr_blocks = ["52.114.148.0/32", "52.114.132.46/32", "52.114.75.24/32", "52.114.76.76/32", "52.114.7.24/32", "52.114.14.70/32"]
+  }
+
+  ingress {
+    description = "sip from everywhere"
+    from_port   = 5060
+    to_port     = 5060
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    description = "rtp from everywhere"
+    from_port   = 40000
+    to_port     = 60000
+    protocol    = "udp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    description = "rtpengine ng protocol from VPC"
+    from_port   = 22222
+    to_port     = 22222
+    protocol    = "udp"
+    cidr_blocks = [aws_vpc.jambonz.cidr_block]
+  }
+
+
+  ingress {
+    description = "http api"
+    from_port   = 3000
+    to_port     = 3000
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    description = "http api from FS"
+    from_port   = 3000
+    to_port     = 3000
+    protocol    = "tcp"
+    security_groups = [aws_security_group.allow_jambonz_feature_server.id]
+  }
+
+  ingress {
+    description = "http webapp"
+    from_port   = 3001
+    to_port     = 3001
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = {
+    Name = "allow_${var.prefix}_sbc_sip"
+  }
+}
+
 
