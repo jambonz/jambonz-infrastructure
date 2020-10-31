@@ -1,0 +1,101 @@
+{
+  "variables": {
+    "region": "us-east-1",
+    "ssh_username": "admin",
+    "ami_description": "jambonz monitoring server", 
+    "instance_type": "t2.medium",
+    "homer_user": "homer_user",
+    "homer_password": "XcapJTqy11LnsYRtxXGPTYQkAnI",
+    "install_influxdb":  "yes",
+    "install_homer":  "yes",
+    "install_nodered":  "yes",
+    "influxdb_ip":  "127.0.0.1",
+    "tag_name": "jambonz-monitoring-server"
+  },
+  "builders": [{
+    "type": "amazon-ebs",
+    "region": "{{user `region`}}",
+    "source_ami_filter": {
+      "filters": {
+        "virtualization-type": "hvm",
+        "name": "debian-stretch-hvm-x86_64-gp2-*",
+        "root-device-type": "ebs"
+      },
+      "owners": ["379101102735"],
+      "most_recent": true
+    },
+    "instance_type": "{{user `instance_type`}}",
+    "ssh_username": "{{user `ssh_username`}}",
+    "ami_name": "jambonz-monitoring-server-all-in-one-{{isotime |clean_resource_name }}",
+    "ami_description": "{{user `ami_description`}}",
+    "launch_block_device_mappings": [
+      {
+        "device_name": "xvda",
+        "volume_size": 40,
+        "volume_type": "gp2",
+        "delete_on_termination": true
+      }
+    ],
+    "security_group_filter": {
+      "filters": {
+        "tag:Class": "packer"
+      }
+    },
+    "tags": {
+      "Name": "{{user `tag_name`}}"
+    },
+    "run_tags": {
+      "Name": "homer-ami-building"
+    }
+  }],
+  "provisioners": [
+    {
+      "type": "shell",
+      "inline": [
+        "while [ ! -f /var/lib/cloud/instance/boot-finished ]; do echo 'Waiting for cloud-init...'; sleep 1; done",
+        "sudo apt-get update",
+        "sudo apt-get -y install software-properties-common make cmake gcc g++ dirmngr sudo python3-dev \\",
+        "curl wget sed git"
+      ]
+    },
+    {
+      "type": "file",
+      "source": "files/",
+      "destination": "/tmp"
+    },
+    {
+      "type": "shell",
+      "script": "scripts/install_chrony.sh"
+    },
+    {
+      "type": "shell",
+      "execute_command": "chmod +x {{ .Path }}; sudo '{{ .Path }}' {{user `install_nodered`}}",
+      "script": "scripts/install_node_red.sh"
+    },
+    {
+      "type": "shell",
+      "execute_command": "chmod +x {{ .Path }}; sudo '{{ .Path }}' {{user `install_homer`}} {{user `homer_user`}} {{user `homer_password`}}",
+      "script": "scripts/install_postgresql.sh"
+    },
+    {
+      "type": "shell",
+      "execute_command": "chmod +x {{ .Path }}; sudo '{{ .Path }}' {{user `install_homer`}} {{user `influxdb_ip`}}",
+      "script": "scripts/install_telegraf.sh"
+    },
+    {
+      "type": "shell",
+      "execute_command": "chmod +x {{ .Path }}; sudo '{{ .Path }}' {{user `install_homer`}} {{user `homer_user`}} {{user `homer_password`}}",
+      "script": "scripts/install_homer.sh"
+    },
+    {
+      "type": "shell",
+      "execute_command": "chmod +x {{ .Path }}; sudo '{{ .Path }}' {{user `install_influxdb`}}",
+      "script": "scripts/install_influxdb.sh"
+    },
+    {
+      "type": "shell",
+      "execute_command": "chmod +x {{ .Path }}; sudo '{{ .Path }}' {{user `install_influxdb`}}",
+      "script": "scripts/install_grafana.sh"
+    }
+  ]
+}
