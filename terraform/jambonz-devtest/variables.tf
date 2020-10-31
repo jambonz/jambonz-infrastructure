@@ -4,7 +4,7 @@ variable "prefix" {
 }
 variable "region" {
   description = "the aws region in which to create the VPC"
-  default = "us-west-2"
+  default = "us-west-1"
 }
 variable "vpc_cidr_block" {
   description = "the CIDR block for the whole VPC"
@@ -13,8 +13,8 @@ variable "vpc_cidr_block" {
 variable "public_subnets" {
   type = map(string)
   default = {
-    "us-west-2a" = "172.31.32.0/24"
-    "us-west-2b" = "172.31.33.0/24"
+    "us-west-1a" = "172.31.32.0/24"
+    "us-west-1b" = "172.31.33.0/24"
   }
 }
 variable "jambonz_sbc_sip_rtp_private_ips" {
@@ -27,19 +27,19 @@ variable "ec2_instance_type" {
 }
 variable "key_name" {
   description = "name of an aws keypair that you have downloaded and wish to use to access the jambonz instance via ssh"
-  default = "your-key-here"
+  default = "aws-drachtio-us-west-1"
 }
 variable "ssh_key_path" {
   description = "path to your aws keypair on your local machine"
-  default = "/path/to/key.pem"
+  default = "~/aws/aws-drachtio-us-west-1.pem"
 }
 variable "aws_access_key_id_runtime" {
   description = "AWS access key jambonz will use to access AWS Polly TTS"
-  default = "your-aws-access-key-id"
+  default = "AKIAJH6IPHQPOLMVLVWQ"
 }
 variable "aws_secret_access_key_runtime" {
   description = "AWS secret access key jambonz will use to access AWS Polly TTS"
-  default = "your-aws-secret_access-key"
+  default = "WycWsihQzDY2KQ+/+1tMPO4/DM9ADWOd86+kC5DC"
 }
 variable "sns_topic" {
   description = "AWS SNS topic for autoscale events"
@@ -56,7 +56,7 @@ variable "cluster_id" {
 
 variable "datadog_api_key" {
   description = "datadog api key - only supply if you wish to install datadog monitoring"
-  default = ""
+  default = "88e5d83b6a857cc5dca140b432df583f"
 }
 variable "datadog_site" {
   description = "datadog site"
@@ -64,7 +64,7 @@ variable "datadog_site" {
 }
 variable "datadog_env_name" {
   description = "environment identifier"
-  default = "prod"
+  default = "us-west-1"
 }
 
 
