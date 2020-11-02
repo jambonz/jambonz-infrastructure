@@ -1,11 +1,13 @@
 #!/bin/bash
 PUBLIC_IP=`curl -s http://169.254.169.254/latest/meta-data/public-ipv4`
-ENABLE_DATADOG_METRICS=0
-if [ "${DATADOG_API_KEY}" ] ; then
-  ENABLE_DATADOG_METRICS=1
-fi
 
 echo "running jambonz user data script"
+
+# seed database
+mysql -h ${JAMBONES_MYSQL_HOST} -u admin -D jambones -p${JAMBONES_MYSQL_PASSWORD} < /home/admin/apps/jambonz-api-server/db/jambones-sql.sql
+mysql -h ${JAMBONES_MYSQL_HOST} -u admin -D jambones -p${JAMBONES_MYSQL_PASSWORD} < /home/admin/apps/jambonz-api-server/db/create-admin-token.sql
+mysql -h ${JAMBONES_MYSQL_HOST} -u admin -D jambones -p${JAMBONES_MYSQL_PASSWORD} < /home/admin/apps/jambonz-api-server/db/create-default-account.sql
+JAMBONES_MYSQL_HOST=${JAMBONES_MYSQL_HOST} JAMBONES_MYSQL_USER=admin JAMBONES_MYSQL_PASSWORD=${JAMBONES_MYSQL_PASSWORD} JAMBONES_MYSQL_DATABASE=jambones /home/admin/apps/jambonz-api-server/db/reset_admin_password.js
 
 # jambonz webapp
 echo "building webapp.."
@@ -42,6 +44,11 @@ module.exports = {
       JAMBONES_LOGLEVEL: 'info',
       JAMBONE_API_VERSION: 'v1',
       JAMBONES_CLUSTER_ID: '${JAMBONES_CLUSTER_ID}',
+      ENABLE_METRICS: 1,
+      STATS_HOST: '127.0.0.1',
+      STATS_PORT: 8125,
+      STATS_PROTOCOL: 'udp',
+      STATS_TELEGRAF: 1,
       HTTP_PORT:  3000
 		},
   },
@@ -63,6 +70,11 @@ module.exports = {
       JAMBONES_INBOUND_ROUTE: '127.0.0.1:4002',
       JAMBONES_OUTBOUND_ROUTE: '127.0.0.1:4003',
       JAMBONZ_TAGGED_INBOUND: 1,
+      ENABLE_METRICS: 1,
+      STATS_HOST: '127.0.0.1',
+      STATS_PORT: 8125,
+      STATS_PROTOCOL: 'udp',
+      STATS_TELEGRAF: 1,
       JAMBONES_NETWORK_CIDR: '${VPC_CIDR}'
 		}
   },
@@ -80,7 +92,6 @@ module.exports = {
     max_memory_restart: '1G',
     env: {
       NODE_ENV: 'production',
-      ENABLE_DATADOG_METRICS: $ENABLE_DATADOG_METRICS,
       JAMBONES_LOGLEVEL: 'info',
       DRACHTIO_HOST: '127.0.0.1',
       DRACHTIO_PORT: 9022,
@@ -92,6 +103,11 @@ module.exports = {
       JAMBONES_MYSQL_CONNECTION_LIMIT: 10,
       JAMBONES_REDIS_HOST: '${JAMBONES_REDIS_HOST}',
       JAMBONES_REDIS_PORT: 6379,
+      ENABLE_METRICS: 1,
+      STATS_HOST: '127.0.0.1',
+      STATS_PORT: 8125,
+      STATS_PROTOCOL: 'udp',
+      STATS_TELEGRAF: 1
 		}
   },
   {
@@ -109,7 +125,6 @@ module.exports = {
     env: {
       NODE_ENV: 'production',
       JAMBONES_LOGLEVEL: 'info',
-      ENABLE_DATADOG_METRICS: $ENABLE_DATADOG_METRICS,
       DRACHTIO_HOST: '127.0.0.1',
       DRACHTIO_PORT: 9022,
       DRACHTIO_SECRET: 'cymru',
@@ -121,6 +136,11 @@ module.exports = {
       JAMBONES_MYSQL_CONNECTION_LIMIT: 10,
       JAMBONES_REDIS_HOST: '${JAMBONES_REDIS_HOST}',
       JAMBONES_REDIS_PORT: 6379,
+      ENABLE_METRICS: 1,
+      STATS_HOST: '127.0.0.1',
+      STATS_PORT: 8125,
+      STATS_PROTOCOL: 'udp',
+      STATS_TELEGRAF: 1,
       MS_TEAMS_FQDN: '${MS_TEAMS_FQDN}'
 		}
   },
@@ -139,7 +159,6 @@ module.exports = {
     env: {
       NODE_ENV: 'production',
       JAMBONES_LOGLEVEL: 'info',
-      ENABLE_DATADOG_METRICS: $ENABLE_DATADOG_METRICS,
       DRACHTIO_HOST: '127.0.0.1',
       DRACHTIO_PORT: 9022,
       DRACHTIO_SECRET: 'cymru',
@@ -152,6 +171,11 @@ module.exports = {
       JAMBONES_REDIS_HOST: '${JAMBONES_REDIS_HOST}',
       JAMBONES_REDIS_PORT: 6379,
       JAMBONES_CLUSTER_ID: '${JAMBONES_CLUSTER_ID}',
+      ENABLE_METRICS: 1,
+      STATS_HOST: '127.0.0.1',
+      STATS_PORT: 8125,
+      STATS_PROTOCOL: 'udp',
+      STATS_TELEGRAF: 1,
       MS_TEAMS_SIP_PROXY_IPS: '52.114.148.0, 52.114.132.46, 52.114.75.24, 52.114.76.76, 52.114.7.24, 52.114.14.70'
 		}
   },
@@ -171,23 +195,16 @@ sudo env PATH=$PATH:/usr/bin /usr/lib/node_modules/pm2/bin/pm2 startup systemd -
 sudo -u admin bash -c "pm2 save"
 sudo systemctl enable pm2-admin.service
 
-# install datadog if a datadog api key was provided
-if [ "${DATADOG_API_KEY}" ] ; then
-  echo "installing datadog.."
+# configure telegraph to send to the monitoring server
+sudo sed -i -e "s/influxdb:8086/${MONITORING_SERVER_IP}:8086/g"  /etc/telegraf/telegraf.conf
+sudo systemctl restart telegraf
 
-  sed -i -e 's@^api_key:.*@'"api_key: ${DATADOG_API_KEY}"'@g' /etc/datadog-agent/datadog.yaml
-  sed -i -e 's@^# site:.*@'"site: ${DATADOG_SITE}"'@g' /etc/datadog-agent/datadog.yaml
-  sed -i -e 's@^# log_level:.*@log_level: warn@g' /etc/datadog-agent/datadog.yaml
+# point drachtio server and rtpengine to the HEP endpoint on the monitoring server
+sudo sed -i -e "s/--address 0.0.0.0 --port 9022/--address 0.0.0.0 --port 9022 --homer ${MONITORING_SERVER_IP}:9060 --homer-id 10/g"  /etc/systemd/system/drachtio.service
+sudo sed -i -e "s/--delete-delay 0/--delete-delay 0 --homer=${MONITORING_SERVER_IP}:9060 --homer-protocol=udp --homer-id=11/g"  /etc/systemd/system/rtpengine.service
 
-  tee -a /etc/datadog-agent/datadog.yaml > /dev/null <<EOT
-tags:
-  env_name:${DATADOG_ENV_NAME}
-  role:sbc
-EOT
-
-  systemctl enable datadog-agent
-  systemctl restart datadog-agent
-  
-fi
+sudo systemctl daemon-reload
+sudo sytemctl restart drachtio
+sudo sytemctl restart rtpengine
 
 echo "user data script completed"

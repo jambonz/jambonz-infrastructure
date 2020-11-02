@@ -5,6 +5,8 @@
     "ami_description": "jambonz SBC SIP+RTP", 
     "drachtio_version": "develop",
     "jambonz_version": "master",
+    "install_datadog": "no",
+    "install_telegraf": "yes",
     "instance_type": "t2.medium",
     "rtp_engine_version": "mr8.5",
     "rtp_engine_min_port": "40000",
@@ -75,7 +77,13 @@
     },
     {
       "type": "shell",
+      "execute_command": "chmod +x {{ .Path }}; sudo '{{ .Path }}' {{user `install_datadog`}}",
       "script": "scripts/install_datadog.sh"
+    },
+    {
+      "type": "shell",
+      "execute_command": "chmod +x {{ .Path }}; sudo '{{ .Path }}' {{user `install_telegraf`}}",
+      "script": "scripts/install_telegraf.sh"
     },
     {
       "type": "shell",

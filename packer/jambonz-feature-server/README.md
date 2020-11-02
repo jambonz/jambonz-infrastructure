@@ -1,6 +1,6 @@
-# packer-jambonz-mini
+# jambonz-feature-server
 
-A [packer](https://www.packer.io/) template to build an AMI containing everything needed to run jambonz on a single EC2 instance.  The base linux distro is Debian 9 (stretch).
+A [packer](https://www.packer.io/) template to build an AMI for the jambonz feature server.  The base linux distro is Debian 9 (stretch).
 
 ## Installing 
 
@@ -31,3 +31,14 @@ EC2 Instance type to use when building the AMI.
 "drachtio_version": "v0.8.4"
 ```
 drachtio tag or branch to build
+
+```
+    "install_datadog": "no",
+```
+whether to install datadog (commercial) monitoring agent
+
+```
+    "install_telegraf": "yes",
+```
+whether to install telegraf (open source) monitoring agent
+

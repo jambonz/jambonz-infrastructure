@@ -44,3 +44,16 @@ rtpengine version
 "rtp_engine_max_port": "60000"
 ```
 rtp port range for rtpengine
+
+```
+    "install_datadog": "no",
+```
+whether to install datadog (commercial) monitoring agent
+
+```
+    "install_telegraf": "yes",
+```
+whether to install telegraf (open source) monitoring agent
+
+
+

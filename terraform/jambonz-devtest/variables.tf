@@ -21,17 +21,25 @@ variable "jambonz_sbc_sip_rtp_private_ips" {
   type = list(string)
   default = ["172.31.32.10"]
 }
-variable "ec2_instance_type" {
-  description = "the EC2 instance type to use for the jambonz server"
-  default = "t2.medium"
+variable "ec2_instance_type_sbc" {
+  description = "the EC2 instance type to use for the SBC"
+  default = "t3.medium"
+}
+variable "ec2_instance_type_fs" {
+  description = "the EC2 instance type to use for the Feature server"
+  default = "t3.medium"
+}
+variable "ec2_instance_type_monitoring" {
+  description = "the EC2 instance type to use for the monitoring server"
+  default = "t3.medium"
 }
 variable "key_name" {
   description = "name of an aws keypair that you have downloaded and wish to use to access the jambonz instance via ssh"
-  default = "aws-drachtio-us-west-1"
+  default = "your-key"
 }
 variable "ssh_key_path" {
   description = "path to your aws keypair on your local machine"
-  default = "~/aws/aws-drachtio-us-west-1.pem"
+  default = "path-to-key.pem"
 }
 variable "aws_access_key_id_runtime" {
   description = "AWS access key jambonz will use to access AWS Polly TTS"
@@ -53,7 +61,6 @@ variable "cluster_id" {
   description = "short cluster identifier"
   default = "jb"
 }
-
 variable "datadog_api_key" {
   description = "datadog api key - only supply if you wish to install datadog monitoring"
   default = "your dd key"

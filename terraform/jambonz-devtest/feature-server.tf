@@ -56,7 +56,7 @@ data "aws_ami" "jambonz-feature-server" {
 # create a launch configuration
 resource "aws_launch_configuration" "jambonz-feature-server" {
   image_id                    = data.aws_ami.jambonz-feature-server.id
-  instance_type               = var.ec2_instance_type
+  instance_type               = var.ec2_instance_type_fs
   associate_public_ip_address = true
   security_groups             = [aws_security_group.allow_jambonz_feature_server.id]
   key_name                    = var.key_name
@@ -72,14 +72,15 @@ resource "aws_launch_configuration" "jambonz-feature-server" {
     AWS_REGION              = var.region
     AWS_SNS_TOPIC_ARN       = aws_sns_topic.jambonz_sns_topic.arn
     GCP_CREDENTIALS         = file("${path.module}/credentials/gcp.json")
-    DATADOG_API_KEY         = var.datadog_api_key
-    DATADOG_SITE            = var.datadog_site
-    DATADOG_ENV_NAME         = var.datadog_env_name
+    MONITORING_SERVER_IP    = aws_instance.jambonz-monitoring-server.private_ip
   })
 
   lifecycle {
     create_before_destroy = true
   }
+
+  depends_on = [aws_instance.jambonz-monitoring-server]
+
 }
 
 # create a placement group to spread feature server instances

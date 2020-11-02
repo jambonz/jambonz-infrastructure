@@ -1,8 +1,4 @@
 #!/bin/bash
-ENABLE_DATADOG_METRICS=0
-if [ "${DATADOG_API_KEY}" ] ; then
-  ENABLE_DATADOG_METRICS=1
-fi
 
 echo "running jambonz user data script"
 
@@ -29,8 +25,12 @@ module.exports = {
       AWS_ACCESS_KEY_ID: '${AWS_ACCESS_KEY_ID}',
       AWS_SECRET_ACCESS_KEY: '${AWS_SECRET_ACCESS_KEY}',
       AWS_REGION: '${AWS_REGION}',
+      ENABLE_METRICS: 1,
+      STATS_HOST: '127.0.0.1',
+      STATS_PORT: 8125,
+      STATS_PROTOCOL: 'udp',
+      STATS_TELEGRAF: 1,
       AWS_SNS_TOPIC_ARM: '${AWS_SNS_TOPIC_ARN}',
-      ENABLE_DATADOG_METRICS: $ENABLE_DATADOG_METRICS,
       JAMBONES_NETWORK_CIDR: '${VPC_CIDR}',
       JAMBONES_MYSQL_HOST: '${JAMBONES_MYSQL_HOST}',
       JAMBONES_MYSQL_USER: '${JAMBONES_MYSQL_USER}',
@@ -62,22 +62,8 @@ sudo env PATH=$PATH:/usr/bin /usr/lib/node_modules/pm2/bin/pm2 startup systemd -
 sudo -u admin bash -c "pm2 save"
 sudo systemctl enable pm2-admin.service
 
-# install datadog if a datadog api key was provided
-if [ "${DATADOG_API_KEY}" ] ; then
-  echo "installing datadog.."
-
-  sed -i -e 's@^api_key:.*@'"api_key: ${DATADOG_API_KEY}"'@g' /etc/datadog-agent/datadog.yaml
-  sed -i -e 's@^# site:.*@'"site: ${DATADOG_SITE}"'@g' /etc/datadog-agent/datadog.yaml
-  sed -i -e 's@^# log_level:.*@log_level: warning@g' /etc/datadog-agent/datadog.yaml
-
-  tee -a /etc/datadog-agent/datadog.yaml > /dev/null <<EOT
-tags:
-  env_name:${DATADOG_ENV_NAME}
-  role:fs
-EOT
-
-  systemctl enable datadog-agent
-  systemctl restart datadog-agent
-fi
+# configure telegraph to send to the monitoring server
+sudo sed -i -e "s/influxdb:8086/${MONITORING_SERVER_IP}:8086/g"  /etc/telegraf/telegraf.conf
+sudo systemctl restart telegraf
 
 echo "user data script completed"
