@@ -12,8 +12,8 @@ sudo mv /tmp/grafana-datasource.yml /etc/grafana/provisioning/datasources/dataso
 sudo mv /tmp/grafana-dashboard-heplify.json /var/lib/grafana/dashboards
 sudo mv /tmp/grafana-dashboard-jambonz.json /var/lib/grafana/dashboards
 
-sudo chmod -R grafana:grafana /var/lib/grafana/dashboards
-sudo chmod -R grafana:grafana /etc/grafana/provisioning/dashboards
+sudo chown -R grafana:grafana /var/lib/grafana/dashboards
+sudo chown -R grafana:grafana /etc/grafana/provisioning/dashboards
 
 sudo systemctl enable grafana-server
 sudo systemctl start grafana-server
