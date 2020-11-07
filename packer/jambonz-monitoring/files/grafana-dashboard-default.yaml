@@ -3,6 +3,6 @@ apiVersion: 1
 providers:
   - name: Default
     type: file
-    folder: 'VoIP'
+    folder: 'jambonz'
     options:
       path: /var/lib/grafana/dashboards
