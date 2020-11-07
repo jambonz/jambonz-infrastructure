@@ -4,6 +4,10 @@ data "aws_ami" "jambonz-monitoring-server" {
   name_regex       = "^jambonz-monitoring-server"
   owners           = ["376029039784"]
 }
+resource "aws_eip" "jambonz-monitoring-server" {
+  instance = aws_instance.jambonz-monitoring-server.id
+  vpc      = true
+}
 
 resource "aws_instance" "jambonz-monitoring-server" {
   ami                    = data.aws_ami.jambonz-monitoring-server.id
@@ -11,7 +15,6 @@ resource "aws_instance" "jambonz-monitoring-server" {
   key_name               = var.key_name
   vpc_security_group_ids = [aws_security_group.allow_jambonz_monitoring.id]
   subnet_id              = local.my_subnet_ids[0]
-  associate_public_ip_address = true
   monitoring             = true
 
   tags = {
