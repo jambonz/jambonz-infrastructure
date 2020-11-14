@@ -62,7 +62,7 @@ module.exports = {
     max_memory_restart: '1G',
     env: {
       NODE_ENV: 'production',
-      ENABLE_DATADOG_METRICS: 0,
+      ENABLE_METRICS: 0,
       JAMBONES_LOGLEVEL: 'info',
       DRACHTIO_HOST: '127.0.0.1',
       DRACHTIO_PORT: 9022,
@@ -91,7 +91,7 @@ module.exports = {
     env: {
       NODE_ENV: 'production',
       JAMBONES_LOGLEVEL: 'info',
-      ENABLE_DATADOG_METRICS: 0,
+      ENABLE_METRICS: 0,
       DRACHTIO_HOST: '127.0.0.1',
       DRACHTIO_PORT: 9022,
       DRACHTIO_SECRET: 'cymru',
@@ -121,7 +121,7 @@ module.exports = {
     env: {
       NODE_ENV: 'production',
       JAMBONES_LOGLEVEL: 'info',
-      ENABLE_DATADOG_METRICS: 0,
+      ENABLE_METRICS: 0,
       DRACHTIO_HOST: '127.0.0.1',
       DRACHTIO_PORT: 9022,
       DRACHTIO_SECRET: 'cymru',
