@@ -16,10 +16,10 @@
     "source_ami_filter": {
       "filters": {
         "virtualization-type": "hvm",
-        "name": "debian-stretch-hvm-x86_64-gp2-*",
+        "name": "debian-10-amd64-*",
         "root-device-type": "ebs"
       },
-      "owners": ["379101102735"],
+      "owners": ["136693071363"],
       "most_recent": true
     },
     "instance_type": "{{user `instance_type`}}",
@@ -28,7 +28,7 @@
     "ami_description": "{{user `ami_description`}}",
     "launch_block_device_mappings": [
       {
-        "device_name": "xvda",
+        "device_name": "/dev/xvda",
         "volume_size": 40,
         "volume_type": "gp2",
         "delete_on_termination": true
@@ -52,7 +52,7 @@
       "inline": [
         "while [ ! -f /var/lib/cloud/instance/boot-finished ]; do echo 'Waiting for cloud-init...'; sleep 1; done",
         "sudo apt-get update",
-        "sudo apt-get -y install python lsof gcc g++ make cmake build-essential git autoconf automake mysql-client redis-tools \\",
+        "sudo apt-get -y install python lsof gcc g++ make cmake build-essential git autoconf automake default-mysql-client redis-tools \\",
         "curl telnet libtool libtool-bin libssl-dev libcurl4-openssl-dev libz-dev systemd-coredump liblz4-tool \\",
         "iptables-dev libavformat-dev liblua5.1-0-dev libavfilter-dev libavcodec-dev libswresample-dev \\",
         "libevent-dev libpcap-dev libxmlrpc-core-c3-dev markdown libjson-glib-dev lsb-release \\",
