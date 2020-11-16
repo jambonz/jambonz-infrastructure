@@ -1,6 +1,6 @@
 # create an SNS notification topic
-resource "aws_sns_topic" "jambonz-sns-topic" {
-  name = "${var.prefix}-fs-lifecycle-events"
+resource "aws_sns_topic" "jambonz_sns_topic" {
+  name = "${var.prefix}-${var.region}-fs-lifecycle-events"
 }
 
 resource "aws_iam_role" "jambonz_sns_publish" {
@@ -41,7 +41,7 @@ resource "aws_iam_policy" "allow_jambonz_sns_publish" {
 EOF
 }
 
-resource "aws_iam_role_policy_attachment" "sns-publish-policy-attachment" {
+resource "aws_iam_role_policy_attachment" "sns_publish_policy_attachment" {
     role = aws_iam_role.jambonz_sns_publish.name
     policy_arn = aws_iam_policy.allow_jambonz_sns_publish.arn
 }
@@ -56,7 +56,7 @@ data "aws_ami" "jambonz-feature-server" {
 # create a launch configuration
 resource "aws_launch_configuration" "jambonz-feature-server" {
   image_id                    = data.aws_ami.jambonz-feature-server.id
-  instance_type               = var.ec2_instance_type
+  instance_type               = var.ec2_instance_type_fs
   associate_public_ip_address = true
   security_groups             = [aws_security_group.allow_jambonz_feature_server.id]
   key_name                    = var.key_name
@@ -70,16 +70,17 @@ resource "aws_launch_configuration" "jambonz-feature-server" {
     AWS_ACCESS_KEY_ID       = var.aws_access_key_id_runtime
     AWS_SECRET_ACCESS_KEY   = var.aws_secret_access_key_runtime
     AWS_REGION              = var.region
-    AWS_SNS_TOPIC_ARN       = aws_sns_topic.jambonz-sns-topic.arn
+    AWS_SNS_TOPIC_ARN       = aws_sns_topic.jambonz_sns_topic.arn
     GCP_CREDENTIALS         = file("${path.module}/credentials/gcp.json")
-    DATADOG_API_KEY         = var.datadog_api_key
-    DATADOG_SITE            = var.datadog_site
-    DATADOG_ENV_NAME         = var.datadog_env_name
+    MONITORING_SERVER_IP    = aws_instance.jambonz-monitoring-server.private_ip
   })
 
   lifecycle {
     create_before_destroy = true
   }
+
+  depends_on = [aws_instance.jambonz-monitoring-server]
+
 }
 
 # create a placement group to spread feature server instances
@@ -108,6 +109,9 @@ resource "aws_autoscaling_group" "jambonz-feature-server" {
   lifecycle {
     create_before_destroy = true
   }
+
+  depends_on = [aws_sns_topic.jambonz_sns_topic]
+
 }
 
 # create lifecycle hooks
@@ -117,6 +121,6 @@ resource "aws_autoscaling_lifecycle_hook" "jambonz-scale-in" {
   default_result         = "CONTINUE"
   heartbeat_timeout      = 900
   lifecycle_transition   = "autoscaling:EC2_INSTANCE_TERMINATING"
-  notification_target_arn = aws_sns_topic.jambonz-sns-topic.arn
+  notification_target_arn = aws_sns_topic.jambonz_sns_topic.arn
   role_arn                = aws_iam_role.jambonz_sns_publish.arn
 }

@@ -4,7 +4,7 @@ variable "prefix" {
 }
 variable "region" {
   description = "the aws region in which to create the VPC"
-  default = "us-west-2"
+  default = "us-east-1"
 }
 variable "vpc_cidr_block" {
   description = "the CIDR block for the whole VPC"
@@ -13,8 +13,8 @@ variable "vpc_cidr_block" {
 variable "public_subnets" {
   type = map(string)
   default = {
-    "us-west-2a" = "172.31.32.0/24"
-    "us-west-2b" = "172.31.33.0/24"
+    "us-east-1a" = "172.31.32.0/24"
+    "us-east-1b" = "172.31.33.0/24"
   }
 }
 variable "jambonz_sbc_sip_private_ips" {
@@ -25,9 +25,21 @@ variable "jambonz_sbc_rtp_private_ips" {
   type = list(string)
   default = ["172.31.32.20", "172.31.33.20"]
 }
-variable "ec2_instance_type" {
-  description = "the EC2 instance type to use for the jambonz servers"
-  default = "t2.medium"
+variable "ec2_instance_type_sbc_sip" {
+  description = "the EC2 instance type to use for the SBC"
+  default = "t3.medium"
+}
+variable "ec2_instance_type_sbc_rtp" {
+  description = "the EC2 instance type to use for the SBC"
+  default = "t3.medium"
+}
+variable "ec2_instance_type_fs" {
+  description = "the EC2 instance type to use for the Feature server"
+  default = "t3.medium"
+}
+variable "ec2_instance_type_monitoring" {
+  description = "the EC2 instance type to use for the monitoring server"
+  default = "t3.medium"
 }
 variable "key_name" {
   description = "name of an aws keypair that you have downloaded and wish to use to access the jambonz instance via ssh"

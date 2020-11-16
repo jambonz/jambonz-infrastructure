@@ -5,7 +5,9 @@
     "ami_description": "jambonz SBC SIP", 
     "instance_type": "t2.medium",
     "drachtio_version": "develop",
-    "jambonz_version": "master"
+    "jambonz_version": "master",
+    "install_datadog": "no",
+    "install_telegraf": "yes"
   },
   "builders": [{
     "type": "amazon-ebs",
@@ -71,7 +73,13 @@
     },
     {
       "type": "shell",
+      "execute_command": "chmod +x {{ .Path }}; sudo '{{ .Path }}' {{user `install_datadog`}}",
       "script": "scripts/install_datadog.sh"
+    },
+    {
+      "type": "shell",
+      "execute_command": "chmod +x {{ .Path }}; sudo '{{ .Path }}' {{user `install_telegraf`}}",
+      "script": "scripts/install_telegraf.sh"
     },
     {
       "type": "shell",

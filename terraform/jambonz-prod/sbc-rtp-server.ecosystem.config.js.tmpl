@@ -1,19 +1,11 @@
 #!/bin/bash
-ENABLE_DATADOG_METRICS=0
-if [ "${DATADOG_API_KEY}" ] ; then
-  echo "installing datadog.."
 
-  sed -i -e 's@^api_key:.*@'"api_key: ${DATADOG_API_KEY}"'@g' /etc/datadog-agent/datadog.yaml
-  sed -i -e 's@^# site:.*@'"site: ${DATADOG_SITE}"'@g' /etc/datadog-agent/datadog.yaml
-  sed -i -e 's@^# log_level:.*@log_level: warning@g' /etc/datadog-agent/datadog.yaml
+# configure telegraph to send to the monitoring server
+sudo sed -i -e "s/influxdb:8086/${MONITORING_SERVER_IP}:8086/g"  /etc/telegraf/telegraf.conf
+sudo systemctl restart telegraf
 
-  tee -a /etc/datadog-agent/datadog.yaml > /dev/null <<EOT
-tags:
-  env_name:${DATADOG_ENV_NAME}
-  role:rtp
-EOT
+# point drachtio server and rtpengine to the HEP endpoint on the monitoring server
+sudo sed -i -e "s/--delete-delay 0/--delete-delay 0 --homer=${MONITORING_SERVER_IP}:9060 --homer-protocol=udp --homer-id=11/g"  /etc/systemd/system/rtpengine.service
 
-  systemctl enable datadog-agent
-  systemctl restart datadog-agent
-  
-fi
+sudo systemctl daemon-reload
+sudo sytemctl restart rtpengine
