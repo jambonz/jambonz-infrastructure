@@ -38,14 +38,16 @@ Once it does, you can log into the webapp at `localhost:3001` and configure the 
 
 You can then configure your account, applications, sip trunks and phone numbers as usual.
 
-To stop the system, from the same directory simply rune:
+To stop the system, from the same directory simply run:
 ```
 docker-compose -f docker-compose.yaml down
 ```
 
-**Note**: The mysql database will be stored in the `data_volume/` subfolder that is created, so that your provisioning data will persist when you start and stop the docker network.
+**Note**: The mysql database will be stored in the `data_volume/` subfolder that is created, so that your provisioning data will persist between restarts of the docker network.
 
 Once you have provisioned the system, you should be able to point sip devices to register and send INVITEs to port 5060 on host ip address that you configured above and have that traffic routed to your jambonz system.
 
 ## Capacity
-The system has limited capacity as it is intended to be used as a personal development / test machine.  Specifically, the rtpengine container which is part of the SBC function is configured to handle at most 50 simultaneous calls.
+The system has limited capacity as it is intended to be used as a personal development / test machine.  
+
+Specifically, the rtpengine container which is part of the SBC function is configured to handle at most 50 simultaneous calls.
