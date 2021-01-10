@@ -36,7 +36,12 @@ This step will take several minutes the first time you start it as several docke
 
 Once it does, you can log into the webapp at `localhost:3001` and configure the system.  As usual, the initial password will be admin/admin and you will be forced to change it.
 
-You can then configure your account, applications, sip trunks and phone numbers as usual.  
+You can then configure your account, applications, sip trunks and phone numbers as usual.
+
+To stop the system, from the same directory simply rune:
+```
+docker-compose -f docker-compose.yaml down
+```
 
 **Note**: The mysql database will be stored in the `data_volume/` subfolder that is created, so that your provisioning data will persist when you start and stop the docker network.
 
