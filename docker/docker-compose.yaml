@@ -110,7 +110,6 @@ services:
       JAMBONES_REDIS_PORT: 6379
       JAMBONES_LOGLEVEL: info
       ENABLE_METRICS: 0
-      DEBUG: jambonz:*
     depends_on:
       - mysql
       - redis

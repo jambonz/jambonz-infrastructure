@@ -23,6 +23,7 @@ There are a few configuration items you will need to supply before running docke
 Checkout and install as follows:
 ```
 git clone git@github.com:jambonz/jambonz-infrastructure.git
+cd jambonz-infrastructure
 git submodule update --init
 cd docker
 
