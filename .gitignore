@@ -4,3 +4,6 @@
 *.tfstate.backup
 gcp.json
 jambonz-mini/
+
+data_volume/
+tmpAudio/

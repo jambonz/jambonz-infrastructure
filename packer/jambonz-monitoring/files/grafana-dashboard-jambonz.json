@@ -15,7 +15,6 @@
   "editable": true,
   "gnetId": null,
   "graphTooltip": 0,
-  "id": 4,
   "links": [],
   "panels": [
     {
@@ -1078,18 +1077,13 @@
       "steppedLine": false,
       "targets": [
         {
+          "alias": "average",
           "groupBy": [
             {
               "params": [
                 "$__interval"
               ],
               "type": "time"
-            },
-            {
-              "params": [
-                "host"
-              ],
-              "type": "tag"
             },
             {
               "params": [
@@ -1108,7 +1102,44 @@
             [
               {
                 "params": [
-                  "90_percentile"
+                  "mean"
+                ],
+                "type": "field"
+              },
+              {
+                "params": [],
+                "type": "mean"
+              }
+            ]
+          ],
+          "tags": []
+        },
+        {
+          "alias": "95%",
+          "groupBy": [
+            {
+              "params": [
+                "$__interval"
+              ],
+              "type": "time"
+            },
+            {
+              "params": [
+                "null"
+              ],
+              "type": "fill"
+            }
+          ],
+          "measurement": "tts_response_time",
+          "orderByTime": "ASC",
+          "policy": "default",
+          "refId": "B",
+          "resultFormat": "time_series",
+          "select": [
+            [
+              {
+                "params": [
+                  "95_percentile"
                 ],
                 "type": "field"
               },
@@ -1745,12 +1776,12 @@
     "list": []
   },
   "time": {
-    "from": "now-1h",
+    "from": "now-1d",
     "to": "now"
   },
   "timepicker": {},
   "timezone": "",
   "title": "Jambonz Metrics",
   "uid": "oAM51epMz",
-  "version": 3
+  "version": 1
 }
