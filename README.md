@@ -1,6 +1,6 @@
 # jambonz infrastructure
 
-This repository contains [packer](packer.io) and [terraform](terraform.io) scripts for deploying jambonz on AWS hosted infrastructure.  Packer scripts build the necessary AMIs, and terraform scripts create the full AWS infrastructure using those AMIs.
+This repository contains [packer](packer.io), [terraform](terraform.io), and docker files for deploying jambonz.  For production deployments, an AWS hosted deployment is recommended and the terraform and packer scripts are provided to support that.  For development, a [docker-compose](docker/) file is provided to enable running a full jambonz system on a developer laptop.
 
 A jambonz deployment provides both Session Border Controller (SBC) and feature server functionality.  If you have an existing SBC that you want to use, you can place that in front of the jambonz servers if you wish (though it is not necessary) however you must in all cases deploy both the jambonz SBC and feature server components.
 
