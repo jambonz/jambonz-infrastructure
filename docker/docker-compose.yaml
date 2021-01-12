@@ -90,7 +90,7 @@ services:
     ports:
       - "3001:3001"
     environment:
-      REACT_APP_API_BASE_URL: http://127.0.0.1:3000/v1
+      REACT_APP_API_BASE_URL: http://${HOST_IP}:3000/v1
     depends_on:
       - api-server
 
