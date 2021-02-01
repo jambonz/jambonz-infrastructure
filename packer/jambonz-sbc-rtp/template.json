@@ -16,10 +16,10 @@
     "source_ami_filter": {
       "filters": {
         "virtualization-type": "hvm",
-        "name": "debian-stretch-hvm-x86_64-gp2-*",
+        "name": "debian-10-amd64-*",
         "root-device-type": "ebs"
       },
-      "owners": ["379101102735"],
+      "owners": ["136693071363"],
       "most_recent": true
     },
     "instance_type": "{{user `instance_type`}}",
@@ -28,7 +28,7 @@
     "ami_description": "{{user `ami_description`}}",
     "launch_block_device_mappings": [
       {
-        "device_name": "xvda",
+        "device_name": "/dev/xvda",
         "volume_size": 40,
         "volume_type": "gp2",
         "delete_on_termination": true
