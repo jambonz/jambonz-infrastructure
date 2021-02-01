@@ -17,7 +17,7 @@ There are many variables that can be specified on the `packer build` command lin
 The region to create the AMI in
 
 ```
-"ami_description": "EC2 AMI jambonz mini"
+"ami_description": "jambonz feature server"
 ```
 AMI description.
 
