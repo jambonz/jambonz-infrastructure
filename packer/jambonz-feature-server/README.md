@@ -1,6 +1,6 @@
 # jambonz-feature-server
 
-A [packer](https://www.packer.io/) template to build an AMI for the jambonz feature server.  The base linux distro is Debian 9 (stretch).
+A [packer](https://www.packer.io/) template to build an AMI for the jambonz feature server.  The base linux distro is Debian 10 (buster).
 
 ## Installing 
 
