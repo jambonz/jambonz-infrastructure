@@ -1,6 +1,6 @@
 # packer-sbc-rtp
 
-A [packer](https://www.packer.io/) template to build an AMI for a jambonz SBC RTP server.  The base linux distro is Debian 9 (stretch).
+A [packer](https://www.packer.io/) template to build an AMI for a jambonz SBC RTP server.  The base linux distro is Debian 10 (buster).
 
 ## Installing 
 

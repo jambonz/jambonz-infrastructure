@@ -204,7 +204,7 @@ sudo sed -i -e "s/--address 0.0.0.0 --port 9022/--address 0.0.0.0 --port 9022 --
 sudo sed -i -e "s/--delete-delay 0/--delete-delay 0 --homer=${MONITORING_SERVER_IP}:9060 --homer-protocol=udp --homer-id=11/g"  /etc/systemd/system/rtpengine.service
 
 sudo systemctl daemon-reload
-sudo sytemctl restart drachtio
-sudo sytemctl restart rtpengine
+sudo systemctl restart drachtio
+sudo systemctl restart rtpengine
 
 echo "user data script completed"
