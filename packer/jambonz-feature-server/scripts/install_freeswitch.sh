@@ -12,7 +12,7 @@ echo "AWS_SDK_VERSION version to install is ${AWS_SDK_VERSION}"
 git config --global pull.rebase true
 cd /usr/local/src
 git clone https://github.com/signalwire/freeswitch.git -b ${VERSION}
-git clone https://github.com/warmcat/libwebsockets.git -b v4.2.0
+git clone https://github.com/warmcat/libwebsockets.git -b v3.2.3
 git clone https://github.com/davehorton/drachtio-freeswitch-modules.git -b master
 git clone https://github.com/grpc/grpc -b ${GRPC_VERSION}
 

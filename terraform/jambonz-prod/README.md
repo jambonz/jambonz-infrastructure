@@ -1,6 +1,6 @@
 # terraform for a jambonz production system
 
-This terraform configuration generates a jambonz deployment suitable for testing or trial deployments.
+This terraform configuration generates a jambonz deployment suitable for production deployments.
 
 The deployment generated consists of:
 
