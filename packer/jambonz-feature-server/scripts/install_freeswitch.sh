@@ -2,18 +2,20 @@
 VERSION=v1.10.5
 GRPC_VERSION=v1.24.2
 GOOGLE_API_VERSION=v1p1beta1-speech
-AWS_SDK_VERSION=1.8.129
+AWS_SDK_VERSION=1.9.21
+LWS_VERSION=v3.2.3
 
 echo "freeswitch version to install is ${VERSION}"
 echo "GRPC version to install is ${GRPC_VERSION}"
 echo "GOOGLE_API_VERSION version to install is ${GOOGLE_API_VERSION}"
 echo "AWS_SDK_VERSION version to install is ${AWS_SDK_VERSION}"
+echo "LWS_VERSION version to install is ${LWS_VERSION}"
 
 git config --global pull.rebase true
 cd /usr/local/src
 git clone https://github.com/signalwire/freeswitch.git -b ${VERSION}
-git clone https://github.com/warmcat/libwebsockets.git -b v3.2.3
-git clone https://github.com/davehorton/drachtio-freeswitch-modules.git -b master
+git clone https://github.com/warmcat/libwebsockets.git -b ${LWS_VERSION}
+git clone https://github.com/drachtio/drachtio-freeswitch-modules.git -b master
 git clone https://github.com/grpc/grpc -b ${GRPC_VERSION}
 
 cd freeswitch/libs
@@ -59,6 +61,7 @@ make -j 4 && sudo make install
 
 # build aws-sdk-cpp
 cd /usr/local/src/freeswitch/libs/aws-sdk-cpp
+git submodule update --init --recursive
 mkdir -p build && cd build
 cmake .. -DBUILD_ONLY="lexv2-runtime;transcribestreaming" -DCMAKE_BUILD_TYPE=RelWithDebInfo -DBUILD_SHARED_LIBS=OFF -DCMAKE_CXX_FLAGS="-Wno-unused-parameter"
 make -j 4 && sudo make install
