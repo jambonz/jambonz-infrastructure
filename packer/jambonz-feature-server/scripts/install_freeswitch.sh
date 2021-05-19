@@ -2,7 +2,7 @@
 VERSION=v1.10.5
 GRPC_VERSION=v1.24.2
 GOOGLE_API_VERSION=v1p1beta1-speech
-AWS_SDK_VERSION=1.9.21
+AWS_SDK_VERSION=1.8.129
 LWS_VERSION=v3.2.3
 
 echo "freeswitch version to install is ${VERSION}"
@@ -61,7 +61,6 @@ make -j 4 && sudo make install
 
 # build aws-sdk-cpp
 cd /usr/local/src/freeswitch/libs/aws-sdk-cpp
-git submodule update --init --recursive
 mkdir -p build && cd build
 cmake .. -DBUILD_ONLY="lexv2-runtime;transcribestreaming" -DCMAKE_BUILD_TYPE=RelWithDebInfo -DBUILD_SHARED_LIBS=OFF -DCMAKE_CXX_FLAGS="-Wno-unused-parameter"
 make -j 4 && sudo make install
