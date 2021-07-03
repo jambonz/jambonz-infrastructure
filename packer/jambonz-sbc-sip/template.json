@@ -4,8 +4,8 @@
     "ssh_username": "admin",
     "ami_description": "jambonz SBC SIP", 
     "instance_type": "t2.medium",
-    "drachtio_version": "main",
-    "jambonz_version": "master",
+    "drachtio_version": "v0.8.10",
+    "jambonz_version": "v0.6.0",
     "install_datadog": "no",
     "install_telegraf": "yes"
   },
@@ -23,12 +23,12 @@
     },
     "instance_type": "{{user `instance_type`}}",
     "ssh_username": "{{user `ssh_username`}}",
-    "ami_name": "jambonz-sbc-sip-{{isotime |clean_resource_name }}",
+    "ami_name": "jambonz-sbc-sip-{{user `jambonz_version`}}-{{isotime |clean_resource_name }}",
     "ami_description": "{{user `ami_description`}}",
     "launch_block_device_mappings": [
       {
         "device_name": "/dev/xvda",
-        "volume_size": 40,
+        "volume_size": 60,
         "volume_type": "gp2",
         "delete_on_termination": true
       }
@@ -51,21 +51,34 @@
       "inline": [
         "while [ ! -f /var/lib/cloud/instance/boot-finished ]; do echo 'Waiting for cloud-init...'; sleep 1; done",
         "sudo apt-get update",
-        "sudo apt-get -y install python gcc g++ make cmake build-essential git autoconf automake mysql-client redis-tools \\",
-        "curl telnet libtool libtool-bin libssl-dev libcurl4-openssl-dev libz-dev systemd-coredump liblz4-tool \\",
+        "sudo apt-get -y install python gcc g++ make cmake build-essential git autoconf automake default-mysql-client redis-tools \\",
+        "jq curl telnet libtool libtool-bin libssl-dev libcurl4-openssl-dev libz-dev systemd-coredump liblz4-tool \\",
         "iptables-dev libavformat-dev liblua5.1-0-dev libavfilter-dev libavcodec-dev libswresample-dev \\",
         "libevent-dev libpcap-dev libxmlrpc-core-c3-dev markdown libjson-glib-dev lsb-release \\",
         "libhiredis-dev gperf libspandsp-dev default-libmysqlclient-dev htop dnsutils gdb \\",
         "gnupg2 wget pkg-config ca-certificates libjpeg-dev libsqlite3-dev libpcre3-dev libldns-dev \\",
         "libspeex-dev libspeexdsp-dev libedit-dev libtiff-dev yasm valgrind libswscale-dev haveged \\",
         "libopus-dev libsndfile-dev libshout3-dev libmpg123-dev libmp3lame-dev libopusfile-dev fail2ban",
-        "sudo chmod a+w /usr/local/src"
+        "sudo chmod a+w /usr/local/src",
+        "ssh-keyscan github.com >> ~/.ssh/known_hosts",
+        "mkdir ~/apps",
+        "cd ~/apps",
+        "git clone git@github.com:jambonz/sbc-options-handler.git",
+        "git clone git@github.com:jambonz/sbc-outbound.git -b {{user `jambonz_version`}}",
+        "git clone git@github.com:jambonz/sbc-inbound.git -b {{user `jambonz_version`}}",
+        "git clone git@github.com:jambonz/sbc-registrar.git -b {{user `jambonz_version`}}",
+        "git clone git@github.com:jambonz/sbc-call-router.git"
       ]
     },
     {
       "type": "file",
       "source": "files/",
       "destination": "/tmp"
+    },
+    {
+      "type": "shell",
+      "execute_command": "chmod +x {{ .Path }}; sudo '{{ .Path }}' {{build `ID`}}",
+      "script": "scripts/install_apiban.sh"
     },
     {
       "type": "shell",
@@ -80,10 +93,6 @@
       "type": "shell",
       "execute_command": "chmod +x {{ .Path }}; sudo '{{ .Path }}' {{user `install_telegraf`}}",
       "script": "scripts/install_telegraf.sh"
-    },
-    {
-      "type": "shell",
-      "script": "scripts/install_apiban.sh"
     },
     {
       "type": "shell",

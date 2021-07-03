@@ -1,0 +1,8 @@
+[nginx-noproxy]
+
+enabled  = true
+port     = http,https
+filter   = nginx-noproxy
+logpath  = /var/log/nginx/access.log
+maxretry = 1
+bantime = 86400

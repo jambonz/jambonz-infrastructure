@@ -2,16 +2,8 @@
 VERSION=$1
 
 cd /home/admin
-mkdir apps
 cp /tmp/ecosystem.config.js apps
 cd apps
-
-git clone https://github.com/jambonz/sbc-outbound.git -b ${VERSION}
-git clone https://github.com/jambonz/sbc-inbound.git -b ${VERSION}
-git clone https://github.com/jambonz/sbc-registrar.git -b ${VERSION}
-git clone https://github.com/jambonz/sbc-call-router.git -b ${VERSION}
-git clone https://github.com/jambonz/jambonz-api-server.git -b ${VERSION}
-git clone https://github.com/jambonz/jambonz-webapp.git -b ${VERSION}
 
 cd /home/admin/apps/sbc-inbound && sudo npm install --unsafe-perm
 cd /home/admin/apps/sbc-outbound && sudo npm install --unsafe-perm

@@ -10,15 +10,13 @@ git clone https://github.com/jambonz/sbc-outbound.git -b ${VERSION}
 git clone https://github.com/jambonz/sbc-inbound.git -b ${VERSION}
 git clone https://github.com/jambonz/sbc-registrar.git -b ${VERSION}
 git clone https://github.com/jambonz/sbc-call-router.git -b ${VERSION}
-git clone https://github.com/jambonz/jambonz-api-server.git -b ${VERSION}
-git clone https://github.com/jambonz/jambonz-webapp.git -b ${VERSION}
+git clone https://github.com/jambonz/sbc-options-handler.git -b ${VERSION}
 
 cd /home/admin/apps/sbc-inbound && sudo npm install --unsafe-perm
 cd /home/admin/apps/sbc-outbound && sudo npm install --unsafe-perm
 cd /home/admin/apps/sbc-registrar && sudo npm install --unsafe-perm
 cd /home/admin/apps/sbc-call-router && sudo npm install --unsafe-perm
-cd /home/admin/apps/jambonz-api-server && sudo npm install --unsafe-perm
-cd /home/admin/apps/jambonz-webapp && sudo npm install --unsafe-perm && npm run build
+cd /home/admin/apps/sbc-options-handler && sudo npm install --unsafe-perm
 
 sudo -u admin bash -c "pm2 install pm2-logrotate"
 sudo -u admin bash -c "pm2 set pm2-logrotate:max_size 1G"

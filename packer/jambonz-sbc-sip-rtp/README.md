@@ -9,7 +9,7 @@ $  packer build -color=false template.json
 ```
 
 ### variables
-There are many variables that can be specified on the `packer build` command line; however defaults (which are shown below) are appropriate for building an "all in one" jambonz server, so you generally should not need to specify values.
+There are many variables that can be specified on the `packer build` command line; these are shown below with their default values.
 
 ```
 "region": "us-east-1"
@@ -17,25 +17,25 @@ There are many variables that can be specified on the `packer build` command lin
 The region to create the AMI in
 
 ```
-"ami_description": "jambonz SBC SIP+RTP"
+"ami_description": "jambonz SBC SIP+RTP+Webserver"
 ```
 AMI description.
 
 ```
-"instance_type": "t2.medium"
+"instance_type": "t2.xlarge"
 ```
 EC2 Instance type to use when building the AMI.
 
 
 ```
-"drachtio_version": "v0.8.4"
+"drachtio_version": "v0.8.10"
 ```
 drachtio tag or branch to build
 
 ```
 
 ```
-"rtp_engine_version": "mr8.3.1.4",
+"rtp_engine_version": "mr9.3.1.8",
 ```
 rtpengine version
 

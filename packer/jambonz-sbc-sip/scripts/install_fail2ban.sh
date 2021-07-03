@@ -26,3 +26,6 @@ EOF
 
 sudo cp /tmp/drachtio-fail2ban.conf /etc/fail2ban/filter.d/drachtio.conf
 sudo chmod 0644 /etc/fail2ban/filter.d/drachtio.conf
+
+sudo systemctl enable fail2ban
+sudo systemctl restart fail2ban

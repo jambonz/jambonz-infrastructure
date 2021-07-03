@@ -2,12 +2,8 @@
 VERSION=$1
 
 cd /home/admin
-mkdir apps credentials
 cp /tmp/ecosystem.config.js apps
 cd apps
-
-git clone https://github.com/jambonz/jambonz-feature-server.git -b ${VERSION}
-git clone https://github.com/jambonz/fsw-clear-old-calls.git
 
 cd /home/admin/apps/jambonz-feature-server && sudo npm install --unsafe-perm
 cd /home/admin/apps/fsw-clear-old-calls && npm install && sudo npm install -g .

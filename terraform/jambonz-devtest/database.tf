@@ -4,6 +4,12 @@ resource "aws_db_subnet_group" "jambonz" {
   subnet_ids = local.my_subnet_ids
 }
 
+# generate random password
+resource "random_password" "password" {
+  length           = 16
+  special          = false
+}
+
 # create aurora database
 resource "aws_rds_cluster" "jambonz" {
   cluster_identifier      = "aurora-cluster-${var.prefix}"
@@ -14,7 +20,7 @@ resource "aws_rds_cluster" "jambonz" {
   db_subnet_group_name    = aws_db_subnet_group.jambonz.name
   database_name           = "jambones"
   master_username         = "admin"
-  master_password         = "JambonzR0ck$"
+  master_password         = random_password.password.result
   skip_final_snapshot     = true
   backup_retention_period = 5
   preferred_backup_window = "07:00-09:00"

@@ -1,13 +1,14 @@
-# terraform for a jambonz development / test system
+# terraform for a 2-instance jambonz system
 
-This terraform configuration generates a jambonz deployment suitable for testing or small production deployments.
+This terraform configuration generates a jambonz deployment suitable for testing or small production loads.
 
 The deployment generated consists of:
 
 - a VPC along with public subnets, internet gateway, routing table and the like.
-- 2 EC2 instances: 1 SBC and 1 feature server (the SBC is assigned an elastic IP)
-- an autoscale group containing the feature server
-- an SNS topic that is used to notify autoscale lifecycle events to the feature server
+- 2 EC2 instances: 1 Session Border Controller (SBC) and 1 feature server (FS)
+- an EIP (elastic IP) for the SBC instance
+- an autoscale group containing the FS instance, allowing for horizontal scaling of the FS
+- an SNS topic that is used to notify autoscale lifecycle events to the FS instance(s)
 - an aurora mysql serverless database
 - an elasticache redis server
 
@@ -15,14 +16,25 @@ The deployment generated consists of:
 
 ### Prerequisites
 
-Before running the terraform script you will need to have done the following:
+Before running the terraform script there are two pre-requisites:
 
-1. Provisioned accounts on AWS and GCP
-1. (AWS) Created a keypair in your target region and downloaded the .pem file to your local machine.
-1. (AWS) Generated an access key id and secret access key
-1. (GCP) Created a project, enabled both text to speech and speech to text APIs, created a service account for the project and downloaded the json key file for the service account.
-1. Copied the the GCP json key file into the `credentials\` folder in your local copy of this project.
-1. Reviewed and edited the [variables.tf](./variables.tf) file in your local copy of this project to specify your desired AWS region, availability zones, EC2 instance type, and your AWS keys (alternatively, these can be specified on the command line when running the script).
+1.  You need to create amis for the SBC and the Feature server by running the [jambonz-sbc-sip-rtp](../../packer/jambonz-sbc-sip-rtp) and [jambonz-feature-server](../../packer/jambonz-feature-server) packer scripts.
+1. You need to create an IAM role with permissions to publish SNS notifications.  These are used by the feature server to gracefully respond to scale-in lifecycle events.
+
+Please refer to the above packer scripts for generating your AMIs.
+
+### Creating an AMI role
+As mentioned above, we need to create an AMI role that has permissions to generate SNS notifications. To do, so go into the IAM dashboard in AWS and then do the following:
+- click on Roles / Create role,
+- under "Choose a use case" select the link at the bottom of the page titled "EC2 Auto Scaling",
+- under "Select your use case"  choose "EC2 Auto Scaling Notification Access" and then click "Next: Permissions"
+- Leave the settings in place and click "Next: Tags"
+- You do not need to add any tags, so click "Next: Review"
+- Enter a Role name (e.g. "my-jambonz-sns-role") and click Create role
+
+The role will then be created. When you run the terraform script you will provide the role name as the value for the terraform variable named "ami_role_name".
+
+> **Note**: The creation of the AMI role is a one-time thing; you can use the created IAM role for all clusters you deploy.
 
 ### It's go time!
 
@@ -32,47 +44,43 @@ After [installing terraform](https://learn.hashicorp.com/terraform/getting-start
 terraform init
 ```
 
-Testing out the script is a good idea, particularly if you've made changes:
-```
-terraform plan
-```
+At that point you are ready to run the script.  There are a couple of variables that you must supply, and some others that are optional.  These variables can either be defined by editing the [./variables.tf] file or supplied on the command line in `var='variable=value'` format.
 
-When you are ready to run it, do terraform apply, optionally passing any command-line arguments that you want to override variables.tf.
+|Variable Name|Value|Required?|Default Value|
+|-----|----|------|-----|
+|ami_owner_account|your aws account id|Yes|None|
+|ami_role_name|name of the IAM role you created above|Yes|None|
+|key_name|name of existing aws key-pair to use to access the instances (e.g. my-keypair)|Yes|None|
+|ssh_key_path|path to key-pair file on local machine (e.g. ~/credentials/my-keypair.pem)|Yes|None|
+|region|AWS region to create instances in|No|us-west-1|
+|ec2_instance_type_sbc|EC2 instance type for SBC|No|t3.medium|
+|ec2_instance_type_fs|EC2 instance type for Feature Server|No|t3.medium|
+|vpc_cidr_block|Network CIDR for the created VPC|No|172.31.0.0/16|
+|public_subnets|Two public subnets to create within the VPC|No|{"us-west-1a" = "172.31.32.0/24""us-west-1b" = "172.31.33.0/24"}|
+|cluster_id|short identifier used to prefix some names of created items|No|jb|
+|prefix|name of VPC|No|jambonz|
 
-So, if you edit variables.tf to put in your selections:
-
-```
-terraform apply 
-```
-
-or, if you prefer command-line arguments, you might do:
+A command line with variables supplied looks like this:
 
 ```
 terraform apply \
--var='region=eu-west-3' \
--var='public_subnets={"eu-west-3a": "172.31.32.0/24", "eu-west-3b": "172.31.33.0/24"}' \
--var='aws_access_key_id_runtime=XXXX' \
--var='aws_secret_access_key_runtime=YYYYY' \
--var='ssh_key_path=~/aws/aws-dhorton-paris.pem' \
--var='key_name=aws-dhorton-paris'
+-var='ami_owner_account=376029039784' \
+-var='ami_role_name=my-jambonz-sns-role' \
+-var='region=us-west-1' \
+-var='public_subnets={"us-west-1a" = "172.31.32.0/24","us-west-1b" = "172.31.33.0/24"}' \
+-var='ssh_key_path=~/aws/~/aws/aws-drachtio-us-west-1.pem' \
+-var='key_name=aws-drachtio-us-west-1' 
 ```
 
 Enter 'yes' at the confirmation prompt, and very shortly you will be the proud owner of a brand-new jambonz cluster!
 
-(Note: to destroy the cluster, simply run `terraform destroy`).
+(Note: to destroy the cluster, simply run `terraform destroy` with the same command line arguments).
 
-### Next steps
+### Access the jambonz portal
 
-After creating the cluster, get the elastic IP of your SBC server and navigate to:
+After creating the cluster, wait a few minutes before accessing the jambonz portal for the first time.  There are some userdata scripts that need to finish running, and you may get a "502 Bad Gateway" error if you attempt to access the portal before they have completed.  If this happens, simply wait a few minutes and try again.
 
-```
-http://your-elastic-ip:3001
-```
- in your web browser to bring up the provisioning GUI.  
+Once the SBC instance is fully up, log into the jambonz portal by navigating to `http://eip-of-sbc-instance` in your web browser.
  
- Log in with admin/admin.
+Log in the first time with username and password 'admin'.  You will then be forced to set a new password.
  
- You'll be asked to change the password and then walked through a simple configuration of your account, applications, sip trunks and phone numbers.  
- 
- Once done, you are ready to test!
-

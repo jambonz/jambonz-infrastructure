@@ -1,17 +1,47 @@
 #!/bin/bash
-PUBLIC_IP=`curl -s http://169.254.169.254/latest/meta-data/public-ipv4`
+PUBLIC_IPV4=`curl -s http://169.254.169.254/latest/meta-data/public-ipv4`
 
 echo "running jambonz user data script"
 
+# move grafana to port 3010
+echo "moving grafana to port 3010"
+sudo systemctl stop grafana-server
+sudo sed -i -e "s/;http_port = 3000/http_port = 3010/g" /etc/grafana/grafana.ini
+sudo systemctl restart grafana-server
+
+# configure telegraph to send to the monitoring server
+sudo sed -i -e "s/influxdb:8086/${MONITORING_SERVER_IP}:8086/g"  /etc/telegraf/telegraf.conf
+sudo systemctl restart telegraf
+
+# point drachtio server and rtpengine to the HEP endpoint on the monitoring server
+sudo sed -i -e "s/--address 0.0.0.0 --port 9022/--address 0.0.0.0 --port 9022 --homer ${MONITORING_SERVER_IP}:9060 --homer-id 10/g"  /etc/systemd/system/drachtio.service
+sudo sed -i -e "s/--delete-delay 0/--delete-delay 0 --homer=${MONITORING_SERVER_IP}:9060 --homer-protocol=udp --homer-id=11/g"  /etc/systemd/system/rtpengine.service
+
+# update server names for access to grafana and homer
+sudo sed -i -E "s|^(\s*)server_name\s+homer.your_domain.com;|\1server_name homer.${JAMBONES_DNS_NAME};|g"  /etc/nginx/sites-available/default
+sudo sed -i -E "s|^(\s*)server_name\s+grafana.your_domain.com;|\1server_name grafana.${JAMBONES_DNS_NAME};|g"  /etc/nginx/sites-available/default
+
+echo "restarting services"
+sudo systemctl daemon-reload
+sudo systemctl restart nginx
+sudo systemctl restart drachtio
+sudo systemctl restart rtpengine
+sudo systemctl restart telegraf
+sudo systemctl restart influxdb
+sudo systemctl restart postgresql
+sudo systemctl restart homer-app
+sudo systemctl restart heplify-server
+
 # seed database
-mysql -h ${JAMBONES_MYSQL_HOST} -u admin -D jambones -p${JAMBONES_MYSQL_PASSWORD} < /home/admin/apps/jambonz-api-server/db/jambones-sql.sql
-mysql -h ${JAMBONES_MYSQL_HOST} -u admin -D jambones -p${JAMBONES_MYSQL_PASSWORD} < /home/admin/apps/jambonz-api-server/db/create-admin-token.sql
-mysql -h ${JAMBONES_MYSQL_HOST} -u admin -D jambones -p${JAMBONES_MYSQL_PASSWORD} < /home/admin/apps/jambonz-api-server/db/create-default-account.sql
+echo "seeding database"
+mysql -h ${JAMBONES_MYSQL_HOST} -u admin -p${JAMBONES_MYSQL_PASSWORD} -D jambones < /home/admin/apps/jambonz-api-server/db/jambones-sql.sql
+mysql -h ${JAMBONES_MYSQL_HOST} -u admin -p${JAMBONES_MYSQL_PASSWORD} -D jambones < /home/admin/apps/jambonz-api-server/db/seed-production-database-open-source.sql
 JAMBONES_MYSQL_HOST=${JAMBONES_MYSQL_HOST} JAMBONES_MYSQL_USER=admin JAMBONES_MYSQL_PASSWORD=${JAMBONES_MYSQL_PASSWORD} JAMBONES_MYSQL_DATABASE=jambones /home/admin/apps/jambonz-api-server/db/reset_admin_password.js
 
 # jambonz webapp
 echo "building webapp.."
-echo "REACT_APP_API_BASE_URL=http://$PUBLIC_IP:3000/v1" > /home/admin/apps/jambonz-webapp/.env.local
+echo "REACT_APP_API_BASE_URL=http://$PUBLIC_IPV4/api/v1" > /home/admin/apps/jambonz-webapp/.env.local
+echo "REACT_APP_MOBILE_BREAKPOINT=767px" >> /home/admin/apps/jambonz-webapp/.env.local
 cd  /home/admin/apps/jambonz-webapp/
 npm run build
 
@@ -44,12 +74,13 @@ module.exports = {
       JAMBONES_LOGLEVEL: 'info',
       JAMBONE_API_VERSION: 'v1',
       JAMBONES_CLUSTER_ID: '${JAMBONES_CLUSTER_ID}',
+      JAMBONES_TIME_SERIES_HOST: '${MONITORING_SERVER_IP}',
       ENABLE_METRICS: 1,
       STATS_HOST: '127.0.0.1',
       STATS_PORT: 8125,
       STATS_PROTOCOL: 'tcp',
       STATS_TELEGRAF: 1,
-      HTTP_PORT:  3000
+      HTTP_PORT:  3002
 		},
   },
   {
@@ -93,6 +124,7 @@ module.exports = {
     env: {
       NODE_ENV: 'production',
       JAMBONES_LOGLEVEL: 'info',
+      RTPENGINE_PING_INTERVAL: 30000,
       DRACHTIO_HOST: '127.0.0.1',
       DRACHTIO_PORT: 9022,
       DRACHTIO_SECRET: 'cymru',
@@ -103,6 +135,7 @@ module.exports = {
       JAMBONES_MYSQL_CONNECTION_LIMIT: 10,
       JAMBONES_REDIS_HOST: '${JAMBONES_REDIS_HOST}',
       JAMBONES_REDIS_PORT: 6379,
+      JAMBONES_TIME_SERIES_HOST: '${MONITORING_SERVER_IP}',
       ENABLE_METRICS: 1,
       STATS_HOST: '127.0.0.1',
       STATS_PORT: 8125,
@@ -125,6 +158,7 @@ module.exports = {
     env: {
       NODE_ENV: 'production',
       JAMBONES_LOGLEVEL: 'info',
+      RTPENGINE_PING_INTERVAL: 30000,
       DRACHTIO_HOST: '127.0.0.1',
       DRACHTIO_PORT: 9022,
       DRACHTIO_SECRET: 'cymru',
@@ -136,12 +170,12 @@ module.exports = {
       JAMBONES_MYSQL_CONNECTION_LIMIT: 10,
       JAMBONES_REDIS_HOST: '${JAMBONES_REDIS_HOST}',
       JAMBONES_REDIS_PORT: 6379,
+      JAMBONES_TIME_SERIES_HOST: '${MONITORING_SERVER_IP}',
       ENABLE_METRICS: 1,
       STATS_HOST: '127.0.0.1',
       STATS_PORT: 8125,
       STATS_PROTOCOL: 'tcp',
-      STATS_TELEGRAF: 1,
-      MS_TEAMS_FQDN: '${MS_TEAMS_FQDN}'
+      STATS_TELEGRAF: 1
 		}
   },
   {
@@ -158,6 +192,7 @@ module.exports = {
     max_memory_restart: '1G',
     env: {
       NODE_ENV: 'production',
+      JAMBONES_NETWORK_CIDR: '${VPC_CIDR}',
       JAMBONES_LOGLEVEL: 'info',
       DRACHTIO_HOST: '127.0.0.1',
       DRACHTIO_PORT: 9022,
@@ -170,6 +205,7 @@ module.exports = {
       JAMBONES_MYSQL_CONNECTION_LIMIT: 10,
       JAMBONES_REDIS_HOST: '${JAMBONES_REDIS_HOST}',
       JAMBONES_REDIS_PORT: 6379,
+      JAMBONES_TIME_SERIES_HOST: '${MONITORING_SERVER_IP}',
       JAMBONES_CLUSTER_ID: '${JAMBONES_CLUSTER_ID}',
       ENABLE_METRICS: 1,
       STATS_HOST: '127.0.0.1',
@@ -187,24 +223,13 @@ module.exports = {
   }]
 };
 EOF
+sudo sed -i -e "s/\(.*\)JAMBONES_MYSQL_PASSWORD.*/\1JAMBONES_MYSQL_PASSWORD: '${JAMBONES_MYSQL_PASSWORD}',/g" /home/admin/apps/ecosystem.config.js 
 
-echo "finished writing config file"
+echo "starting applications"
 
 sudo -u admin bash -c "pm2 start /home/admin/apps/ecosystem.config.js"
 sudo env PATH=$PATH:/usr/bin /usr/lib/node_modules/pm2/bin/pm2 startup systemd -u admin --hp /home/admin
 sudo -u admin bash -c "pm2 save"
 sudo systemctl enable pm2-admin.service
-
-# configure telegraph to send to the monitoring server
-sudo sed -i -e "s/influxdb:8086/${MONITORING_SERVER_IP}:8086/g"  /etc/telegraf/telegraf.conf
-sudo systemctl restart telegraf
-
-# point drachtio server and rtpengine to the HEP endpoint on the monitoring server
-sudo sed -i -e "s/--address 0.0.0.0 --port 9022/--address 0.0.0.0 --port 9022 --homer ${MONITORING_SERVER_IP}:9060 --homer-id 10/g"  /etc/systemd/system/drachtio.service
-sudo sed -i -e "s/--delete-delay 0/--delete-delay 0 --homer=${MONITORING_SERVER_IP}:9060 --homer-protocol=udp --homer-id=11/g"  /etc/systemd/system/rtpengine.service
-
-sudo systemctl daemon-reload
-sudo systemctl restart drachtio
-sudo systemctl restart rtpengine
 
 echo "user data script completed"

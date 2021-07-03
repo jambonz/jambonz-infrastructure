@@ -2,16 +2,17 @@
   "variables": {
     "region": "us-east-1",
     "ssh_username": "admin",
-    "ami_description": "jambonz SBC SIP+RTP", 
-    "drachtio_version": "main",
-    "jambonz_version": "master",
-    "install_datadog": "no",
-    "install_telegraf": "yes",
-    "instance_type": "t2.medium",
-    "rtp_engine_version": "mr8.5",
+    "ami_description": "jambonz SBC SIP+RTP+Webserver+monitoring", 
+    "drachtio_version": "v0.8.10",
+    "jambonz_version": "v0.6.3",
+    "install_influxdb":  "yes",
+    "install_homer":  "yes",
+    "homer_user": "homer_user",
+    "homer_password": "XcapJTqy11LnsYRtxXGPTYQkAnI",
+    "instance_type": "t2.xlarge",
+    "rtp_engine_version": "mr9.3.1.8",
     "rtp_engine_min_port": "40000",
     "rtp_engine_max_port": "60000"
-
   },
   "builders": [{
     "type": "amazon-ebs",
@@ -27,12 +28,12 @@
     },
     "instance_type": "{{user `instance_type`}}",
     "ssh_username": "{{user `ssh_username`}}",
-    "ami_name": "jambonz-sbc-sip-rtp-{{isotime |clean_resource_name }}",
+    "ami_name": "jambonz-sbc-sip-rtp-{{user `jambonz_version`}}-{{isotime |clean_resource_name }}",
     "ami_description": "{{user `ami_description`}}",
     "launch_block_device_mappings": [
       {
         "device_name": "/dev/xvda",
-        "volume_size": 40,
+        "volume_size": 60,
         "volume_type": "gp2",
         "delete_on_termination": true
       }
@@ -56,14 +57,23 @@
         "while [ ! -f /var/lib/cloud/instance/boot-finished ]; do echo 'Waiting for cloud-init...'; sleep 1; done",
         "sudo apt-get update",
         "sudo apt-get -y install lsof python lsof gcc g++ make cmake build-essential git autoconf automake default-mysql-client redis-tools \\",
-        "curl telnet libtool libtool-bin libssl-dev libcurl4-openssl-dev libz-dev systemd-coredump liblz4-tool \\",
+        "jq curl telnet libtool libtool-bin libssl-dev libcurl4-openssl-dev libz-dev systemd-coredump liblz4-tool \\",
         "iptables-dev libavformat-dev liblua5.1-0-dev libavfilter-dev libavcodec-dev libswresample-dev \\",
         "libevent-dev libpcap-dev libxmlrpc-core-c3-dev markdown libjson-glib-dev lsb-release \\",
-        "libhiredis-dev gperf libspandsp-dev default-libmysqlclient-dev htop dnsutils gdb \\",
+        "libhiredis-dev gperf libspandsp-dev default-libmysqlclient-dev htop dnsutils gdb certbot python-certbot-nginx \\",
         "gnupg2 wget pkg-config ca-certificates libjpeg-dev libsqlite3-dev libpcre3-dev libldns-dev \\",
         "libspeex-dev libspeexdsp-dev libedit-dev libtiff-dev yasm valgrind libswscale-dev haveged \\",
         "libopus-dev libsndfile-dev libshout3-dev libmpg123-dev libmp3lame-dev libopusfile-dev fail2ban",
-        "sudo chmod a+w /usr/local/src"
+        "sudo chmod a+w /usr/local/src",
+        "ssh-keyscan github.com >> ~/.ssh/known_hosts",
+        "mkdir ~/apps",
+        "cd ~/apps",
+        "git clone git@github.com:jambonz/sbc-outbound.git -b {{user `jambonz_version`}}",
+        "git clone git@github.com:jambonz/sbc-inbound.git -b {{user `jambonz_version`}}",
+        "git clone git@github.com:jambonz/sbc-registrar.git -b {{user `jambonz_version`}}",
+        "git clone git@github.com:jambonz/sbc-call-router.git -b {{user `jambonz_version`}}",
+        "git clone git@github.com:jambonz/jambonz-api-server.git -b {{user `jambonz_version`}}",
+        "git clone git@github.com:jambonz/jambonz-webapp.git -b {{user `jambonz_version`}}"
       ]
     },
     {
@@ -77,17 +87,21 @@
     },
     {
       "type": "shell",
-      "execute_command": "chmod +x {{ .Path }}; sudo '{{ .Path }}' {{user `install_datadog`}}",
-      "script": "scripts/install_datadog.sh"
+      "execute_command": "chmod +x {{ .Path }}; sudo '{{ .Path }}' {{user `install_homer`}} {{user `homer_user`}} {{user `homer_password`}}",
+      "script": "scripts/install_postgresql.sh"
     },
     {
       "type": "shell",
-      "execute_command": "chmod +x {{ .Path }}; sudo '{{ .Path }}' {{user `install_telegraf`}}",
       "script": "scripts/install_telegraf.sh"
     },
     {
       "type": "shell",
+      "execute_command": "chmod +x {{ .Path }}; sudo '{{ .Path }}' {{build `ID`}}",
       "script": "scripts/install_apiban.sh"
+    },
+    {
+      "type": "shell",
+      "script": "scripts/install_nginx.sh"
     },
     {
       "type": "shell",
@@ -105,12 +119,36 @@
     },
     {
       "type": "shell",
+      "script": "scripts/install_fail2ban.sh"
+    },
+    {
+      "type": "shell",
+      "script": "scripts/install_telegraf.sh"
+    },
+    {
+      "type": "shell",
+      "execute_command": "chmod +x {{ .Path }}; sudo '{{ .Path }}' {{user `install_homer`}} {{user `homer_user`}} {{user `homer_password`}}",
+      "script": "scripts/install_homer.sh"
+    },
+    {
+      "type": "shell",
+      "script": "scripts/install_influxdb.sh"
+    },
+    {
+      "type": "shell",
+      "script": "scripts/install_grafana.sh"
+    },
+    {
+      "type": "shell",
       "execute_command": "chmod +x {{ .Path }}; sudo '{{ .Path }}' {{user `jambonz_version`}}",
       "script": "scripts/install_app.sh"
     },
     {
       "type": "shell",
-      "script": "scripts/install_fail2ban.sh"
+      "inline": [
+        "sudo rm /root/.ssh/authorized_keys",
+        "sudo rm /home/admin/.ssh/authorized_keys"
+      ]
     }
   ]
 }

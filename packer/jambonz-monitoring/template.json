@@ -4,6 +4,7 @@
     "ssh_username": "admin",
     "ami_description": "jambonz monitoring server", 
     "instance_type": "t2.medium",
+    "jambonz_version": "v0.6.0",
     "homer_user": "homer_user",
     "homer_password": "XcapJTqy11LnsYRtxXGPTYQkAnI",
     "install_influxdb":  "yes",
@@ -26,12 +27,12 @@
     },
     "instance_type": "{{user `instance_type`}}",
     "ssh_username": "{{user `ssh_username`}}",
-    "ami_name": "jambonz-monitoring-server-all-in-one-{{isotime |clean_resource_name }}",
+    "ami_name": "jambonz-monitoring-server-{{user `jambonz_version`}}-{{isotime |clean_resource_name }}",
     "ami_description": "{{user `ami_description`}}",
     "launch_block_device_mappings": [
       {
         "device_name": "/dev/xvda",
-        "volume_size": 40,
+        "volume_size": 100,
         "volume_type": "gp2",
         "delete_on_termination": true
       }
@@ -45,7 +46,7 @@
       "Name": "{{user `tag_name`}}"
     },
     "run_tags": {
-      "Name": "homer-ami-building"
+      "Name": "jambonz-monitoring-server-build"
     }
   }],
   "provisioners": [
@@ -55,7 +56,8 @@
         "while [ ! -f /var/lib/cloud/instance/boot-finished ]; do echo 'Waiting for cloud-init...'; sleep 1; done",
         "sudo apt-get update",
         "sudo apt-get -y install software-properties-common make cmake gcc g++ dirmngr sudo python3-dev \\",
-        "curl wget sed git"
+        "curl wget sed git",
+        "sudo find / -name authorized_keys | sudo xargs -0 -r rm -Rf"
       ]
     },
     {

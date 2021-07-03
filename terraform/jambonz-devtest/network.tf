@@ -52,7 +52,6 @@ resource "aws_subnet" "jambonz" {
 # for ease of reference later on, create a list of public subnet ids
 locals {
   my_subnet_ids = [for v in aws_subnet.jambonz : v.id]
-  rtpengine_hostports = [for ip in var.jambonz_sbc_sip_rtp_private_ips : "${ip}:22222"]
 }
 
 # create a security group that allows any server in the VPC to access redis
@@ -204,7 +203,22 @@ resource "aws_security_group" "allow_jambonz_sbc_sip_rtp" {
   }
 
   ingress {
-    description = "sip from everywhere"
+    description = "http"
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+  ingress {
+    description = "https"
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    description = "sip over udp"
     from_port   = 5060
     to_port     = 5060
     protocol    = "udp"
@@ -212,17 +226,17 @@ resource "aws_security_group" "allow_jambonz_sbc_sip_rtp" {
   }
 
   ingress {
-    description = "sip tls for teams"
+    description = "sip over tls"
     from_port   = 5061
     to_port     = 5061
     protocol    = "tcp"
-    cidr_blocks = ["52.114.148.0/32", "52.114.132.46/32", "52.114.75.24/32", "52.114.76.76/32", "52.114.7.24/32", "52.114.14.70/32"]
+    cidr_blocks = ["0.0.0.0/0"]
   }
 
   ingress {
-    description = "sip from everywhere"
-    from_port   = 5060
-    to_port     = 5060
+    description = "sip over wss"
+    from_port   = 4433
+    to_port     = 4433
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
@@ -243,13 +257,12 @@ resource "aws_security_group" "allow_jambonz_sbc_sip_rtp" {
     cidr_blocks = [aws_vpc.jambonz.cidr_block]
   }
 
-
   ingress {
-    description = "http api"
-    from_port   = 3000
-    to_port     = 3000
+    description = "rtpengine http protocol from VPC"
+    from_port   = 8080
+    to_port     = 8080
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = [aws_vpc.jambonz.cidr_block]
   }
 
   ingress {
@@ -258,49 +271,6 @@ resource "aws_security_group" "allow_jambonz_sbc_sip_rtp" {
     to_port     = 3000
     protocol    = "tcp"
     security_groups = [aws_security_group.allow_jambonz_feature_server.id]
-  }
-
-  ingress {
-    description = "http webapp"
-    from_port   = 3001
-    to_port     = 3001
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  tags = {
-    Name = "allow_${var.prefix}_sbc_sip"
-  }
-}
-
-
-# create a security group for the monitoring server
-resource "aws_security_group" "allow_jambonz_monitoring" {
-  name        = "allow_jambonz_monitoring"
-  description = "Allow traffic to jambonz monitoring server"
-  vpc_id      = aws_vpc.jambonz.id
-
-  ingress {
-    description = "ssh"
-    from_port   = 22
-    to_port     = 22
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  ingress {
-    description = "grafana"
-    from_port   = 3000
-    to_port     = 3000
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
   }
 
   ingress {
@@ -320,27 +290,11 @@ resource "aws_security_group" "allow_jambonz_monitoring" {
   }
 
   ingress {
-    description = "homer webapp"
-    from_port   = 9080
-    to_port     = 9080
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  ingress {
     description = "homer HEP"
     from_port   = 9060
     to_port     = 9060
     protocol    = "udp"
     cidr_blocks = [aws_vpc.jambonz.cidr_block]
-  }
-
-  ingress {
-    description = "Node-RED"
-    from_port   = 1880
-    to_port     = 1880
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
   }
 
   egress {
@@ -354,3 +308,5 @@ resource "aws_security_group" "allow_jambonz_monitoring" {
     Name = "allow_${var.prefix}_sbc_sip"
   }
 }
+
+
