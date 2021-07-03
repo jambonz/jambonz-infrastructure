@@ -16,25 +16,9 @@ The deployment generated consists of:
 
 ### Prerequisites
 
-Before running the terraform script there are two pre-requisites:
-
-1.  You need to create amis for the SBC and the Feature server by running the [jambonz-sbc-sip-rtp](../../packer/jambonz-sbc-sip-rtp) and [jambonz-feature-server](../../packer/jambonz-feature-server) packer scripts.
-1. You need to create an IAM role with permissions to publish SNS notifications.  These are used by the feature server to gracefully respond to scale-in lifecycle events.
+Before running the terraform script you need to create amis for the SBC and the Feature server by running the [jambonz-sbc-sip-rtp](../../packer/jambonz-sbc-sip-rtp) and [jambonz-feature-server](../../packer/jambonz-feature-server) packer scripts.
 
 Please refer to the above packer scripts for generating your AMIs.
-
-### Creating an AMI role
-As mentioned above, we need to create an AMI role that has permissions to generate SNS notifications. To do, so go into the IAM dashboard in AWS and then do the following:
-- click on Roles / Create role,
-- under "Choose a use case" select the link at the bottom of the page titled "EC2 Auto Scaling",
-- under "Select your use case"  choose "EC2 Auto Scaling Notification Access" and then click "Next: Permissions"
-- Leave the settings in place and click "Next: Tags"
-- You do not need to add any tags, so click "Next: Review"
-- Enter a Role name (e.g. "my-jambonz-sns-role") and click Create role
-
-The role will then be created. When you run the terraform script you will provide the role name as the value for the terraform variable named "ami_role_name".
-
-> **Note**: The creation of the AMI role is a one-time thing; you can use the created IAM role for all clusters you deploy.
 
 ### It's go time!
 
@@ -49,7 +33,6 @@ At that point you are ready to run the script.  There are a couple of variables 
 |Variable Name|Value|Required?|Default Value|
 |-----|----|------|-----|
 |ami_owner_account|your aws account id|Yes|None|
-|ami_role_name|name of the IAM role you created above|Yes|None|
 |key_name|name of existing aws key-pair to use to access the instances (e.g. my-keypair)|Yes|None|
 |ssh_key_path|path to key-pair file on local machine (e.g. ~/credentials/my-keypair.pem)|Yes|None|
 |region|AWS region to create instances in|No|us-west-1|
@@ -65,7 +48,6 @@ A command line with variables supplied looks like this:
 ```
 terraform apply \
 -var='ami_owner_account=376029039784' \
--var='ami_role_name=my-jambonz-sns-role' \
 -var='region=us-west-1' \
 -var='public_subnets={"us-west-1a" = "172.31.32.0/24","us-west-1b" = "172.31.33.0/24"}' \
 -var='ssh_key_path=~/aws/~/aws/aws-drachtio-us-west-1.pem' \

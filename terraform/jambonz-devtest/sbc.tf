@@ -32,6 +32,6 @@ resource "aws_instance" "jambonz-sbc-sip-rtp-server" {
   depends_on = [aws_internet_gateway.jambonz, aws_elasticache_cluster.jambonz, aws_rds_cluster.jambonz]
 
   tags = {
-    Name = "${var.prefix}-sbc-sip-rtp-server"  
+    Name = "jambonz-sbc-sip-rtp-server"  
   }
 }

@@ -1,11 +1,54 @@
-# retrieve IAM role that you created manually for SNS (see README)
-data "aws_iam_role" "jambonz_ami_role" {
-  name           = var.ami_role_name
-}
-
 # create an SNS notification topic
 resource "aws_sns_topic" "jambonz_sns_topic_open_source" {
-#  name = "${var.prefix}-fs-lifecycle-events"
+}
+
+resource "aws_iam_instance_profile" "jambonz_feature_server_profile" {
+  name = "jambonz_feature_server_profile"
+  role = aws_iam_role.jambonz_sns_publish.name
+}
+
+resource "aws_iam_role" "jambonz_sns_publish" {
+  assume_role_policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Principal": {
+        "Service": [
+          "ec2.amazonaws.com",
+          "autoscaling.amazonaws.com"
+        ]
+      },
+      "Action": "sts:AssumeRole"
+    }
+  ]
+}
+EOF
+}
+
+resource "aws_iam_policy" "allow_jambonz_sns_publish" {
+  policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Action": [
+        "sns:*",
+        "autoscaling:CompleteLifecycleAction",
+        "autoscaling:Describe*"
+      ],
+      "Effect": "Allow",
+      "Resource": "*"
+    }
+  ]
+}
+EOF
+}
+
+resource "aws_iam_role_policy_attachment" "sns_publish_policy_attachment" {
+    role = aws_iam_role.jambonz_sns_publish.name
+    policy_arn = aws_iam_policy.allow_jambonz_sns_publish.arn
 }
 
 # select the most recent jambonz AMIs
@@ -19,6 +62,7 @@ data "aws_ami" "jambonz-feature-server" {
 resource "aws_launch_configuration" "jambonz-feature-server" {
   image_id                    = data.aws_ami.jambonz-feature-server.id
   instance_type               = var.ec2_instance_type_fs
+  iam_instance_profile        = aws_iam_instance_profile.jambonz_feature_server_profile.name
   associate_public_ip_address = true
   security_groups             = [aws_security_group.allow_jambonz_feature_server.id]
   key_name                    = var.key_name
@@ -44,7 +88,7 @@ resource "aws_launch_configuration" "jambonz-feature-server" {
 
 # create a placement group to spread feature server instances
 resource "aws_placement_group" "jambonz-feature-server" {
-  name = "${var.prefix}-feature-server"
+  name = "jambonz-feature-server-placement-group"
   strategy = "spread"
 }
 
@@ -61,7 +105,7 @@ resource "aws_autoscaling_group" "jambonz-feature-server" {
   
   tag {
     key                 = "Name"
-    value               = "${var.prefix}-feature-server"
+    value               = "jambonz-feature-server"
     propagate_at_launch = true
   }
 
@@ -81,5 +125,5 @@ resource "aws_autoscaling_lifecycle_hook" "jambonz-scale-in" {
   heartbeat_timeout      = 900
   lifecycle_transition   = "autoscaling:EC2_INSTANCE_TERMINATING"
   notification_target_arn = aws_sns_topic.jambonz_sns_topic_open_source.arn
-  role_arn                = data.aws_iam_role.jambonz_ami_role.arn
+  role_arn                = aws_iam_role.jambonz_sns_publish.arn
 }

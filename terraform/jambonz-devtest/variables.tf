@@ -2,10 +2,6 @@ variable "ami_owner_account" {
   description = "AWS account id that owns the AMIs that will be installed"
   default = "aws_owner_account here"
 }
-variable "ami_role_name" {
-  description = "Name of AWS AMI role that you created for SNS scale-in notifications (see README)"
-  default = "ami_role_name_here"
-}
 variable "prefix" {
   description = "name of VPC and other identifiers - lower case letters only"
   default = "jambonz"

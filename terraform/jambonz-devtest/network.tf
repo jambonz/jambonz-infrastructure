@@ -76,7 +76,7 @@ resource "aws_security_group" "allow_redis" {
   }
 
   tags = {
-    Name = "${var.prefix}_allow_redis"
+    Name = "jambonz_allow_redis"
   }
 }
 
@@ -102,7 +102,7 @@ resource "aws_security_group" "allow_mysql" {
   }
 
   tags = {
-    Name = "${var.prefix}_allow_mysql"
+    Name = "jambonz_allow_mysql"
   }
 }
 
@@ -184,13 +184,12 @@ resource "aws_security_group" "allow_jambonz_feature_server" {
   }
 
   tags = {
-    Name = "allow_${var.prefix}_feature_server"
+    Name = "jambonz_allow_feature_server"
   }
 }
 
 # create a security group to allow sip, rtp and http to the sbc sip+rtp server
 resource "aws_security_group" "allow_jambonz_sbc_sip_rtp" {
-  name        = "allow_jambonz_sbc_sip_rtp"
   description = "Allow traffic to jambonz sbc sip rtp server"
   vpc_id      = aws_vpc.jambonz.id
 
@@ -305,7 +304,7 @@ resource "aws_security_group" "allow_jambonz_sbc_sip_rtp" {
   }
 
   tags = {
-    Name = "allow_${var.prefix}_sbc_sip"
+    Name = "jambonz_allow_sip_rtp_http"
   }
 }
 
