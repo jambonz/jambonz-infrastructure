@@ -47,7 +47,7 @@ A command line with variables supplied looks like this:
 
 ```
 terraform apply \
--var='ami_owner_account=376029039784' \
+-var='ami_owner_account=376029039584' \
 -var='region=us-west-1' \
 -var='public_subnets={"us-west-1a" = "172.31.32.0/24","us-west-1b" = "172.31.33.0/24"}' \
 -var='ssh_key_path=~/aws/~/aws/aws-drachtio-us-west-1.pem' \
