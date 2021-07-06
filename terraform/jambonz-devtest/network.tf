@@ -190,6 +190,7 @@ resource "aws_security_group" "allow_jambonz_feature_server" {
 
 # create a security group to allow sip, rtp and http to the sbc sip+rtp server
 resource "aws_security_group" "allow_jambonz_sbc_sip_rtp" {
+  name        = "allow_jambonz_sbc_sip_rtp"
   description = "Allow traffic to jambonz sbc sip rtp server"
   vpc_id      = aws_vpc.jambonz.id
 
