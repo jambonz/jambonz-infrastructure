@@ -1,7 +1,9 @@
 #!/bin/bash
-VERSION=v1.10.5
-GRPC_VERSION=v1.24.2
-GOOGLE_API_VERSION=v1p1beta1-speech
+VERSION=v1.10.6
+GRPC_VERSION=c66d2cc
+#GRPC_VERSION=v1.39.1
+#GOOGLE_API_VERSION=v1p1beta1-speech
+GOOGLE_API_VERSION=e9da6f8b469c52b83f900e820be30762e9e05c57
 AWS_SDK_VERSION=1.8.129
 LWS_VERSION=v3.2.3
 
@@ -11,12 +13,15 @@ echo "GOOGLE_API_VERSION version to install is ${GOOGLE_API_VERSION}"
 echo "AWS_SDK_VERSION version to install is ${AWS_SDK_VERSION}"
 echo "LWS_VERSION version to install is ${LWS_VERSION}"
 
+export LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH
+
 git config --global pull.rebase true
 cd /usr/local/src
 git clone https://github.com/signalwire/freeswitch.git -b ${VERSION}
 git clone https://github.com/warmcat/libwebsockets.git -b ${LWS_VERSION}
-git clone https://github.com/drachtio/drachtio-freeswitch-modules.git -b master
-git clone https://github.com/grpc/grpc -b ${GRPC_VERSION}
+git clone https://github.com/drachtio/drachtio-freeswitch-modules.git -b feature/dialogflow-location-support
+git clone https://github.com/grpc/grpc -b master
+cd grpc && git checkout ${GRPC_VERSION} && cd ..
 
 cd freeswitch/libs
 
@@ -24,7 +29,8 @@ git clone https://github.com/freeswitch/spandsp.git -b master
 git clone https://github.com/freeswitch/sofia-sip.git -b master
 git clone https://github.com/dpirch/libfvad.git
 git clone https://github.com/aws/aws-sdk-cpp.git -b ${AWS_SDK_VERSION}
-git clone https://github.com/davehorton/googleapis -b ${GOOGLE_API_VERSION}
+git clone https://github.com/googleapis/googleapis -b master 
+cd googleapis && git checkout ${GOOGLE_API_VERSION} && cd ..
 git clone https://github.com/awslabs/aws-c-common.git
 
 sudo cp -r /usr/local/src/drachtio-freeswitch-modules/modules/mod_audio_fork /usr/local/src/freeswitch/src/mod/applications/mod_audio_fork
@@ -68,17 +74,22 @@ make -j 4 && sudo make install
 # build grpc
 cd /usr/local/src/grpc
 git submodule update --init --recursive
-cd /usr/local/src/grpc/third_party/protobuf
-./autogen.sh
-./configure
-sudo make -j 4 install 
-cd /usr/local/src/grpc
-export LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH
+#cd /usr/local/src/grpc/third_party/protobuf
+#./autogen.sh
+#./configure
+#sudo make -j 4 install 
+#cd /usr/local/src/grpc
+mkdir -p cmake/build
+cd cmake/build
+cmake -DBUILD_SHARED_LIBS=ON -DgRPC_SSL_PROVIDER=package -DBUILD_SHARED_LIBS=ON -DCMAKE_BUILD_TYPE=RelWithDebInfo ../..
 make -j 4
 sudo make install
 
 # build googleapis
 cd /usr/local/src/freeswitch/libs/googleapis
+echo "Ref: https://github.com/GoogleCloudPlatform/cpp-samples/issues/113"
+sed -i 's/\$fields/fields/' google/maps/routes/v1/route_service.proto
+sed -i 's/\$fields/fields/' google/maps/routes/v1alpha/route_service.proto
 LANGUAGE=cpp make -j 4
 
 # copy Makefiles into place

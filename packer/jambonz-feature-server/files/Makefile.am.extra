@@ -310,6 +310,7 @@ libs/googleapis/gens/google/api/servicecontrol/v1/distribution.grpc.pb.cc \
 libs/googleapis/gens/google/api/servicecontrol/v1/quota_controller.grpc.pb.cc \
 libs/googleapis/gens/google/api/servicecontrol/v1/metric_value.pb.cc \
 libs/googleapis/gens/google/api/servicecontrol/v1/distribution.pb.cc \
+libs/googleapis/gens/google/api/servicecontrol/v1/http_request.pb.cc \
 libs/googleapis/gens/google/api/servicecontrol/v1/log_entry.pb.cc \
 libs/googleapis/gens/google/api/servicecontrol/v1/service_controller.grpc.pb.cc \
 libs/googleapis/gens/google/api/servicecontrol/v1/metric_value.grpc.pb.cc \
@@ -381,6 +382,8 @@ libs/googleapis/gens/google/type/latlng.pb.cc \
 libs/googleapis/gens/google/type/color.grpc.pb.cc \
 libs/googleapis/gens/google/type/money.grpc.pb.cc \
 libs/googleapis/gens/google/cloud/dialogflow/v2beta1/gcs.pb.cc \
+libs/googleapis/gens/google/cloud/dialogflow/v2beta1/environment.pb.cc \
+libs/googleapis/gens/google/cloud/dialogflow/v2beta1/fulfillment.pb.cc \
 libs/googleapis/gens/google/cloud/dialogflow/v2beta1/validation_result.pb.cc \
 libs/googleapis/gens/google/cloud/dialogflow/v2beta1/agent.grpc.pb.cc \
 libs/googleapis/gens/google/cloud/dialogflow/v2beta1/agent.pb.cc \
