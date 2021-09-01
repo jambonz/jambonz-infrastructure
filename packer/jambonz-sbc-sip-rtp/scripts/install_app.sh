@@ -5,6 +5,7 @@ cd /home/admin
 cp /tmp/ecosystem.config.js apps
 cd apps
 
+cd /home/admin/apps/sbc-options-handler && sudo npm install --unsafe-perm
 cd /home/admin/apps/sbc-inbound && sudo npm install --unsafe-perm
 cd /home/admin/apps/sbc-outbound && sudo npm install --unsafe-perm
 cd /home/admin/apps/sbc-registrar && sudo npm install --unsafe-perm

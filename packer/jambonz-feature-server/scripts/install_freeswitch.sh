@@ -74,11 +74,6 @@ make -j 4 && sudo make install
 # build grpc
 cd /usr/local/src/grpc
 git submodule update --init --recursive
-#cd /usr/local/src/grpc/third_party/protobuf
-#./autogen.sh
-#./configure
-#sudo make -j 4 install 
-#cd /usr/local/src/grpc
 mkdir -p cmake/build
 cd cmake/build
 cmake -DBUILD_SHARED_LIBS=ON -DgRPC_SSL_PROVIDER=package -DBUILD_SHARED_LIBS=ON -DCMAKE_BUILD_TYPE=RelWithDebInfo ../..
