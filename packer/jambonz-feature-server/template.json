@@ -5,7 +5,7 @@
     "ami_description": "jambonz feature server", 
     "instance_type": "t2.xlarge",
     "drachtio_version": "v0.8.10",
-    "jambonz_version": "v0.6.3",
+    "jambonz_version": "v0.5-branch",
     "install_telegraf": "yes",
     "install_datadog": "no"
   },
@@ -79,6 +79,10 @@
     },
     {
       "type": "shell",
+      "script": "scripts/install_freeswitch.sh"
+    },
+    {
+      "type": "shell",
       "script": "scripts/install_nodejs.sh"
     },
     {
@@ -90,10 +94,6 @@
       "type": "shell",
       "execute_command": "chmod +x {{ .Path }}; sudo '{{ .Path }}' {{user `install_telegraf`}}",
       "script": "scripts/install_telegraf.sh"
-    },
-    {
-      "type": "shell",
-      "script": "scripts/install_freeswitch.sh"
     },
     {
       "type": "shell",

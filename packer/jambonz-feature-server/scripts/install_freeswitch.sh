@@ -4,6 +4,7 @@ GRPC_VERSION=v1.24.2
 GOOGLE_API_VERSION=v1p1beta1-speech
 AWS_SDK_VERSION=1.8.129
 LWS_VERSION=v3.2.3
+DRACHTIO_MODULES_VERSION=v0.3.3
 
 echo "freeswitch version to install is ${VERSION}"
 echo "GRPC version to install is ${GRPC_VERSION}"
@@ -15,7 +16,7 @@ git config --global pull.rebase true
 cd /usr/local/src
 git clone https://github.com/signalwire/freeswitch.git -b ${VERSION}
 git clone https://github.com/warmcat/libwebsockets.git -b ${LWS_VERSION}
-git clone https://github.com/drachtio/drachtio-freeswitch-modules.git -b master
+git clone https://github.com/drachtio/drachtio-freeswitch-modules.git -b ${DRACHTIO_MODULES_VERSION}
 git clone https://github.com/grpc/grpc -b ${GRPC_VERSION}
 
 cd freeswitch/libs
@@ -42,7 +43,7 @@ cd /usr/local/src/libwebsockets
 sudo mkdir -p build && cd build && sudo cmake .. -DCMAKE_BUILD_TYPE=RelWithDebInfo && sudo make && sudo make install
 
 # build libfvad
-cd /usr/local/src/libfvad
+cd /usr/local/src/freeswitch/libs/libfvad
 sudo autoreconf -i && sudo ./configure && sudo make -j 4 && sudo make install
 
 # build spandsp
