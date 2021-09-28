@@ -4,8 +4,8 @@
     "ssh_username": "admin",
     "ami_description": "jambonz SBC SIP", 
     "instance_type": "t2.medium",
-    "drachtio_version": "v0.8.10",
-    "jambonz_version": "v0.6.0",
+    "drachtio_version": "v0.8.11-rc1",
+    "jambonz_version": "v0.6.6",
     "install_datadog": "no",
     "install_telegraf": "yes"
   },

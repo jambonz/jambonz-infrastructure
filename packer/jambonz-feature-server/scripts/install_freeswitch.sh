@@ -1,13 +1,15 @@
 #!/bin/bash
-VERSION=v1.10.5
+FREESWITCH_VERSION=v1.10.5
 GRPC_VERSION=c66d2cc
 #GRPC_VERSION=v1.39.1
 #GOOGLE_API_VERSION=v1p1beta1-speech
 GOOGLE_API_VERSION=e9da6f8b469c52b83f900e820be30762e9e05c57
 AWS_SDK_VERSION=1.8.129
 LWS_VERSION=v3.2.3
+MODULES_VERSION=v0.4.0
 
-echo "freeswitch version to install is ${VERSION}"
+echo "freeswitch version to install is ${FREESWITCH_VERSION}"
+echo "drachtio modules version to install is ${MODULES_VERSION}"
 echo "GRPC version to install is ${GRPC_VERSION}"
 echo "GOOGLE_API_VERSION version to install is ${GOOGLE_API_VERSION}"
 echo "AWS_SDK_VERSION version to install is ${AWS_SDK_VERSION}"
@@ -17,9 +19,9 @@ export LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH
 
 git config --global pull.rebase true
 cd /usr/local/src
-git clone https://github.com/signalwire/freeswitch.git -b ${VERSION}
+git clone https://github.com/signalwire/freeswitch.git -b ${FREESWITCH_VERSION}
 git clone https://github.com/warmcat/libwebsockets.git -b ${LWS_VERSION}
-git clone https://github.com/drachtio/drachtio-freeswitch-modules.git -b feature/dialogflow-location-support
+git clone https://github.com/drachtio/drachtio-freeswitch-modules.git -b ${MODULES_VERSION}
 git clone https://github.com/grpc/grpc -b master
 cd grpc && git checkout ${GRPC_VERSION} && cd ..
 
