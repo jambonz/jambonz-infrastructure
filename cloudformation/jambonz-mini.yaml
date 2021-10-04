@@ -1,0 +1,223 @@
+AWSTemplateFormatVersion: 2010-09-09
+
+Parameters:
+  InstanceType:
+    Description: jambonzMini EC2 instance type
+    Type: String
+    Default: t2.medium
+    AllowedValues:
+      - t2.small
+      - t2.medium
+      - t2.large
+      - t2.xlarge
+      - t3.small
+      - t3.medium
+      - t3.large
+      - t3.xlarge
+      - t3a.small
+      - t3a.medium
+      - t3a.large
+      - t3a.xlarge
+      - c5.large
+      - c5.xlarge
+      - c5.2xlarge
+      - c5n.large
+      - c5n.xlarge
+      - c5n.2xlarge
+    ConstraintDescription: must be a valid EC2 instance type.
+  KeyName:
+    Description: Name of an EC2 KeyPair to enable SSH access to the instance.
+    Type: 'AWS::EC2::KeyPair::KeyName'
+    ConstraintDescription: must be the name of an existing EC2 KeyPair.
+  AllowedSshCidr:
+    Description: Please set CIDR to x.x.x.x/32 to allow one specific IP address ssh access, 0.0.0.0/0 to allow all IP addresses access, or another CIDR range.
+    Type: String
+    AllowedPattern: \d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\/\d{1,2}
+    ConstraintDescription: must be a valid network CIDR
+  AllowedHttpCidr:
+    Description: Please set CIDR to x.x.x.x/32 to allow one specific IP address http(s) access, 0.0.0.0/0 to allow all IP addresses access, or another CIDR range.
+    Type: String
+    AllowedPattern: \d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\/\d{1,2}
+    ConstraintDescription: must be a valid network CIDR
+    Default: 0.0.0.0/0
+  AllowedSipCidr:
+    Description: Please set CIDR to x.x.x.x/32 to allow one specific IP address sip access, 0.0.0.0/0 to allow all IP addresses access, or another CIDR range.
+    Type: String
+    ConstraintDescription: must be a valid network CIDR
+    AllowedPattern: \d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\/\d{1,2}
+    Default: 0.0.0.0/0
+  AllowedRtpCidr:
+    Description: Please set CIDR to x.x.x.x/32 to allow one specific IP address to send RTP traffic, 0.0.0.0/0 to allow all IP addresses access, or another CIDR range.
+    Type: String
+    ConstraintDescription: must be a valid network CIDR
+    AllowedPattern: \d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\/\d{1,2}
+    Default: 0.0.0.0/0
+Mappings:
+  AWSRegion2AMI:
+    us-east-1:
+      Ami: ami-376029039784
+
+Resources:
+  VPC:
+    Type: 'AWS::EC2::VPC'
+    Properties:
+      EnableDnsSupport: true
+      EnableDnsHostnames: true
+      CidrBlock: 10.0.0.0/16
+  PublicSubnet:
+    Type: 'AWS::EC2::Subnet'
+    Properties:
+      VpcId: !Ref VPC
+      CidrBlock: 10.0.0.0/24
+  jambonzInstance:
+    Type: 'AWS::EC2::Instance'
+    Properties:
+      InstanceType: !Ref InstanceType
+      ImageId: !FindInMap [ "AWSRegion2AMI", !Ref AWS::Region,  "Ami"]
+      KeyName: !Ref KeyName
+      NetworkInterfaces:
+        - GroupSet:
+            - !Ref jambonzSecurityGroup
+          AssociatePublicIpAddress: true
+          DeviceIndex: '0'
+          DeleteOnTermination: true
+          SubnetId: !Ref PublicSubnet
+      UserData: !Base64 
+        'Fn::Join':
+          - ''
+          - - |
+              #!/bin/bash -xe
+            - >
+              PRIVATE_IPV4="$(curl -s
+              http://169.254.169.254/latest/meta-data/local-ipv4)" 
+            - >
+              PUBLIC_IPV4="$(curl -s
+              http://169.254.169.254/latest/meta-data/public-ipv4)" 
+            - >
+              INSTANCE_ID="$(curl -s
+              http://169.254.169.254/latest/meta-data/instance-id)" 
+            - >
+              NEW_DB_PASSWD="$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1)" 
+            - >
+              echo "alter user 'admin'@'%' identified by '${NEW_DB_PASSWD}'" | 
+              mysql -h localhost -u admin -D jambones -pJambonzR0ck$ 
+            - >
+              sudo sed -i -e "s/\(.*\)JAMBONES_MYSQL_PASSWORD.*/\1JAMBONES_MYSQL_PASSWORD: '${NEW_DB_PASSWD}',/g"
+              /home/admin/apps/ecosystem.config.js 
+            - >
+              sudo sed -i -e "s/\(.*\)PRIVATE_IP\(.*\)/\1${PRIVATE_IPV4}\2/g"
+              /home/admin/apps/ecosystem.config.js 
+            - >
+              JAMBONES_ADMIN_INITIAL_PASSWORD=${INSTANCE_ID} JAMBONES_MYSQL_USER=admin 
+              JAMBONES_MYSQL_PASSWORD=${NEW_DB_PASSWD} JAMBONES_MYSQL_DATABASE=jambones JAMBONES_MYSQL_HOST=localhost 
+              /home/admin/apps/jambonz-api-server/db/reset_admin_password.js
+            - >
+              echo "REACT_APP_API_BASE_URL=http://${PUBLIC_IPV4}/api/v1" >
+              /home/admin/apps/jambonz-webapp/.env 
+            - >
+              echo "REACT_APP_MOBILE_BREAKPOINT=767px" >>
+              /home/admin/apps/jambonz-webapp/.env 
+            - >
+              cd /home/admin/apps/jambonz-webapp && npm run build 
+            - |
+              # update ecosystem.config.js with private ip 
+            - >
+              sudo -u admin bash -c "pm2 restart
+              /home/admin/apps/ecosystem.config.js" 
+            - >
+              sudo systemctl restart heplify-server
+            - |+
+
+  jambonzSecurityGroup:
+    Type: 'AWS::EC2::SecurityGroup'
+    Properties:
+      VpcId: !Ref VPC
+      GroupDescription: 'Allow sip, rtp, http and ssh access'
+      SecurityGroupIngress:
+        - Description: sip
+          IpProtocol: udp
+          FromPort: 5060
+          ToPort: 5060
+          CidrIp: !Ref AllowedSipCidr
+        - Description: rtp
+          IpProtocol: udp
+          FromPort: 40000
+          ToPort: 60000
+          CidrIp: !Ref AllowedRtpCidr
+        - Description: http
+          IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: !Ref AllowedHttpCidr
+        - Description: https
+          IpProtocol: tcp
+          FromPort: 443
+          ToPort: 443
+          CidrIp: !Ref AllowedHttpCidr
+        - Description: homer
+          IpProtocol: tcp
+          FromPort: 9080
+          ToPort: 9080
+          CidrIp: !Ref AllowedHttpCidr
+        - Description: grafana
+          IpProtocol: tcp
+          FromPort: 3000
+          ToPort: 3000
+          CidrIp: !Ref AllowedHttpCidr
+        - Description: ssh
+          IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: !Ref AllowedSshCidr
+    DependsOn:
+      - PublicRoute
+  InternetGateway:
+    Type: 'AWS::EC2::InternetGateway'
+    Properties: {}
+  PublicRouteTable:
+    Type: 'AWS::EC2::RouteTable'
+    Properties:
+      VpcId: !Ref VPC
+  PublicRoute:
+    Type: 'AWS::EC2::Route'
+    Properties:
+      DestinationCidrBlock: 0.0.0.0/0
+      RouteTableId: !Ref PublicRouteTable
+      GatewayId: !Ref InternetGateway
+    DependsOn:
+      - VPCGatewayAttachment
+  VPCGatewayAttachment:
+    Type: 'AWS::EC2::VPCGatewayAttachment'
+    Properties:
+      InternetGatewayId: !Ref InternetGateway
+      VpcId: !Ref VPC
+  PublicSubnetRouteTableAssociation:
+    Type: 'AWS::EC2::SubnetRouteTableAssociation'
+    Properties:
+      RouteTableId: !Ref PublicRouteTable
+      SubnetId: !Ref PublicSubnet
+  EIP:
+    Type: 'AWS::EC2::EIP'
+    Properties:
+      Domain: vpc
+  EIPAssociation:
+    Type: 'AWS::EC2::EIPAssociation'
+    Properties:
+      InstanceId: !Ref jambonzInstance
+      AllocationId: !GetAtt EIP.AllocationId
+
+Outputs:
+  URL:
+    Value: !Join 
+      - ''
+      - - 'http://'
+        - !GetAtt 
+          - jambonzInstance
+          - PublicIp
+    Description: URL for the jambonz portal
+  User:
+    Value: admin
+    Description: Login username for the jambonz portal
+  Password:
+    Value: !Ref jambonzInstance
+    Description: Initial password for jambonz portal.  You will be forced to change it once you log in for the first time.
