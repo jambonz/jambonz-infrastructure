@@ -14,3 +14,7 @@ sudo mv /tmp/drachtio.service /etc/systemd/system
 sudo chmod 644 /etc/drachtio.conf.xml
 sudo chmod 644 /etc/systemd/system/drachtio.service
 sudo systemctl enable drachtio
+
+
+sudo cp /tmp/auto-assign-elastic-ip.sh /usr/local/bin
+sudo chmod +x /usr/local/bin/auto-assign-elastic-ip.sh

@@ -1,6 +1,34 @@
 module.exports = {
   apps : [
   {
+    name: 'jambonz-smpp-esme',
+    cwd: '/home/admin/apps/jambonz-smpp-esme',
+    script: 'app.js',
+    out_file: '/home/admin/.pm2/logs/jambonz-smpp-esme.log',
+    err_file: '/home/admin/.pm2/logs/jambonz-smpp-esme.log',
+    combine_logs: true,
+    instance_var: 'INSTANCE_ID',
+    exec_mode: 'fork',
+    instances: 1,
+    autorestart: true,
+    watch: false,
+    max_memory_restart: '1G',
+    env: {
+      NODE_ENV: 'production',
+      AVOID_UDH: true,
+      JAMBONES_MYSQL_HOST: '${JAMBONES_MYSQL_HOST}',
+      JAMBONES_MYSQL_USER: '${JAMBONES_MYSQL_USER}',
+      JAMBONES_MYSQL_PASSWORD: '${JAMBONES_MYSQL_PASSWORD}',
+      JAMBONES_MYSQL_DATABASE: 'jambones',
+      JAMBONES_MYSQL_CONNECTION_LIMIT: 10,
+      JAMBONES_REDIS_HOST: '${JAMBONES_REDIS_HOST}',
+      JAMBONES_REDIS_PORT: 6379,
+      JAMBONES_LOGLEVEL: 'debug',
+      JAMBONES_CLUSTER_ID: '${JAMBONES_CLUSTER_ID}',
+      HTTP_PORT: 3020
+    }
+  },
+  {
     name: 'sbc-options-handler',
     cwd: '/home/admin/apps/sbc-options-handler',
     script: 'app.js',

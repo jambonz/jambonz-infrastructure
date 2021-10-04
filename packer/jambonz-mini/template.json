@@ -2,10 +2,20 @@
   "variables": {
     "region": "us-east-1",
     "ssh_username": "admin",
-    "ami_description": "EC2 AMI jambonz mini", 
-    "instance_type": "t2.medium",
-    "drachtio_version": "v0.8.4",
-    "rtp_engine_version": "mr7.4.1.5",
+    "ami_description": "jambonz all-in-one AMI", 
+    "instance_type": "t2.xlarge",
+    "drachtio_version": "v0.8.10",
+    "jambonz_version": "v0.6.5",
+    "jambonz_user": "admin",
+    "jambonz_password": "JambonzR0ck$",
+    "install_telegraf": "yes",
+    "homer_user": "homer_user",
+    "homer_password": "XcapJTqy11LnsYRtxXGPTYQkAnI",
+    "install_influxdb":  "yes",
+    "install_homer":  "yes",
+    "install_nodered":  "no",
+    "influxdb_ip":  "127.0.0.1",
+    "rtp_engine_version": "mr9.3.1.8",
     "rtp_engine_min_port": "40000",
     "rtp_engine_max_port": "60000"
   },
@@ -23,12 +33,12 @@
     },
     "instance_type": "{{user `instance_type`}}",
     "ssh_username": "{{user `ssh_username`}}",
-    "ami_name": "jambonz-mini-{{user `drachtio_version`}}-{{isotime |clean_resource_name }}",
+    "ami_name": "jambonz-mini-{{user `jambonz_version`}}-{{isotime |clean_resource_name }}",
     "ami_description": "{{user `ami_description`}}",
     "launch_block_device_mappings": [
       {
         "device_name": "/dev/xvda",
-        "volume_size": 40,
+        "volume_size": 60,
         "volume_type": "gp2",
         "delete_on_termination": true
       }
@@ -42,7 +52,7 @@
       "Name": "jambonz-mini"
     },
     "run_tags": {
-      "Name": "jambonz-mini"
+      "Name": "jambonz-mini-build"
     }
   }],
   "provisioners": [
@@ -51,15 +61,27 @@
       "inline": [
         "while [ ! -f /var/lib/cloud/instance/boot-finished ]; do echo 'Waiting for cloud-init...'; sleep 1; done",
         "sudo apt-get update",
-        "sudo apt-get -y install python gcc g++ make cmake build-essential git autoconf automake mysql-client redis-tools \\",
+        "sudo apt-get -y install python lsof gcc g++ make cmake build-essential git autoconf automake default-mysql-client redis-tools \\",
         "curl telnet libtool libtool-bin libssl-dev libcurl4-openssl-dev libz-dev systemd-coredump liblz4-tool \\",
         "iptables-dev libavformat-dev liblua5.1-0-dev libavfilter-dev libavcodec-dev libswresample-dev \\",
         "libevent-dev libpcap-dev libxmlrpc-core-c3-dev markdown libjson-glib-dev lsb-release \\",
         "libhiredis-dev gperf libspandsp-dev default-libmysqlclient-dev htop dnsutils gdb \\",
         "gnupg2 wget pkg-config ca-certificates libjpeg-dev libsqlite3-dev libpcre3-dev libldns-dev \\",
-        "libspeex-dev libspeexdsp-dev libedit-dev libtiff-dev yasm valgrind libswscale-dev haveged \\",
+        "libspeex-dev libspeexdsp-dev libedit-dev libtiff-dev yasm libswscale-dev haveged jq fail2ban \\",
         "libopus-dev libsndfile-dev libshout3-dev libmpg123-dev libmp3lame-dev libopusfile-dev",
-        "sudo chmod a+w /usr/local/src"
+        "sudo chmod a+w /usr/local/src",
+        "mkdir ~/credentials",
+        "mkdir ~/apps",
+        "cd ~/apps",
+        "git clone https://github.com/jambonz/sbc-options-handler.git -b {{user `jambonz_version`}}",
+        "git clone https://github.com/jambonz/sbc-call-router.git -b {{user `jambonz_version`}}",
+        "git clone https://github.com/jambonz/fsw-clear-old-calls.git -b {{user `jambonz_version`}}",
+        "git clone https://github.com/jambonz/sbc-outbound.git -b {{user `jambonz_version`}}",
+        "git clone https://github.com/jambonz/sbc-inbound.git -b {{user `jambonz_version`}}",
+        "git clone https://github.com/jambonz/sbc-registrar.git -b {{user `jambonz_version`}}",
+        "git clone https://github.com/jambonz/jambonz-feature-server.git -b {{user `jambonz_version`}}",
+        "git clone https://github.com/jambonz/jambonz-api-server.git -b {{user `jambonz_version`}}",
+        "git clone https://github.com/jambonz/jambonz-webapp.git -b {{user `jambonz_version`}}"
       ]
     },
     {
@@ -73,16 +95,59 @@
     },
     {
       "type": "shell",
+      "execute_command": "chmod +x {{ .Path }}; sudo '{{ .Path }}' {{user `install_influxdb`}}",
+      "script": "scripts/install_influxdb.sh"
+    },
+    {
+      "type": "shell",
+      "execute_command": "chmod +x {{ .Path }}; sudo '{{ .Path }}' {{build `ID`}}",
+      "script": "scripts/install_apiban.sh"
+    },
+    {
+      "type": "shell",
+      "script": "scripts/install_nginx.sh"
+    },
+    {
+      "type": "shell",
       "script": "scripts/install_nodejs.sh"
     },
     {
       "type": "shell",
-      "script": "scripts/install_freeswitch.sh"
+      "execute_command": "chmod +x {{ .Path }}; sudo '{{ .Path }}'  {{user `jambonz_user`}} {{user `jambonz_password`}}",
+      "script": "scripts/install_mysql.sh"
     },
     {
       "type": "shell",
-      "execute_command": "chmod +x {{ .Path }}; sudo '{{ .Path }}' {{user `rtp_engine_version`}}",
-      "script": "scripts/install_rtpengine.sh"
+      "script": "scripts/install_redis.sh"
+    },
+    {
+      "type": "shell",
+      "execute_command": "chmod +x {{ .Path }}; sudo '{{ .Path }}' {{user `install_nodered`}}",
+      "script": "scripts/install_node_red.sh"
+    },
+    {
+      "type": "shell",
+      "execute_command": "chmod +x {{ .Path }}; sudo '{{ .Path }}' {{user `install_homer`}} {{user `homer_user`}} {{user `homer_password`}}",
+      "script": "scripts/install_postgresql.sh"
+    },
+    {
+      "type": "shell",
+      "execute_command": "chmod +x {{ .Path }}; sudo '{{ .Path }}' {{user `install_homer`}} {{user `influxdb_ip`}}",
+      "script": "scripts/install_telegraf.sh"
+    },
+    {
+      "type": "shell",
+      "execute_command": "chmod +x {{ .Path }}; sudo '{{ .Path }}' {{user `install_homer`}} {{user `homer_user`}} {{user `homer_password`}}",
+      "script": "scripts/install_homer.sh"
+    },
+    {
+      "type": "shell",
+      "execute_command": "chmod +x {{ .Path }}; sudo '{{ .Path }}' {{user `install_influxdb`}}",
+      "script": "scripts/install_grafana.sh"
+    },
+    {
+      "type": "shell",
+      "script": "scripts/install_freeswitch.sh"
     },
     {
       "type": "shell",
@@ -91,7 +156,24 @@
     },
     {
       "type": "shell",
+      "execute_command": "chmod +x {{ .Path }}; sudo '{{ .Path }}' {{user `rtp_engine_version`}}",
+      "script": "scripts/install_rtpengine.sh"
+    },
+    {
+      "type": "shell",
+      "script": "scripts/install_fail2ban.sh"
+    },
+    {
+      "type": "shell",
+      "execute_command": "chmod +x {{ .Path }}; sudo '{{ .Path }}' {{user `jambonz_version`}} {{user `jambonz_user`}} {{user `jambonz_password`}}",
       "script": "scripts/install_app.sh"
+    },
+    {
+      "type": "shell",
+      "inline": [
+        "sudo rm /root/.ssh/authorized_keys",
+        "sudo rm /home/admin/.ssh/authorized_keys"
+      ]
     }
   ]
 }

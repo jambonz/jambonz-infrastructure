@@ -4,7 +4,7 @@
     "ssh_username": "admin",
     "ami_description": "jambonz feature server", 
     "instance_type": "t2.xlarge",
-    "drachtio_version": "v0.8.11-rc1",
+    "drachtio_version": "v0.8.11-rc2",
     "jambonz_version": "v0.6.6",
     "install_telegraf": "yes",
     "install_datadog": "no"
