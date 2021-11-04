@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: drachtio-sbc
+  name: drachtio-sbc
+spec:
+  ports:
+    - name: "9022"
+      port: 9022
+      protocol: TCP
+      targetPort: 9022
+    - name: "5060"
+      port: 5060
+      protocol: UDP
+      targetPort: 5060
+  selector:
+    app: drachtio-sbc
