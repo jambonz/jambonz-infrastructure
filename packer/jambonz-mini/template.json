@@ -4,8 +4,8 @@
     "ssh_username": "admin",
     "ami_description": "jambonz all-in-one AMI", 
     "instance_type": "t2.xlarge",
-    "drachtio_version": "v0.8.10",
-    "jambonz_version": "v0.6.5",
+    "drachtio_version": "v0.8.12",
+    "jambonz_version": "v0.6.7-rc4",
     "jambonz_user": "admin",
     "jambonz_password": "JambonzR0ck$",
     "install_telegraf": "yes",
@@ -15,7 +15,7 @@
     "install_homer":  "yes",
     "install_nodered":  "no",
     "influxdb_ip":  "127.0.0.1",
-    "rtp_engine_version": "mr9.3.1.8",
+    "rtp_engine_version": "mr10.0.1.4",
     "rtp_engine_min_port": "40000",
     "rtp_engine_max_port": "60000"
   },
@@ -81,7 +81,9 @@
         "git clone https://github.com/jambonz/sbc-registrar.git -b {{user `jambonz_version`}}",
         "git clone https://github.com/jambonz/jambonz-feature-server.git -b {{user `jambonz_version`}}",
         "git clone https://github.com/jambonz/jambonz-api-server.git -b {{user `jambonz_version`}}",
-        "git clone https://github.com/jambonz/jambonz-webapp.git -b {{user `jambonz_version`}}"
+        "git clone https://github.com/jambonz/jambonz-webapp.git -b {{user `jambonz_version`}}",
+        "git clone https://github.com/jambonz/jambonz-smpp-esme.git -b {{user `jambonz_version`}}",
+        "git clone https://github.com/jambonz/sbc-rtpengine-sidecar.git -b {{user `jambonz_version`}}"
       ]
     },
     {

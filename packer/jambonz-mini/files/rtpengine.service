@@ -15,6 +15,7 @@ ExecStart=/usr/local/bin/rtpengine \
 --listen-ng=22222 \
 --listen-http=8080 \
 --listen-udp=12222 \
+--dtmf-log-dest=127.0.0.1:22223 \
 --listen-cli=127.0.0.1:9900 \
 --pidfile /var/run/rtpengine.pid \
 --port-min 40000 \

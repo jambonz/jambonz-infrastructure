@@ -17,6 +17,8 @@ cd /home/admin/apps/sbc-outbound && sudo npm install --unsafe-perm
 cd /home/admin/apps/sbc-registrar && sudo npm install --unsafe-perm
 cd /home/admin/apps/sbc-call-router && sudo npm install --unsafe-perm
 cd /home/admin/apps/jambonz-api-server && sudo npm install --unsafe-perm
+cd /home/admin/apps/jambonz-smpp-esme && sudo npm install --unsafe-perm
+cd /home/admin/apps/sbc-rtpengine-sidecar && sudo npm install --unsafe-perm
 
 JAMBONES_MYSQL_HOST=localhost JAMBONES_MYSQL_USER=${DB_USER} JAMBONES_MYSQL_PASSWORD=${DB_PASS} JAMBONES_MYSQL_DATABASE=jambones /home/admin/apps/jambonz-api-server/db/reset_admin_password.js
 
@@ -32,5 +34,3 @@ rm
 sudo chown -R admin:admin  /home/admin/apps
 
 sudo rm /home/admin/apps/jambonz-webapp/.env
-#sudo cp /tmp/initialize-webapp-userdata.sh /var/lib/cloud/scripts/per-instance
-#sudo chmod +x /var/lib/cloud/scripts/per-instance/initialize-webapp-userdata.sh

@@ -14,3 +14,6 @@ sudo -u admin bash -c "pm2 set pm2-logrotate:retain 5"
 sudo -u admin bash -c "pm2 set pm2-logrotate:compress true"
 
 sudo chown -R admin:admin  /home/admin/apps
+
+sudo cp /tmp/auto-assign-elastic-ip.sh /usr/local/bin
+sudo chmod +x /usr/local/bin/auto-assign-elastic-ip.sh
