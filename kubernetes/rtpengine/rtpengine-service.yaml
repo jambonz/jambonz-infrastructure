@@ -416,4 +416,7 @@ spec:
     #   targetPort: 40100
   selector:
     app: rtpengine
+<<<<<<< HEAD
   clusterIP: None
+=======
+>>>>>>> feat: Add K8S manifest to deploy Jambonz using Kustomize

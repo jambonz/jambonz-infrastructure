@@ -12,4 +12,7 @@ spec:
       targetPort: 4000
   selector:
     app: call-router
+<<<<<<< HEAD
   clusterIP: None
+=======
+>>>>>>> feat: Add K8S manifest to deploy Jambonz using Kustomize

@@ -14,6 +14,7 @@ spec:
       labels:
         app: api-server
     spec:
+<<<<<<< HEAD
       nodeSelector:
         kubernetes.io/arch: amd64
       initContainers:
@@ -33,6 +34,34 @@ spec:
               value: "3000"
             - name: JAMBONE_API_VERSION
               value: v1
+=======
+      containers:
+        - env:
+            - name: ENABLE_METRICS
+              value: "0"
+            - name: HTTP_PORT
+              value: "3000"
+            - name: JAMBONES_CLUSTER_ID
+              value: jb
+            - name: JAMBONES_LOGLEVEL
+              value: info
+            - name: JAMBONES_MYSQL_DATABASE
+              value: jambones
+            - name: JAMBONES_MYSQL_HOST
+              value: mysql
+            - name: JAMBONES_MYSQL_PASSWORD
+              value: jambones
+            - name: JAMBONES_MYSQL_USER
+              value: jambones
+            - name: JAMBONES_REDIS_HOST
+              value: redis
+            - name: JAMBONES_REDIS_PORT
+              value: "6379"
+            - name: JAMBONE_API_VERSION
+              value: v1
+            - name: NODE_ENV
+              value: production
+>>>>>>> feat: Add K8S manifest to deploy Jambonz using Kustomize
           image: jambonz/jambonz-api-server:latest
           name: api-server
           ports:
