@@ -1,0 +1,27 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: default # Replace by your namespace here
+
+resources:
+- namespace.yaml
+- mysql/mysql-service.yaml
+- mysql/mysql-statefulset.yaml
+- redis/redis-service.yaml
+- redis/redis-statefulset.yaml
+- rtpengine/rtpengine-service.yaml
+- rtpengine/rtpengine-deployment.yaml
+- webapp/webapp-deployment.yaml
+- webapp/webapp-service.yaml
+- webapp/webapp-ingress.yaml
+- api-server/api-server-deployment.yaml
+- api-server/api-server-service.yaml
+- api-server/api-server-ingress.yaml
+- drachtio-sbc/drachtio-sbc-deployment.yaml
+- drachtio-sbc/drachtio-sbc-service.yaml
+- drachtio-sbc/drachtio-sbc-configmap.yaml
+- call-router/call-router-deployment.yaml
+- call-router/call-router-service.yaml
+- sbc-inbound/sbc-inbound-deployment.yaml
+- sbc-outbound/sbc-outbound-deployment.yaml
+- registrar/registrar-deployment.yaml

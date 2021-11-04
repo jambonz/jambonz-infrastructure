@@ -1,0 +1,52 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: drachtio-sbc
+  name: drachtio-sbc
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: drachtio-sbc
+  template:
+    metadata:
+      labels:
+        app: drachtio-sbc
+    spec:
+      containers:
+        - args:
+            - drachtio
+            - --contact
+            - sip:$(MY_POD_IP);transport=udp
+            - --contact
+            - sip:$(MY_POD_IP);transport=tcp
+            - --address
+            - 0.0.0.0
+            - --port
+            - "9022"
+          image: drachtio/drachtio-server:latest
+          name: drachtio-sbc
+          env:
+            - name: MY_POD_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
+          ports:
+            - containerPort: 9022
+              protocol: TCP
+            - containerPort: 5060
+              protocol: UDP
+          resources: {}
+          volumeMounts:
+            - mountPath: /etc/drachtio.conf.xml
+              name: drachtio-sbc-conf
+              subPath: drachtio.conf.xml
+      restartPolicy: Always
+      volumes:
+      - name: drachtio-sbc-conf
+        configMap:
+          name: drachtio-sbc-conf
+          items:
+          - key: drachtio.conf.xml
+            path: drachtio.conf.xml

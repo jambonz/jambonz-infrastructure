@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: api-server
+  name: api-server
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: api-server
+  template:
+    metadata:
+      labels:
+        app: api-server
+    spec:
+      containers:
+        - env:
+            - name: ENABLE_METRICS
+              value: "0"
+            - name: HTTP_PORT
+              value: "3000"
+            - name: JAMBONES_CLUSTER_ID
+              value: jb
+            - name: JAMBONES_LOGLEVEL
+              value: info
+            - name: JAMBONES_MYSQL_DATABASE
+              value: jambones
+            - name: JAMBONES_MYSQL_HOST
+              value: mysql
+            - name: JAMBONES_MYSQL_PASSWORD
+              value: jambones
+            - name: JAMBONES_MYSQL_USER
+              value: jambones
+            - name: JAMBONES_REDIS_HOST
+              value: redis
+            - name: JAMBONES_REDIS_PORT
+              value: "6379"
+            - name: JAMBONE_API_VERSION
+              value: v1
+            - name: NODE_ENV
+              value: production
+          image: jambonz/jambonz-api-server:latest
+          name: api-server
+          ports:
+            - containerPort: 3000
+          resources: {}
+      restartPolicy: Always

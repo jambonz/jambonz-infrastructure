@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: webapp
+  name: webapp
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: webapp
+  template:
+    metadata:
+      labels:
+        app: webapp
+    spec:
+      containers:
+        - env:
+            - name: REACT_APP_API_BASE_URL
+              value: https://api-server/v1
+            - name: NODE_OPTIONS
+              value: '--openssl-legacy-provider'
+          image: cognigydevelopment.azurecr.io/jambonzwebapp:8473 # {"$imagepolicy": "flux-system:jambonzwebapp"}
+          name: webapp
+          ports:
+            - containerPort: 3001
+          resources: {}
+      restartPolicy: Always
