@@ -16,3 +16,4 @@ spec:
       targetPort: 5060
   selector:
     app: drachtio-sbc
+  clusterIP: None

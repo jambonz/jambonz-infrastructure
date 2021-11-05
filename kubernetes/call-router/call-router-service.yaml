@@ -12,3 +12,4 @@ spec:
       targetPort: 4000
   selector:
     app: call-router
+  clusterIP: None

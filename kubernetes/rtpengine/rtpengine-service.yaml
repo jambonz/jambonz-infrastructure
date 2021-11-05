@@ -416,3 +416,4 @@ spec:
     #   targetPort: 40100
   selector:
     app: rtpengine
+  clusterIP: None
