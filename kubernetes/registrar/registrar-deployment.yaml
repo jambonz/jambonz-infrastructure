@@ -17,31 +17,9 @@ spec:
       nodeSelector:
         kubernetes.io/arch: amd64
       containers:
-        - env:
-            - name: DRACHTIO_HOST
-              value: drachtio-sbc
-            - name: DRACHTIO_PORT
-              value: "9022"
-            - name: DRACHTIO_SECRET
-              value: cymru
-            - name: ENABLE_METRICS
-              value: "0"
-            - name: JAMBONES_LOGLEVEL
-              value: info
-            - name: JAMBONES_MYSQL_DATABASE
-              value: jambones
-            - name: JAMBONES_MYSQL_HOST
-              value: mysql
-            - name: JAMBONES_MYSQL_PASSWORD
-              value: jambones
-            - name: JAMBONES_MYSQL_USER
-              value: jambones
-            - name: JAMBONES_REDIS_HOST
-              value: redis
-            - name: JAMBONES_REDIS_PORT
-              value: "6379"
-            - name: NODE_ENV
-              value: production
+        - envFrom:
+          - secretRef:
+              name: jambonz
           image: jambonz/sbc-registrar:latest
           name: registrar
           resources: {}

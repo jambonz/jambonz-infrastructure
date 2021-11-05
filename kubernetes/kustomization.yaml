@@ -25,3 +25,7 @@ resources:
 - sbc-inbound/sbc-inbound-deployment.yaml
 - sbc-outbound/sbc-outbound-deployment.yaml
 - registrar/registrar-deployment.yaml
+secretGenerator:
+  - envs:
+      - jambonz.env
+    name: jambonz

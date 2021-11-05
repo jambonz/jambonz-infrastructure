@@ -23,11 +23,20 @@ spec:
             - name: MYSQL_ALLOW_EMPTY_PASSWORD
               value: "yes"
             - name: MYSQL_DATABASE
-              value: jambones
+              valueFrom:
+                secretKeyRef:
+                  name: jambonz
+                  key: JAMBONES_MYSQL_DATABASE
             - name: MYSQL_PASSWORD
-              value: jambones
+              valueFrom:
+                secretKeyRef:
+                  name: jambonz
+                  key: JAMBONES_MYSQL_PASSWORD
             - name: MYSQL_USER
-              value: jambones
+              valueFrom:
+                secretKeyRef:
+                  name: jambonz
+                  key: JAMBONES_MYSQL_USER
           image: mysql
           livenessProbe:
             exec:
