@@ -22,7 +22,7 @@ spec:
               value: https://api-server/v1
             - name: NODE_OPTIONS
               value: '--openssl-legacy-provider'
-          image: cognigydevelopment.azurecr.io/jambonzwebapp:8473 # {"$imagepolicy": "flux-system:jambonzwebapp"}
+          image: jambonz/webapp:latest
           name: webapp
           ports:
             - containerPort: 3001
