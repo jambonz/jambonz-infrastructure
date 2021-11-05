@@ -1,0 +1,21 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: db-create
+spec:
+  backoffLimit: 0
+  template:
+    metadata:
+      annotations:
+        sidecar.istio.io/inject: "false"
+    spec:
+      containers:
+        - envFrom:
+          - secretRef:
+              name: jambonz
+          image: jambonz/db
+          imagePullPolicy: Always
+          name: db
+      nodeSelector:
+        kubernetes.io/arch: amd64
+      restartPolicy: Never

@@ -1,10 +1,11 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
-namespace: default # Replace by your namespace here
+namespace: jambonz
 
 resources:
 - namespace.yaml
+- db/db-create.yaml
 - mysql/mysql-service.yaml
 - mysql/mysql-statefulset.yaml
 - redis/redis-service.yaml
