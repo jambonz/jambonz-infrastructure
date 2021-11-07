@@ -14,41 +14,25 @@ spec:
         app: drachtio-sbc-rtp
     spec:
       nodeSelector:
-        eks.amazonaws.com/nodegroup: sbc-node-group
+        voip-environment: edge
       hostNetwork: true
+      tolerations:
+        - key: "voip-edge"
+          operator: "Exists"
+          effect: "NoSchedule"
       containers:
         - name: drachtio
           image: drachtio/drachtio-server:0.8.12
-          ports:
-            - containerPort: 9023
-              protocol: TCP
-            - containerPort: 5064
-              protocol: UDP
-          resources: {}
-          volumeMounts:
-            - mountPath: /etc/drachtio.conf.xml
-              name: drachtio-sbc-rtp-conf
-              subPath: drachtio.conf.xml
-        - name: sbc-rtpengine-sidecar
-          image: jambonz/sbc-rtpengine-sidecar:latest
-          env:
-            - name: NODE_ENV
-              value: production
-            - name: RTPENGINE_DTMF_LOG_PORT
-              value: 22223
-            - name: JAMBONES_CLUSTER_ID
-              value: jb
-            - name: JAMBONES_REDIS_HOST
-              value: redis
-            - name: JAMBONES_REDIS_PORT
-              value: "6379"
-            - name: ENABLE_METRICS
-              value: "0"
+          args: ['drachtio', '--contact', 'sip:*:5064;transport=udp,tcp', '--port', '9023']
+        - name: rtpengine-sidecar
+          image: jambonz/rtpengine-sidecar:latest
+          envFrom:
+            - secretRef:
+                name: jambonz
+        - name: rtpengine 
+          image: jambonz/rtpengine:latest 
+          args: ['rtpengine']
+          envFrom:
+            - secretRef:
+                name: jambonz
       restartPolicy: Always
-      volumes:
-      - name: drachtio-sbc-rtp-conf
-        configMap:
-          name: drachtio-sbc-rtp-conf
-          items:
-          - key: drachtio.conf.xml
-            path: drachtio.conf.xml
