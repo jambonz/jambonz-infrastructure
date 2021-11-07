@@ -14,8 +14,12 @@ spec:
         app: drachtio-sbc-sip
     spec:
       nodeSelector:
-        eks.amazonaws.com/nodegroup: sbc-node-group
+        voip-environment: edge
       hostNetwork: true
+      tolerations:
+        - key: "voip-edge"
+          operator: "Exists"
+          effect: "NoSchedule"
       containers:
         - name: drachtio
           image: drachtio/drachtio-server:0.8.12

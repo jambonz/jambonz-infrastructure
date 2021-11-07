@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: drachtio-sbc-sip-conf
+data:
+  drachtio.conf.xml: |
+    <drachtio>
+
+        <!-- udp port to listen on for client connections and shared secret used to authenticate clients -->
+        <admin port="9023" secret="cymru">0.0.0.0</admin>
+        <sip>
+          <contact>sip:*:5064;transport=udp</contact>
+          <udp-mtu>4096</udp-mtu>
+        </sip>
+        <cdrs>false</cdrs>
+
+        <logging>
+            <sofia-loglevel>3</sofia-loglevel>
+            <loglevel>info</loglevel>
+        </logging>
+
+    </drachtio>

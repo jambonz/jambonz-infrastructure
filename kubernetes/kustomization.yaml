@@ -1,22 +1,20 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
-<<<<<<< HEAD
 namespace: jambonz
 
 resources:
 - namespace.yaml
 - db/db-create.yaml
-=======
-namespace: default # Replace by your namespace here
-
-resources:
 - namespace.yaml
->>>>>>> feat: Add K8S manifest to deploy Jambonz using Kustomize
 - mysql/mysql-service.yaml
 - mysql/mysql-statefulset.yaml
 - redis/redis-service.yaml
 - redis/redis-statefulset.yaml
+- sbc-sip/sbc-sip-configmap.yaml
+- sbc-sip/sbc-sip-daemonset.yaml
+- influxdb/influxdb-service.yaml
+- influxdb/influxdb-statefulset.yaml
 - rtpengine/rtpengine-service.yaml
 - rtpengine/rtpengine-deployment.yaml
 - webapp/webapp-deployment.yaml
@@ -25,18 +23,7 @@ resources:
 - api-server/api-server-deployment.yaml
 - api-server/api-server-service.yaml
 - api-server/api-server-ingress.yaml
-- drachtio-sbc/drachtio-sbc-deployment.yaml
-- drachtio-sbc/drachtio-sbc-service.yaml
-- drachtio-sbc/drachtio-sbc-configmap.yaml
-- call-router/call-router-deployment.yaml
-- call-router/call-router-service.yaml
-- sbc-inbound/sbc-inbound-deployment.yaml
-- sbc-outbound/sbc-outbound-deployment.yaml
-- registrar/registrar-deployment.yaml
-<<<<<<< HEAD
 secretGenerator:
   - envs:
       - jambonz.env
     name: jambonz
-=======
->>>>>>> feat: Add K8S manifest to deploy Jambonz using Kustomize

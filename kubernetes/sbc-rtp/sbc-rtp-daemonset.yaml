@@ -1,0 +1,54 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: drachtio-sbc-rtp
+  labels:
+    app: drachtio-sbc-rtp
+spec:
+  selector:
+    matchLabels:
+      app: drachtio-sbc-rtp
+  template:
+    metadata:
+      labels:
+        app: drachtio-sbc-rtp
+    spec:
+      nodeSelector:
+        eks.amazonaws.com/nodegroup: sbc-node-group
+      hostNetwork: true
+      containers:
+        - name: drachtio
+          image: drachtio/drachtio-server:0.8.12
+          ports:
+            - containerPort: 9023
+              protocol: TCP
+            - containerPort: 5064
+              protocol: UDP
+          resources: {}
+          volumeMounts:
+            - mountPath: /etc/drachtio.conf.xml
+              name: drachtio-sbc-rtp-conf
+              subPath: drachtio.conf.xml
+        - name: sbc-rtpengine-sidecar
+          image: jambonz/sbc-rtpengine-sidecar:latest
+          env:
+            - name: NODE_ENV
+              value: production
+            - name: RTPENGINE_DTMF_LOG_PORT
+              value: 22223
+            - name: JAMBONES_CLUSTER_ID
+              value: jb
+            - name: JAMBONES_REDIS_HOST
+              value: redis
+            - name: JAMBONES_REDIS_PORT
+              value: "6379"
+            - name: ENABLE_METRICS
+              value: "0"
+      restartPolicy: Always
+      volumes:
+      - name: drachtio-sbc-rtp-conf
+        configMap:
+          name: drachtio-sbc-rtp-conf
+          items:
+          - key: drachtio.conf.xml
+            path: drachtio.conf.xml
