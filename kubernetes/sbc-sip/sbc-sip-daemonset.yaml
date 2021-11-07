@@ -24,9 +24,9 @@ spec:
         - name: drachtio
           image: drachtio/drachtio-server:0.8.12
           args: ['drachtio', '--cloud-deployment', '--contact', 'sip:*:5060;transport=tcp']
-          env:
-            - name: CLOUD
-              value: aws
+          envFrom:
+            - secretRef:
+                name: jambonz
           ports:
             - containerPort: 9022
               protocol: TCP
@@ -41,137 +41,32 @@ spec:
               subPath: drachtio.conf.xml
         - name: sbc-call-router
           image: jambonz/sbc-call-router:latest
+          envFrom:
+            - secretRef:
+                name: jambonz
           env:
-            - name: NODE_ENV
-              value: production
             - name: HTTP_PORT
               value: "4000"
-            - name: JAMBONES_INBOUND_ROUTE
-              value: "4002"
-            - name: JAMBONES_OUTBOUND_ROUTE
-              value: "4003"
-            - name: JAMBONZ_TAGGED_INBOUND
-              value: "1"
-            - name: ENABLE_METRICS
-              value: "0"
-            - name: JAMBONES_NETWORK_CIDR
-              value: 172.31.0.0/16
         - name: sbc-options-handler
           image: jambonz/sbc-options-handler:latest
-          env:
-            - name: NODE_ENV
-              value: production
-            - name: JAMBONES_LOGLEVEL
-              value: info
-            - name: JAMBONES_CLUSTER_ID
-              value: jb 
-            - name: DRACHTIO_HOST
-              value: localhost
-            - name: DRACHTIO_SECRET
-              value: cymru
-            - name: DRACHTIO_PORT
-              value: "9022"
-            - name: JAMBONES_REDIS_HOST
-              value: redis
-            - name: JAMBONES_REDIS_PORT
-              value: "6379"
-            - name: ENABLE_METRICS
-              value: "0"
-            - name: JAMBONES_NETWORK_CIDR
-              value: 172.31.0.0/16
+          envFrom:
+            - secretRef:
+                name: jambonz
         - name: sbc-registrar
           image: jambonz/sbc-registrar:latest
-          env:
-            - name: NODE_ENV
-              value: production
-            - name: JAMBONES_LOGLEVEL
-              value: info
-            - name: DRACHTIO_HOST
-              value: localhost
-            - name: DRACHTIO_SECRET
-              value: cymru
-            - name: DRACHTIO_PORT
-              value: "9022"
-            - name: JAMBONES_MYSQL_DATABASE
-              value: jambones
-            - name: JAMBONES_MYSQL_HOST
-              value: mysql
-            - name: JAMBONES_MYSQL_PASSWORD
-              value: jambones
-            - name: JAMBONES_MYSQL_USER
-              value: jambones
-            - name: JAMBONES_REDIS_HOST
-              value: redis
-            - name: JAMBONES_REDIS_PORT
-              value: "6379"
-            - name: ENABLE_METRICS
-              value: "0"
+          envFrom:
+            - secretRef:
+                name: jambonz
         - name: sbc-inbound
           image: jambonz/sbc-inbound:latest
-          env:
-            - name: NODE_ENV
-              value: production
-            - name: JAMBONES_LOGLEVEL
-              value: info
-            - name: JAMBONES_CLUSTER_ID
-              value: jb  
-            - name: JAMBONES_NETWORK_CIDR
-              value: 172.31.0.0/16
-            - name: DRACHTIO_HOST
-              value: localhost
-            - name: DRACHTIO_SECRET
-              value: cymru
-            - name: DRACHTIO_PORT
-              value: "9022"
-            - name: JAMBONES_MYSQL_DATABASE
-              value: jambones
-            - name: JAMBONES_MYSQL_HOST
-              value: mysql
-            - name: JAMBONES_MYSQL_PASSWORD
-              value: jambones
-            - name: JAMBONES_MYSQL_USER
-              value: jambones
-            - name: JAMBONES_REDIS_HOST
-              value: redis
-            - name: JAMBONES_REDIS_PORT
-              value: "6379"
-            - name: JAMBONES_TIME_SERIES_HOST
-              value: influxdb
-            - name: ENABLE_METRICS
-              value: "0"
+          envFrom:
+            - secretRef:
+                name: jambonz
         - name: sbc-outbound
           image: jambonz/sbc-outbound:latest
-          env:
-            - name: NODE_ENV
-              value: production
-            - name: JAMBONES_LOGLEVEL
-              value: info
-            - name: JAMBONES_NETWORK_CIDR
-              value: 172.31.0.0/16
-            - name: JAMBONES_CLUSTER_ID
-              value: jb  
-            - name: DRACHTIO_HOST
-              value: localhost
-            - name: DRACHTIO_SECRET
-              value: cymru
-            - name: DRACHTIO_PORT
-              value: "9022"
-            - name: JAMBONES_MYSQL_DATABASE
-              value: jambones
-            - name: JAMBONES_MYSQL_HOST
-              value: mysql
-            - name: JAMBONES_MYSQL_PASSWORD
-              value: jambones
-            - name: JAMBONES_MYSQL_USER
-              value: jambones
-            - name: JAMBONES_REDIS_HOST
-              value: redis
-            - name: JAMBONES_REDIS_PORT
-              value: "6379"
-            - name: JAMBONES_TIME_SERIES_HOST
-              value: influxdb
-            - name: ENABLE_METRICS
-              value: "0"
+          envFrom:
+            - secretRef:
+                name: jambonz
       restartPolicy: Always
       volumes:
       - name: drachtio-sbc-sip-conf
