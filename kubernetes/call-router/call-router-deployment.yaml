@@ -14,7 +14,6 @@ spec:
       labels:
         app: call-router
     spec:
-<<<<<<< HEAD
       nodeSelector:
         kubernetes.io/arch: amd64
       containers:
@@ -24,26 +23,6 @@ spec:
           env:
             - name: HTTP_PORT
               value: "4000"
-=======
-      containers:
-        - env:
-            - name: ENABLE_METRICS
-              value: "0"
-            - name: HTTP_PORT
-              value: "4000"
-            - name: JAMBONES_INBOUND_ROUTE
-              value: 127.0.0.1:4002
-            - name: JAMBONES_LOGLEVEL
-              value: info
-            - name: JAMBONES_NETWORK_CIDR
-              value: 100.0.0.0/8
-            - name: JAMBONES_OUTBOUND_ROUTE
-              value: 127.0.0.1:4003
-            - name: JAMBONZ_TAGGED_INBOUND
-              value: "1"
-            - name: NODE_ENV
-              value: production
->>>>>>> feat: Add K8S manifest to deploy Jambonz using Kustomize
           image: jambonz/sbc-call-router:latest
           name: call-router
           resources: {}

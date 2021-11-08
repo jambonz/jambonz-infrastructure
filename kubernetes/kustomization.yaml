@@ -6,23 +6,21 @@ namespace: jambonz
 resources:
 - namespace.yaml
 - db/db-create.yaml
-- namespace.yaml
 - mysql/mysql-service.yaml
 - mysql/mysql-statefulset.yaml
 - redis/redis-service.yaml
 - redis/redis-statefulset.yaml
-- sbc-sip/sbc-sip-configmap.yaml
-- sbc-sip/sbc-sip-daemonset.yaml
 - influxdb/influxdb-service.yaml
 - influxdb/influxdb-statefulset.yaml
-- rtpengine/rtpengine-service.yaml
-- rtpengine/rtpengine-deployment.yaml
 - webapp/webapp-deployment.yaml
 - webapp/webapp-service.yaml
 - webapp/webapp-ingress.yaml
 - api-server/api-server-deployment.yaml
 - api-server/api-server-service.yaml
 - api-server/api-server-ingress.yaml
+- sbc-sip/sbc-sip-configmap.yaml
+- sbc-sip/sbc-sip-daemonset.yaml
+- sbc-rtp/sbc-rtp-daemonset.yaml
 secretGenerator:
   - envs:
       - jambonz.env

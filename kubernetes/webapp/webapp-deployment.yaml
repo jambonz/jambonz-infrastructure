@@ -14,22 +14,15 @@ spec:
       labels:
         app: webapp
     spec:
-<<<<<<< HEAD
       nodeSelector:
         kubernetes.io/arch: amd64
-=======
->>>>>>> feat: Add K8S manifest to deploy Jambonz using Kustomize
       containers:
         - env:
             - name: REACT_APP_API_BASE_URL
               value: https://api-server/v1
             - name: NODE_OPTIONS
               value: '--openssl-legacy-provider'
-<<<<<<< HEAD
           image: jambonz/webapp:latest
-=======
-          image: cognigydevelopment.azurecr.io/jambonzwebapp:8473 # {"$imagepolicy": "flux-system:jambonzwebapp"}
->>>>>>> feat: Add K8S manifest to deploy Jambonz using Kustomize
           name: webapp
           ports:
             - containerPort: 3001
