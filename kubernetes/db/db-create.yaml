@@ -3,7 +3,7 @@ kind: Job
 metadata:
   name: db-create
 spec:
-  backoffLimit: 0
+  backoffLimit: 10
   template:
     metadata:
       annotations:
@@ -13,9 +13,9 @@ spec:
         - envFrom:
           - secretRef:
               name: jambonz
-          image: jambonz/db
+          image: jambonz/db-create:latest
           imagePullPolicy: Always
           name: db
       nodeSelector:
         kubernetes.io/arch: amd64
-      restartPolicy: Never
+      restartPolicy: OnFailure
