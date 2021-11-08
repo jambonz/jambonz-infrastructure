@@ -20,6 +20,14 @@ spec:
         - key: "voip-edge"
           operator: "Exists"
           effect: "NoSchedule"
+      initContainers:
+        - args:
+            - wait
+            - --for=condition=complete
+            - --timeout=300s
+            - job/db-create
+          image: d3fk/kubectl:v1.18
+          name: db-create-wait
       containers:
         - name: drachtio
           image: drachtio/drachtio-server:0.8.12
