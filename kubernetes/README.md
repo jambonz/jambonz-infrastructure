@@ -1,12 +1,15 @@
 This is the first draft of deploying Jambonz on Kubernetes (K8S). The K8S manifests are built based on the Docker compose file in the same repository.
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 # Notes
 
 - The Ingresses are set up to work with [Traefik v1.7](https://doc.traefik.io/traefik/v1.7/). Please adapt it to work with the Ingress Controller of your cluster
 
 =======
 >>>>>>> feat: Add K8S manifest to deploy Jambonz using Kustomize
+=======
+>>>>>>> 6ca8d8d8188d825732fcf6f40081170db0f00f17
 # Manual steps
 
 - Setup MySQL databases and tables
