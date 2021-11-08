@@ -26,9 +26,34 @@ spec:
           args: ['drachtio', '--contact', 'sip:*:5064;transport=udp,tcp', '--port', '9023']
         - name: rtpengine-sidecar
           image: jambonz/rtpengine-sidecar:latest
-          envFrom:
-            - secretRef:
-                name: jambonz
+          env:
+            - name: DRACHTIO_PORT
+              value: "9023"
+            - name: DRACHTIO_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: jambonz
+                  key: DRACHTIO_HOST
+            - name: DRACHTIO_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: jambonz
+                  key: DRACHTIO_SECRET
+            - name: JAMBONES_REDIS_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: jambonz
+                  key: JAMBONES_REDIS_HOST
+            - name: JAMBONES_REDIS_PORT
+              valueFrom:
+                secretKeyRef:
+                  name: jambonz
+                  key: JAMBONES_REDIS_PORT
+            - name: RTPENGINE_DTMF_LOG_PORT
+              valueFrom:
+                secretKeyRef:
+                  name: jambonz
+                  key: RTPENGINE_DTMF_LOG_PORT
         - name: rtpengine 
           image: jambonz/rtpengine:latest 
           args: ['rtpengine']
