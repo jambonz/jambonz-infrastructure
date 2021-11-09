@@ -5,6 +5,8 @@ namespace: jambonz
 
 resources:
 - namespace.yaml
+- rbac/role.yaml
+- rbac/role-binding.yaml
 - db/db-create.yaml
 - influxdb/influxdb-service.yaml
 - influxdb/influxdb-statefulset.yaml
