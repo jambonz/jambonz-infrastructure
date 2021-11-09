@@ -6,6 +6,8 @@ namespace: jambonz
 resources:
 - namespace.yaml
 - db/db-create.yaml
+- influxdb/influxdb-service.yaml
+- influxdb/influxdb-statefulset.yaml
 - mysql/mysql-service.yaml
 - mysql/mysql-statefulset.yaml
 - redis/redis-service.yaml
