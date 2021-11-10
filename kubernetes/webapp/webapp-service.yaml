@@ -9,5 +9,6 @@ spec:
     - name: "webapp"
       port: 3001
       targetPort: 3001
+  type: NodePort
   selector:
     app: webapp

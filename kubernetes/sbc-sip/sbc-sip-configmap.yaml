@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: drachtio-sbc-sip-conf
+  name: jambonz-sbc-sip-conf
 data:
   drachtio.conf.xml: |
     <drachtio>

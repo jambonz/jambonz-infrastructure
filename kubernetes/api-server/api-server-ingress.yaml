@@ -1,15 +1,21 @@
-apiVersion: extensions/v1beta1
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-    name: api-server
-    annotations:
-        kubernetes.io/ingress.class: traefik
+  name: api-server
+  annotations:
+    kubernetes.io/ingress.class: alb
+    alb.ingress.kubernetes.io/scheme: internet-facing
+    alb.ingress.kubernetes.io/target-type: ip
 spec:
-    rules:
-    - host: api-server
+  rules:
+    - host: api.k8sdev.jambonz.us
       http:
         paths:
-        - path: /
-          backend:
-              serviceName: api-server
-              servicePort: 3000
+        - backend:
+            service: 
+              name: api-server
+              port: 
+                number: 3000
+          path: /
+          pathType: Prefix
+

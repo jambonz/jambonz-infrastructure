@@ -1,21 +1,22 @@
 apiVersion: apps/v1
 kind: DaemonSet
 metadata:
-  name: drachtio-sbc-rtp
+  name: jambonz-sbc-rtp
   labels:
-    app: drachtio-sbc-rtp
+    app: jambonz-sbc-rtp
 spec:
   selector:
     matchLabels:
-      app: drachtio-sbc-rtp
+      app: jambonz-sbc-rtp
   template:
     metadata:
       labels:
-        app: drachtio-sbc-rtp
+        app: jambonz-sbc-rtp
     spec:
       nodeSelector:
         voip-environment: edge
       hostNetwork: true
+      dnsPolicy: ClusterFirstWithHostNet
       tolerations:
         - key: "voip-edge"
           operator: "Exists"
@@ -29,6 +30,11 @@ spec:
           env:
             - name: DRACHTIO_PORT
               value: "9023"
+            - name: JAMBONES_CLUSTER_ID
+              valueFrom:
+                secretKeyRef:
+                  name: jambonz
+                  key: JAMBONES_CLUSTER_ID
             - name: DRACHTIO_HOST
               valueFrom:
                 secretKeyRef:

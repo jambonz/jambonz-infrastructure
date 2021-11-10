@@ -19,9 +19,11 @@ spec:
       containers:
         - env:
             - name: REACT_APP_API_BASE_URL
-              value: https://api-server/v1
+              value: http://api.k8sdev.jambonz.us/v1
             - name: NODE_OPTIONS
               value: '--openssl-legacy-provider'
+            - name: DEBUG 
+              value: 'express:*'
           image: jambonz/webapp:latest
           name: webapp
           ports:

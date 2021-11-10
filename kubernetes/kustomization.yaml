@@ -5,6 +5,8 @@ namespace: jambonz
 
 resources:
 - namespace.yaml
+- rbac/role.yaml
+- rbac/role-binding.yaml
 - db/db-create.yaml
 - mysql/mysql-service.yaml
 - mysql/mysql-statefulset.yaml
@@ -22,6 +24,6 @@ resources:
 - sbc-sip/sbc-sip-daemonset.yaml
 - sbc-rtp/sbc-rtp-daemonset.yaml
 secretGenerator:
-  - envs:
-      - jambonz.env
-    name: jambonz
+  - name: jambonz
+    envs:
+    - jambonz.env

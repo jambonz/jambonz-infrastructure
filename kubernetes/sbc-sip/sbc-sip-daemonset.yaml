@@ -1,21 +1,22 @@
 apiVersion: apps/v1
 kind: DaemonSet
 metadata:
-  name: drachtio-sbc-sip
+  name: jambonz-sbc-sip
   labels:
-    app: drachtio-sbc-sip
+    app: jambonz-sbc-sip
 spec:
   selector:
     matchLabels:
-      app: drachtio-sbc-sip
+      app: jambonz-sbc-sip
   template:
     metadata:
       labels:
-        app: drachtio-sbc-sip
+        app: jambonz-sbc-sip
     spec:
       nodeSelector:
         voip-environment: edge
       hostNetwork: true
+      dnsPolicy: ClusterFirstWithHostNet
       tolerations:
         - key: "voip-edge"
           operator: "Exists"
@@ -31,7 +32,7 @@ spec:
       containers:
         - name: drachtio
           image: drachtio/drachtio-server:0.8.12
-          args: ['drachtio', '--cloud-deployment', '--contact', 'sip:*:5060;transport=tcp']
+          args: ['drachtio', '--cloud-deployment', '--loglevel', 'debug']
           envFrom:
             - secretRef:
                 name: jambonz
@@ -45,16 +46,29 @@ spec:
           resources: {}
           volumeMounts:
             - mountPath: /etc/drachtio.conf.xml
-              name: drachtio-sbc-sip-conf
+              name: jambonz-sbc-sip-conf
               subPath: drachtio.conf.xml
         - name: sbc-call-router
           image: jambonz/sbc-call-router:latest
-          envFrom:
-            - secretRef:
-                name: jambonz
           env:
             - name: HTTP_PORT
               value: "4000"
+            - name: JAMBONES_INBOUND_ROUTE
+              value: "127.0.0.1:4002"
+            - name: JAMBONES_OUTBOUND_ROUTE
+              value: "127.0.0.1:4003"
+            - name: JAMBONZ_TAGGED_INBOUND
+              value: "1"
+            - name: ENABLE_METRICS
+              valueFrom:
+                secretKeyRef:
+                  name: jambonz
+                  key: ENABLE_METRICS
+            - name: JAMBONES_NETWORK_CIDR
+              valueFrom:
+                secretKeyRef:
+                  name: jambonz
+                  key: JAMBONES_NETWORK_CIDR
         - name: sbc-options-handler
           image: jambonz/sbc-options-handler:latest
           envFrom:
@@ -77,9 +91,9 @@ spec:
                 name: jambonz
       restartPolicy: Always
       volumes:
-      - name: drachtio-sbc-sip-conf
+      - name: jambonz-sbc-sip-conf
         configMap:
-          name: drachtio-sbc-sip-conf
+          name: jambonz-sbc-sip-conf
           items:
           - key: drachtio.conf.xml
             path: drachtio.conf.xml
