@@ -23,8 +23,19 @@ spec:
           effect: "NoSchedule"
       containers:
         - name: drachtio
-          image: drachtio/drachtio-server:0.8.12
-          args: ['drachtio', '--contact', 'sip:*:5064;transport=udp,tcp', '--port', '9023']
+          image: drachtio/drachtio-server:k8s
+          imagePullPolicy: Always
+          args: ['drachtio', '--cloud-deployment', '--port', '9023']
+          env: 
+            - name: NO_PUBLIC_IP
+              value: "1"
+            - name: DRACHTIO_SIP_PORT
+              value: "5064"
+            - name: CLOUD
+              valueFrom:
+                secretKeyRef:
+                  name: jambonz
+                  key: CLOUD
         - name: rtpengine-sidecar
           image: jambonz/rtpengine-sidecar:latest
           env:

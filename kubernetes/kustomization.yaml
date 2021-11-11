@@ -12,6 +12,7 @@ resources:
 - mysql/mysql-statefulset.yaml
 - redis/redis-service.yaml
 - redis/redis-statefulset.yaml
+- influxdb/influxdb-storageclass.yaml
 - influxdb/influxdb-service.yaml
 - influxdb/influxdb-statefulset.yaml
 - webapp/webapp-deployment.yaml
@@ -23,6 +24,8 @@ resources:
 - sbc-sip/sbc-sip-configmap.yaml
 - sbc-sip/sbc-sip-daemonset.yaml
 - sbc-rtp/sbc-rtp-daemonset.yaml
+- feature-server/feature-server-deployment.yaml
+
 secretGenerator:
   - name: jambonz
     envs:

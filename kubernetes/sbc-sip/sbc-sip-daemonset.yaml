@@ -31,7 +31,8 @@ spec:
           name: db-create-wait
       containers:
         - name: drachtio
-          image: drachtio/drachtio-server:0.8.12
+          image: drachtio/drachtio-server:k8s
+          imagePullPolicy: Always
           args: ['drachtio', '--cloud-deployment', '--loglevel', 'debug']
           envFrom:
             - secretRef:

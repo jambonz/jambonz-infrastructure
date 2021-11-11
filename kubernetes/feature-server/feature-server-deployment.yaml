@@ -1,21 +1,18 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
+  name: jambonz-feature-server
   labels:
-    app: api-server
-  name: api-server
+    app: jambonz-feature-server
 spec:
-  replicas: 1
   selector:
     matchLabels:
-      app: api-server
+      app: jambonz-feature-server
   template:
     metadata:
       labels:
-        app: api-server
+        app: jambonz-feature-server
     spec:
-      nodeSelector:
-        kubernetes.io/arch: amd64
       initContainers:
         - args:
             - wait
@@ -25,28 +22,51 @@ spec:
           image: d3fk/kubectl:v1.18
           name: db-create-wait
       containers:
-        - name: api-server
-          image: jambonz/jambonz-api-server:latest
+        - name: drachtio
+          image: drachtio/drachtio-server:k8s
+          imagePullPolicy: Always
+          args: ['drachtio', '--contact', 'sip:*:5060;transport=udp,tcp']
+          env: 
+        - name: freeswitch
+          image: drachtio/drachtio-freeswitch-mrf:1.10.5
+          volumeMounts:
+            - mountPath: /tmp 
+              name: temp-audio-volume
+        - name: feature-server 
+          image: jambonz/feature-server:latest 
+          volumeMounts:
+            - mountPath: /tmp 
+              name: temp-audio-volume
           env:
             - name: HTTP_PORT
               value: "3000"
-            - name: JAMBONE_API_VERSION
-              value: v1
+            - name: JAMBONES_FREESWITCH
+              value: "localhost:8021:JambonzR0ck$"
+            - name: JAMBONES_LOGLEVEL
+              valueFrom:
+                secretKeyRef:
+                  name: jambonz
+                  key: JAMBONES_LOGLEVEL
             - name: JAMBONES_CLUSTER_ID
               valueFrom:
                 secretKeyRef:
                   name: jambonz
                   key: JAMBONES_CLUSTER_ID
-            - name: JWT_SECRET
+            - name: DRACHTIO_HOST
               valueFrom:
                 secretKeyRef:
                   name: jambonz
-                  key: JWT_SECRET
-            - name: NODE_ENV
+                  key: DRACHTIO_HOST
+            - name: DRACHTIO_PORT
               valueFrom:
                 secretKeyRef:
                   name: jambonz
-                  key: NODE_ENV
+                  key: DRACHTIO_PORT
+            - name: DRACHTIO_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: jambonz
+                  key: DRACHTIO_SECRET
             - name: JAMBONES_MYSQL_DATABASE
               valueFrom:
                 secretKeyRef:
@@ -87,7 +107,26 @@ spec:
                 secretKeyRef:
                   name: jambonz
                   key: ENABLE_METRICS
+            - name: JAMBONES_NETWORK_CIDR
+              valueFrom:
+                secretKeyRef:
+                  name: jambonz
+                  key: JAMBONES_NETWORK_CIDR
+            - name: JAMBONES_NETWORK_CIDR
+              valueFrom:
+                secretKeyRef:
+                  name: jambonz
+                  key: JAMBONES_NETWORK_CIDR
+            - name: JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: jambonz
+                  key: JWT_SECRET
           ports:
             - containerPort: 3000
+            - containerPort: 8021
           resources: {}
       restartPolicy: Always
+      volumes:
+      - name: temp-audio-volume
+        emptyDir: {}
