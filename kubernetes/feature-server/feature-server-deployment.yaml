@@ -124,7 +124,6 @@ spec:
                   key: JWT_SECRET
           ports:
             - containerPort: 3000
-            - containerPort: 8021
           resources: {}
       restartPolicy: Always
       volumes:
