@@ -269,8 +269,6 @@ module.exports = {
     max_memory_restart: '1G',
     env: {
       NODE_ENV: 'production',
-      GOOGLE_APPLICATION_CREDENTIALS: '/home/admin/credentials/gcp.json',
-      AWS_REGION: 'AWS_REGION_HERE',
       ENABLE_METRICS: 1,
       STATS_HOST: '127.0.0.1',
       STATS_PORT: 8125,
@@ -291,7 +289,58 @@ module.exports = {
       DRACHTIO_PORT: 9023,
       DRACHTIO_SECRET: 'cymru',
       JAMBONES_SBCS: 'PRIVATE_IP',
-      JAMBONES_FREESWITCH: '127.0.0.1:8021:JambonzR0ck$'
+      JAMBONES_FREESWITCH: '127.0.0.1:8021:JambonzR0ck$',
+      SMPP_URL: 'http://PRIVATE_IP:3020'
+    }
+  },
+  {
+    name: 'jambonz-smpp-esme',
+    cwd: '/home/admin/apps/jambonz-smpp-esme',
+    script: 'app.js',
+    out_file: '/home/admin/.pm2/logs/jambonz-smpp-esme.log',
+    err_file: '/home/admin/.pm2/logs/jambonz-smpp-esme.log',
+    combine_logs: true,
+    instance_var: 'INSTANCE_ID',
+    exec_mode: 'fork',
+    instances: 1,
+    autorestart: true,
+    watch: false,
+    max_memory_restart: '1G',
+    env: {
+      NODE_ENV: 'production',
+      JAMBONES_LOGLEVEL: 'info',
+      HTTP_PORT: 3020,
+      AVOID_UDH: true,
+      JAMBONES_MYSQL_HOST: '127.0.0.1',
+      JAMBONES_MYSQL_USER: 'admin',
+      JAMBONES_MYSQL_PASSWORD: 'JambonzR0ck$',
+      JAMBONES_MYSQL_DATABASE: 'jambones',
+      JAMBONES_MYSQL_CONNECTION_LIMIT: 10,
+      JAMBONES_REDIS_HOST: '127.0.0.1',
+      JAMBONES_REDIS_PORT: 6379
+    }
+  },
+  {
+    name: 'sbc-rtpengine-sidecar',
+    cwd: '/home/admin/apps/sbc-rtpengine-sidecar',
+    script: 'app.js',
+    instance_var: 'INSTANCE_ID',
+    out_file: '/home/admin/.pm2/logs/jambonz-sbc-rtpengine-sidecar.log',
+    err_file: '/home/admin/.pm2/logs/jambonz-sbc-rtpengine-sidecar.log',
+    exec_mode: 'fork',
+    instances: 1,
+    autorestart: true,
+    watch: false,
+    max_memory_restart: '1G',
+    env: {
+      NODE_ENV: 'production',
+      LOGLEVEL: 'info',
+      DTMF_ONLY: true,
+      ENABLE_METRICS: 1,
+      STATS_HOST: '127.0.0.1',
+      STATS_PORT: 8125,
+      STATS_PROTOCOL: 'tcp',
+      STATS_TELEGRAF: 1
     }
   }
 ]

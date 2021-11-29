@@ -3,6 +3,7 @@
     <load module="mod_audio_fork"/>
     <load module="mod_aws_lex"/>
     <load module="mod_aws_transcribe"/>
+    <load module="mod_azure_transcribe"/>
     <load module="mod_google_transcribe"/>
     <load module="mod_google_tts"/>
     <load module="mod_dialogflow"/>

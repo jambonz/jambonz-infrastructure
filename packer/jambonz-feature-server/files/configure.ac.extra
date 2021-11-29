@@ -1891,6 +1891,7 @@ AC_CONFIG_FILES([Makefile
     src/mod/applications/mod_audio_fork/Makefile
     src/mod/applications/mod_aws_lex/Makefile
     src/mod/applications/mod_aws_transcribe/Makefile
+    src/mod/applications/mod_azure_transcribe/Makefile
     src/mod/applications/mod_google_tts/Makefile
     src/mod/applications/mod_google_transcribe/Makefile
     src/mod/applications/mod_dialogflow/Makefile
