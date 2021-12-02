@@ -336,6 +336,7 @@ module.exports = {
       NODE_ENV: 'production',
       LOGLEVEL: 'info',
       DTMF_ONLY: true,
+      RTPENGINE_DTMF_LOG_PORT: 22223,
       ENABLE_METRICS: 1,
       STATS_HOST: '127.0.0.1',
       STATS_PORT: 8125,

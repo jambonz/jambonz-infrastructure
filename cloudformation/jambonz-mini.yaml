@@ -63,7 +63,7 @@ Mappings:
     us-east-1:
       Ami: ami-01c840e45dc7fa298
     us-east-2:
-      Ami: ami-05e57bc7ff0fe0d34
+      Ami: ami-0b022469a0254a6c0
 
 Resources:
   VPC:
@@ -133,6 +133,8 @@ Resources:
             - >
               sudo -u admin bash -c "pm2 restart
               /home/admin/apps/ecosystem.config.js" 
+            - >
+              sleep 5
             - >
               sudo env PATH=$PATH:/usr/bin /usr/lib/node_modules/pm2/bin/pm2 startup systemd -u admin --hp /home/admin
             - >
