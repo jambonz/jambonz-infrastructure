@@ -15,6 +15,26 @@ Parameters:
     Default: "name of an aws keypair that you have downloaded and will use to access the EC2 instances via ssh"
     Type: "AWS::EC2::KeyPair::KeyName"
 
+  TlsDomain:
+    Default: ""
+    Description: "TLS domain name"
+    Type: String
+
+  TlsKey:
+    Default: ""
+    Description: "TLS .key certificate"
+    Type: "AWS::SSM::Parameter::Value<String>"
+
+  TlsCert:
+    Default: ""
+    Description: "TLS .cert certificate"
+    Type: "AWS::SSM::Parameter::Value<String>"
+
+  TlsFullchain:
+    Default: ""
+    Description: "TLS .fullchain certificate"
+    Type: "AWS::SSM::Parameter::Value<String>"
+
   InstanceTypeSbcSip:
     Description: "the EC2 instance type for the SBC SIP server"
     Type: String
@@ -1060,8 +1080,32 @@ Resources:
               sudo systemctl restart telegraf
 
               echo "restarting drachtio server"
+
+              #If TLS build out certificates from SSM params
+              if ["${TLS_DOMAIN}" != ""] && ["${TLS_KEY}" != ""] && ["${TLS_CERT}" != ""] && ["${TLS_FULLCHAIN}" != ""]; then
+
+                #create certificate based on SSM values
+                sudo mkdir -p "/etc/certs/$TLS_DOMAIN"
+                echo "$TLS_KEY" > "/etc/certs/$TLS_DOMAIN/$TLS_DOMAIN.key"
+                echo "$TLS_CERT" > "/etc/certs/$TLS_DOMAIN/$TLS_DOMAIN.cert"
+                echo "$TLS_FULLCHAIN" > "/etc/certs/$TLS_DOMAIN/$TLS_DOMAIN.fullchain.crt"
+
+                #update drachtio.conf.xml with newly created certs
+                sudo sed -i "/udp-mtu/a \
+                  <tls>
+                    <key-file>/etc/certs/$TLS_DOMAIN/$TLS_DOMAIN.key</key-file>
+                    <cert-file>/etc/certs/$TLS_DOMAIN/$TLS_DOMAIN.crt</cert-file>
+                    <chain-file>/etc/certs/$TLS_DOMAIN/$TLS_DOMAIN.fullchain.crt</chain-file>
+                  </tls>" /etc/drachtio.conf.xml
+
+                #update drachtio.service add contact for tls
+                sudo sed -i -e "s/--contact sip:${LOCAL_IP};transport=tcp/a --contact sips:${LOCAL_IP}:5061;transport=tls --external-ip ${PUBLIC_IP} \/g"  /etc/systemd/system/drachtio.service
+                sudo sed -i -e "s/--contact sip:${LOCAL_IP};transport=tcp/a --contact sips:${LOCAL_IP}:8443;transport=wss --external-ip ${PUBLIC_IP} \/g"  /etc/systemd/system/drachtio.service
+              fi
+
               # point drachtio server to the HEP endpoint on the monitoring server
               sudo sed -i -e "s/--address 0.0.0.0 --port 9022/--address 0.0.0.0 --port 9022 --homer ${MONITORING_SERVER_IP}:9060 --homer-id 10/g"  /etc/systemd/system/drachtio.service
+
               sudo systemctl daemon-reload
               sudo systemctl restart drachtio
 
@@ -1082,6 +1126,11 @@ Resources:
               MONITORING_SERVER_IP: !GetAtt MonitoringServerEC2.PrivateIp
               AWS_SNS_TOPIC_ARN: !Ref SbcSipServerSNSTopic
               JAMBONES_TIME_SERIES_HOST: !GetAtt MonitoringServerEC2.PrivateIp
+              TLS_DOMAIN: !Ref TlsDomain
+              TLS_KEY: !Ref TlsKey
+              TLS_CERT: !Ref TlsCert
+              TLS_FULLCHAIN: !Ref TlsFullchain
+
   SbcSipServerPlacementGroup:
     Type: AWS::EC2::PlacementGroup
     Properties:

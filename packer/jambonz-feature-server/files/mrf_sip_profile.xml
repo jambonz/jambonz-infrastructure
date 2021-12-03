@@ -18,7 +18,8 @@
       <param name="ext-sip-ip" value="$${local_ip_v4}"/>
       <param name="auth-calls" value="false"/>
       <param name="enable-timer" value="false"/>
-      <param name="user-agent-string" value="Jambonz media gateway"/>
+      <param name="user-agent-string" value="$${user_agent_string} media gateway"/>
+      <param name="username" value="$${user_agent_string}"/>
       <param name="apply-nat-acl" value="nat.auto"/>
       <param name="context" value="mrf"/>
       <param name="rtp-timer-name" value="soft"/>
