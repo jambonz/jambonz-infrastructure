@@ -130,8 +130,9 @@ sudo cp /usr/local/src/freeswitch/conf/vanilla/autoload_configs/modules.conf.xml
 sudo cp /tmp/freeswitch.service /etc/systemd/system
 sudo chown root:root -R /usr/local/freeswitch
 sudo chmod 644 /etc/systemd/system/freeswitch.service
-sudo sed -i -e 's/global_codec_prefs=OPUS,G722,PCMU,PCMA,H264,VP8/global_codec_prefs=PCMU,PCMA,OPUS,G722/g' /usr/local/freeswitch/conf/vars.xml
-sudo sed -i -e 's/outbound_codec_prefs=OPUS,G722,PCMU,PCMA,H264,VP8/outbound_codec_prefs=PCMU,PCMA,OPUS,G722/g' /usr/local/freeswitch/conf/vars.xml
+sudo sed -i -e "s/global_codec_prefs=OPUS,G722,PCMU,PCMA,H264,VP8/global_codec_prefs=${CODEC_LIST}/g" /usr/local/freeswitch/conf/vars.xml
+sudo sed -i -e "s/outbound_codec_prefs=OPUS,G722,PCMU,PCMA,H264,VP8/outbound_codec_prefs=${CODEC_LIST}/g" /usr/local/freeswitch/conf/vars.xml
+sudo sed -i -e "s/outbound_codec_prefs=PCMU,PCMA,OPUS,G722/a  <X-PRE-PROCESS cmd='set' data='user_agent_string=${USER_AGENT_STRING}'/>" /usr/local/freeswitch/conf/vars.xml
 sudo systemctl enable freeswitch
 sudo cp /tmp/freeswitch_log_rotation /etc/cron.daily/freeswitch_log_rotation
 sudo chown root:root /etc/cron.daily/freeswitch_log_rotation
