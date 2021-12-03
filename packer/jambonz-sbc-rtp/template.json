@@ -10,6 +10,7 @@
     "rtp_engine_min_port": "40000",
     "rtp_engine_max_port": "60000",
     "install_datadog": "no",
+    "datadog_key" : "",
     "install_telegraf": "yes"
   },
   "builders": [{
@@ -81,7 +82,11 @@
     },
     {
       "type": "shell",
-      "execute_command": "chmod +x {{ .Path }}; sudo '{{ .Path }}' {{user `install_datadog`}}",
+      "environment_vars": [
+        "DD_KEY={{user `datadog_key`}}",
+        "DD_INSTALL={{user `install_datadog`}}"
+      ],
+      "execute_command": "chmod +x {{ .Path }}; sudo '{{ .Path }}'",
       "script": "scripts/install_datadog.sh"
     },
     {

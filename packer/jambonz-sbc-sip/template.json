@@ -7,6 +7,7 @@
     "drachtio_version": "v0.8.13-rc1",
     "jambonz_version": "v0.6.7-rc8",
     "install_datadog": "no",
+    "datadog_key" : "",
     "install_telegraf": "yes"
   },
   "builders": [{
@@ -87,7 +88,11 @@
     },
     {
       "type": "shell",
-      "execute_command": "chmod +x {{ .Path }}; sudo '{{ .Path }}' {{user `install_datadog`}}",
+      "environment_vars": [
+        "DD_KEY={{user `datadog_key`}}",
+        "DD_INSTALL={{user `install_datadog`}}"
+      ],
+      "execute_command": "chmod +x {{ .Path }}; sudo '{{ .Path }}'",
       "script": "scripts/install_datadog.sh"
     },
     {
