@@ -8,7 +8,8 @@
     "jambonz_version": "v0.6.7-rc8",
     "install_telegraf": "yes",
     "install_datadog": "no",
-    "cluster_alias" : "callable",
+    "datadog_key" : "",
+    "cluster_alias" : "jambonz",
     "codec_list" : "PCMU,PCMA,OPUS,G722"
   },
   "builders": [{
@@ -65,8 +66,8 @@
         "ssh-keyscan github.com >> ~/.ssh/known_hosts",
         "mkdir ~/apps",
         "cd ~/apps",
-        "git clone git@github.com:jambonz/jambonz-feature-server.git -b {{user `jambonz_version`}}",
-        "git clone git@github.com:jambonz/fsw-clear-old-calls.git -b {{user `jambonz_version`}}",
+        "git clone https://github.com/jambonz/jambonz-feature-server.git -b {{user `jambonz_version`}}",
+        "git clone https://github.com/jambonz/fsw-clear-old-calls.git -b {{user `jambonz_version`}}",
         "sudo find / -name authorized_keys | sudo xargs -0 -r rm -Rf"
       ]
     },
@@ -85,6 +86,9 @@
     },
     {
       "type": "shell",
+      "environment_vars": [
+        "DD_KEY={{user `datadog_key`}}"
+      ],
       "execute_command": "chmod +x {{ .Path }}; sudo '{{ .Path }}' {{user `install_datadog`}}",
       "script": "scripts/install_datadog.sh"
     },
