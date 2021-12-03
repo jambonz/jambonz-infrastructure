@@ -9,8 +9,8 @@
     "install_telegraf": "yes",
     "install_datadog": "no",
     "datadog_key" : "",
-    "cluster_alias" : "jambonz",
-    "codec_list" : "PCMU,PCMA,OPUS,G722"
+    "mediaserver_name" : "jambonz",
+    "preferred_codec_list" : "PCMU,PCMA,OPUS,G722"
   },
   "builders": [{
     "type": "amazon-ebs",
@@ -100,8 +100,8 @@
     {
       "type": "shell",
       "environment_vars": [
-        "USER_AGENT_STRING={{user `cluster_alias`}}",
-        "CODEC_LIST={{user `codec_list`}}"
+        "USER_AGENT_STRING={{user `mediaserver_name`}}",
+        "CODEC_LIST={{user `preferred_codec_list`}}"
       ],
       "script": "scripts/install_freeswitch.sh"
     },
