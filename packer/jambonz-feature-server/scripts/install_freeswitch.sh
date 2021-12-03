@@ -132,7 +132,7 @@ sudo chown root:root -R /usr/local/freeswitch
 sudo chmod 644 /etc/systemd/system/freeswitch.service
 sudo sed -i -e "s/global_codec_prefs=OPUS,G722,PCMU,PCMA,H264,VP8/global_codec_prefs=${PREFERRED_CODEC_LIST}/g" /usr/local/freeswitch/conf/vars.xml
 sudo sed -i -e "s/outbound_codec_prefs=OPUS,G722,PCMU,PCMA,H264,VP8/outbound_codec_prefs=${PREFERRED_CODEC_LIST}/g" /usr/local/freeswitch/conf/vars.xml
-sudo sed -i -e "s/outbound_codec_prefs=PCMU,PCMA,OPUS,G722/a  <X-PRE-PROCESS cmd='set' data='media_server_name=${MEDIA_SERVER_NAME}'/>" /usr/local/freeswitch/conf/vars.xml
+sudo sed -i -e "/outbound_codec_prefs=/a  <X-PRE-PROCESS cmd=\"set\" data=\"media_server_name=${MEDIA_SERVER_NAME}\"/>" /usr/local/freeswitch/conf/vars.xml
 sudo systemctl enable freeswitch
 sudo cp /tmp/freeswitch_log_rotation /etc/cron.daily/freeswitch_log_rotation
 sudo chown root:root /etc/cron.daily/freeswitch_log_rotation
