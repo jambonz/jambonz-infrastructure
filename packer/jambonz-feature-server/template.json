@@ -7,7 +7,9 @@
     "drachtio_version": "v0.8.13-rc1",
     "jambonz_version": "v0.6.7-rc8",
     "install_telegraf": "yes",
-    "install_datadog": "no"
+    "install_datadog": "no",
+    "cluster_alias" : "callable",
+    "codec_list" : "PCMU,PCMA,OPUS,G722"
   },
   "builders": [{
     "type": "amazon-ebs",
@@ -93,6 +95,10 @@
     },
     {
       "type": "shell",
+      "environment_vars": [
+        "USER_AGENT_STRING={{user `cluster_alias`}}",
+        "CODEC_LIST={{user `codec_list`}}"
+      ],
       "script": "scripts/install_freeswitch.sh"
     },
     {
