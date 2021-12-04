@@ -9,7 +9,7 @@
       <param name="rfc2833-pt" value="101"/>
 
       <param name="dtmf-type" value="rfc2833"/>
-      
+
       <param name="inbound-late-negotiation" value="true"/>
       <param name="rtp-ip" value="$${local_ip_v4}"/>
       <param name="sip-ip" value="$${local_ip_v4}"/>
@@ -18,7 +18,8 @@
       <param name="ext-sip-ip" value="$${local_ip_v4}"/>
       <param name="auth-calls" value="false"/>
       <param name="enable-timer" value="false"/>
-      <param name="user-agent-string" value="Jambonz media gateway"/>
+      <param name="user-agent-string" value="$${media_server_name} media gateway"/>
+      <param name="username" value="$${media_server_name}"/>
       <param name="apply-nat-acl" value="nat.auto"/>
       <param name="context" value="mrf"/>
       <param name="rtp-timer-name" value="soft"/>

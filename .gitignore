@@ -6,3 +6,6 @@ gcp.json
 
 data_volume/
 tmpAudio/
+
+.idea
+*.iml
