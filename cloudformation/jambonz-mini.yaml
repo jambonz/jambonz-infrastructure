@@ -138,6 +138,8 @@ Resources:
             - >
               sudo env PATH=$PATH:/usr/bin /usr/lib/node_modules/pm2/bin/pm2 startup systemd -u admin --hp /home/admin
             - >
+              sudo -u admin bash -c "pm2 save"
+            - >
               sudo systemctl restart heplify-server
             - |+
 
