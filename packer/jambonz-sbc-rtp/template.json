@@ -67,7 +67,7 @@
         "ssh-keyscan github.com >> ~/.ssh/known_hosts",
         "mkdir ~/apps",
         "cd ~/apps",
-        "git clone git@github.com:jambonz/sbc-rtpengine-sidecar.git -b {{user `jambonz_version`}}",
+        "git clone https://github.com/jambonz/sbc-rtpengine-sidecar.git -b {{user `jambonz_version`}}",
         "sudo find / -name authorized_keys | sudo xargs -0 -r rm -Rf"
       ]
     },

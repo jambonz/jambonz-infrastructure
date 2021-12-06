@@ -64,12 +64,12 @@
         "ssh-keyscan github.com >> ~/.ssh/known_hosts",
         "mkdir ~/apps",
         "cd ~/apps",
-        "git clone git@github.com:jambonz/sbc-options-handler.git",
-        "git clone git@github.com:jambonz/sbc-outbound.git -b {{user `jambonz_version`}}",
-        "git clone git@github.com:jambonz/sbc-inbound.git -b {{user `jambonz_version`}}",
-        "git clone git@github.com:jambonz/sbc-registrar.git -b {{user `jambonz_version`}}",
-        "git clone git@github.com:jambonz/jambonz-smpp-esme.git -b {{user `jambonz_version`}}",
-        "git clone git@github.com:jambonz/sbc-call-router.git"
+        "git clone https://github.com/jambonz/sbc-options-handler.git",
+        "git clone https://github.com/jambonz/sbc-outbound.git -b {{user `jambonz_version`}}",
+        "git clone https://github.com/jambonz/sbc-inbound.git -b {{user `jambonz_version`}}",
+        "git clone https://github.com/jambonz/sbc-registrar.git -b {{user `jambonz_version`}}",
+        "git clone https://github.com/jambonz/jambonz-smpp-esme.git -b {{user `jambonz_version`}}",
+        "git clone https://github.com/jambonz/sbc-call-router.git"
       ]
     },
     {
