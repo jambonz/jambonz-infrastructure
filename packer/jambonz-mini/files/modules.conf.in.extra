@@ -1,6 +1,7 @@
 applications/mod_audio_fork
 applications/mod_aws_lex
 applications/mod_aws_transcribe
+applications/mod_azure_transcribe
 applications/mod_google_tts
 applications/mod_google_transcribe
 applications/mod_dialogflow

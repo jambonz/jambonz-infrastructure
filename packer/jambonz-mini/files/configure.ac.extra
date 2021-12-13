@@ -1891,6 +1891,7 @@ AC_CONFIG_FILES([Makefile
     src/mod/applications/mod_audio_fork/Makefile
     src/mod/applications/mod_aws_lex/Makefile
     src/mod/applications/mod_aws_transcribe/Makefile
+    src/mod/applications/mod_azure_transcribe/Makefile
     src/mod/applications/mod_google_tts/Makefile
     src/mod/applications/mod_google_transcribe/Makefile
     src/mod/applications/mod_dialogflow/Makefile
@@ -2079,9 +2080,9 @@ AC_CONFIG_FILES([Makefile
 		build/freeswitch.pc
 		build/standalone_module/freeswitch.pc
 		build/modmake.rules
-                libs/esl/Makefile
-                libs/esl/perl/Makefile
-                libs/esl/php/Makefile
+    libs/esl/Makefile
+    libs/esl/perl/Makefile
+    libs/esl/php/Makefile
 		libs/xmlrpc-c/include/xmlrpc-c/config.h
 		libs/xmlrpc-c/xmlrpc_config.h
 		libs/xmlrpc-c/config.mk

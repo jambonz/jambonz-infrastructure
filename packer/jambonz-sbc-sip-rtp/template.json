@@ -4,7 +4,7 @@
     "ssh_username": "admin",
     "ami_description": "jambonz SBC SIP+RTP+Webserver+monitoring", 
     "drachtio_version": "v0.8.13-rc1",
-    "jambonz_version": "v0.6.7-rc7",
+    "jambonz_version": "v0.7.0",
     "install_influxdb":  "yes",
     "install_homer":  "yes",
     "homer_user": "homer_user",

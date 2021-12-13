@@ -4,7 +4,7 @@
     "ssh_username": "admin",
     "ami_description": "jambonz webserver", 
     "instance_type": "t2.medium",
-    "jambonz_version": "v0.6.7-rc8",
+    "jambonz_version": "v0.7.0",
     "install_datadog": "no",
     "install_telegraf": "yes"
   },
