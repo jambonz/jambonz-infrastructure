@@ -115,6 +115,13 @@
       "type": "shell",
       "execute_command": "chmod +x {{ .Path }}; sudo '{{ .Path }}' {{user `jambonz_version`}}",
       "script": "scripts/install_app.sh"
+    },
+    {
+      "type": "shell",
+      "inline": [
+        "sudo rm /root/.ssh/authorized_keys",
+        "sudo rm /home/admin/.ssh/authorized_keys"
+      ]
     }
   ]
 }
