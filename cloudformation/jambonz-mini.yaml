@@ -63,8 +63,7 @@ Mappings:
     us-east-1:
       Ami: ami-01c840e45dc7fa298
     us-east-2:
-      Ami: ami-0b022469a0254a6c0
-
+      Ami: ami-03b1d3f36900155bb
 Resources:
   VPC:
     Type: 'AWS::EC2::VPC'
@@ -127,6 +126,9 @@ Resources:
               echo "REACT_APP_MOBILE_BREAKPOINT=767px" >>
               /home/admin/apps/jambonz-webapp/.env 
             - >
+              echo "REACT_APP_ENABLE_SUBSPACE=1" >>
+              /home/admin/apps/jambonz-webapp/.env 
+            - >
               cd /home/admin/apps/jambonz-webapp && npm run build 
             - |
               # update ecosystem.config.js with private ip 
@@ -134,11 +136,9 @@ Resources:
               sudo -u admin bash -c "pm2 restart
               /home/admin/apps/ecosystem.config.js" 
             - >
-              sleep 5
+              sudo -u admin bash -c "pm2 save"
             - >
               sudo env PATH=$PATH:/usr/bin /usr/lib/node_modules/pm2/bin/pm2 startup systemd -u admin --hp /home/admin
-            - >
-              sudo -u admin bash -c "pm2 save"
             - >
               sudo systemctl restart heplify-server
             - |+
