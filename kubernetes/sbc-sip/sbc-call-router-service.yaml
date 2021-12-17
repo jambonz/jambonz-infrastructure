@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: sbc-call-router
+  name: sbc-call-router
+  namespace: jambonz
+spec:
+  ports:
+    - name: app
+      port: 3000
+      protocol: TCP
+      targetPort: 3000
+  selector:
+    app: sbc-call-router
+  clusterIP: None

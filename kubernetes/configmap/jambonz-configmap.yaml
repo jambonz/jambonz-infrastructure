@@ -1,0 +1,34 @@
+# This file contains the main configuration
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: jambonz-env
+  namespace: jambonz
+
+data:
+  NODE_ENV: production
+  CLOUD: gcp
+  K8S: "1"
+  K8S_FEATURE_SERVER_SERVICE_NAME: feature-server.jambonz.svc.cluster.local
+  K8S_RTPENGINE_SERVICE_NAME: rtpengine-ng.jambonz.svc.cluster.local:22222
+  K8S_SBC_REGISTER_SERVICE_NAME: sbc-registrar.jambonz.svc.cluster.local:3000
+  K8S_SBC_OPTIONS_SERVICE_NAME: sbc-options.jambonz.svc.cluster.local:3000
+  K8S_SBC_INBOUND_SERVICE_NAME: sbc-inbound.jambonz.svc.cluster.local:3000
+  K8S_SBC_OUTBOUND_SERVICE_NAME: sbc-outbound.jambonz.svc.cluster.local:3000
+  JAMBONES_NETWORK_CIDR: "10.128.0.0/9,10.72.0.0/14"
+  JAMBONES_CLUSTER_ID: jbeast2
+  JAMBONES_LOGLEVEL: debug
+  ENABLE_METRICS: "0"
+  JAMBONES_TIME_SERIES_HOST: influxdb
+  JAMBONES_MYSQL_DATABASE: jambones
+  JAMBONES_MYSQL_HOST: mysql
+  JAMBONES_MYSQL_PASSWORD: jambones
+  JAMBONES_MYSQL_USER: jambones
+  JAMBONES_REDIS_HOST: redis
+  JAMBONES_REDIS_PORT: "6379"
+  DRACHTIO_SECRET: cymru
+  DRACHTIO_HOST: "127.0.0.1"
+  DRACHTIO_PORT: "9022"
+  RTPENGINE_DTMF_LOG_PORT: "22223"
+  RTPENGINE_LOG_LEVEL: "7"
+  JWT_SECRET: G=u%-97#TffYf

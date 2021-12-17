@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sbc-call-router
+  labels:
+    app: sbc-call-router
+  namespace: jambonz
+spec:
+  selector:
+    matchLabels:
+      app: sbc-call-router
+  template:
+    metadata:
+      labels:
+        app: sbc-call-router
+    spec:
+      containers:
+        - name: sbc-call-router
+          image: jambonz/sbc-call-router:k8s
+          imagePullPolicy: Always 
+          envFrom:
+            - configMapRef:
+                name: jambonz-env
+          env:
+            - name: HTTP_PORT
+              value: "3000"

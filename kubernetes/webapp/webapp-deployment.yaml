@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: webapp
+  name: webapp
+  namespace: jambonz
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: webapp
+  template:
+    metadata:
+      labels:
+        app: webapp
+    spec:
+      nodeSelector:
+        kubernetes.io/arch: amd64
+      containers:
+        - env:
+            - name: REACT_APP_API_BASE_URL
+              value: http://api.k8s-gcp.jambonz.org/v1
+            - name: NODE_OPTIONS
+              value: '--openssl-legacy-provider'
+          image: jambonz/webapp:latest
+          name: webapp
+          ports:
+            - containerPort: 3001
+          resources: {}
+      restartPolicy: Always
