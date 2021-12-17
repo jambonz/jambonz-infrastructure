@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: mysql
+  name: mysql
+  namespace: jambonz
+spec:
+  ports:
+    - name: "mysql"
+      port: 3306
+      targetPort: 3306
+  selector:
+    app: mysql
+  clusterIP: None

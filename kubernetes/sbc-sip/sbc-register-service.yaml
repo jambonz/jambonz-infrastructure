@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: sbc-registrar
+  name: sbc-registrar
+  namespace: jambonz
+spec:
+  ports:
+    - name: app
+      port: 3000
+      protocol: TCP
+      targetPort: 3000
+  selector:
+    app: sbc-register
+  clusterIP: None

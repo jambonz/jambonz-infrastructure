@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: feature-server
+  name: feature-server
+  namespace: jambonz
+spec:
+  ports:
+    - name: sip
+      port: 5060
+      protocol: UDP
+      targetPort: 5060
+    - name: http
+      port: 3000
+      protocol: TCP
+      targetPort: 3000
+  selector:
+    app: feature-server
+  clusterIP: None

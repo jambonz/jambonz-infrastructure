@@ -1,0 +1,77 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  namespace: jambonz
+  name: jambonz-sbc-sip
+  labels:
+    app: jambonz-sbc-sip
+spec:
+  selector:
+    matchLabels:
+      app: jambonz-sbc-sip
+  template:
+    metadata:
+      labels:
+        app: jambonz-sbc-sip
+    spec:
+      nodeSelector:
+        voip-environment: edge
+      hostNetwork: true
+      dnsPolicy: ClusterFirstWithHostNet
+      tolerations:
+        - key: "voip-edge"
+          operator: "Exists"
+          effect: "NoSchedule"
+      initContainers:
+        - args:
+            - wait
+            - --for=condition=complete
+            - --timeout=300s
+            - job/db-create
+          image: d3fk/kubectl:v1.18
+          name: db-create-wait
+      containers:
+        - name: drachtio
+          image: drachtio/drachtio-server:k8s
+          args: ['drachtio', '--loglevel', 'info', '--cloud-deployment', '--sofia-loglevel', '3']
+          envFrom:
+            - configMapRef:
+                name: jambonz-env
+          env:
+            - name: DRACHTIO_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: jambonz-secrets
+                  key: DRACHTIO_SECRET
+          ports:
+            - containerPort: 9022
+              protocol: TCP
+            - containerPort: 5060
+              protocol: UDP
+            - containerPort: 5060
+              protocol: TCP
+          resources: {}
+          volumeMounts:
+            - mountPath: /etc/drachtio.conf.xml
+              name: jambonz-sbc-sip-conf
+              subPath: drachtio.conf.xml
+        - name: sbc-options-handler
+          image: jambonz/sbc-options-handler:k8s
+          imagePullPolicy: Always 
+          envFrom:
+            - configMapRef:
+                name: jambonz-env
+          env:
+            - name: DRACHTIO_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: jambonz-secrets
+                  key: DRACHTIO_SECRET
+      restartPolicy: Always
+      volumes:
+      - name: jambonz-sbc-sip-conf
+        configMap:
+          name: jambonz-sbc-sip-conf
+          items:
+          - key: drachtio.conf.xml
+            path: drachtio.conf.xml
