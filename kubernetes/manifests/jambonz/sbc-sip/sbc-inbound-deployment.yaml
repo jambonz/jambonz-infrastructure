@@ -1,18 +1,18 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: sbc-outbound
+  name: sbc-inbound
   labels:
-    app: sbc-outbound
+    app: sbc-inbound
   namespace: jambonz
 spec:
   selector:
     matchLabels:
-      app: sbc-outbound
+      app: sbc-inbound
   template:
     metadata:
       labels:
-        app: sbc-outbound
+        app: sbc-inbound
     spec:
       initContainers:
         - args:
@@ -23,9 +23,13 @@ spec:
           image: d3fk/kubectl:v1.18
           name: db-create-wait
       containers:
-        - name: sbc-outbound
-          image: jambonz/sbc-outbound:k8s
+        - name: sbc-inbound
+          image: jambonz/sbc-inbound:k8s
           imagePullPolicy: Always
+          lifecycle:
+            preStop:
+              exec:
+                command: ["/bin/sh", "-c", "/opt/app/bin/k8s-pre-stop-hook.js"]
           envFrom:
             - configMapRef:
                 name: jambonz-env
@@ -36,4 +40,5 @@ spec:
                   name: jambonz-secrets
                   key: DRACHTIO_SECRET
             - name: DRACHTIO_PORT
-              value: "3000"
+              value: "4000"
+      terminationGracePeriodSeconds: 900

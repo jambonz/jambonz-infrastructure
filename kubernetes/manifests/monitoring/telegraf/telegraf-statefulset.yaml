@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  labels:
+    app: telegraf
+  name: telegraf
+  namespace: jambonz-monitoring
+spec:
+  serviceName: telegraf
+  replicas: 1
+  selector:
+    matchLabels:
+      app: telegraf
+  template:
+    metadata:
+      name: telegraf
+      labels:
+        app: telegraf
+    spec:
+      nodeSelector:
+        kubernetes.io/arch: amd64
+      containers:
+        - image: telegraf:1.19
+          name: telegraf
+          ports:
+            - containerPort: 8125
+      restartPolicy: Always
