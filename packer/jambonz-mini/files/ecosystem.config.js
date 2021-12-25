@@ -271,6 +271,7 @@ module.exports = {
       STATS_PORT: 8125,
       STATS_PROTOCOL: 'tcp',
       STATS_TELEGRAF: 1,
+      AWS_REGION: 'AWS_REGION_NAME',
       JAMBONES_NETWORK_CIDR: 'PRIVATE_IP/32',
       JAMBONES_MYSQL_HOST: '127.0.0.1',
       JAMBONES_MYSQL_USER: 'admin',

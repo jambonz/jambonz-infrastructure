@@ -20,8 +20,6 @@ spec:
       securityContext:
           runAsUser: 472
           fsGroup: 472
-      nodeSelector:
-        kubernetes.io/arch: amd64
       containers:
         - image: grafana/grafana-oss:latest
           name: grafana
@@ -49,7 +47,32 @@ spec:
           volumeMounts:
             - mountPath: /var/lib/grafana
               name: grafana-claim
+            - mountPath: /etc/grafana/provisioning/datasources/datasource.yaml
+              name: grafana-provisioning
+              subPath: datasource.yaml
+            - mountPath: /etc/grafana/provisioning/dashboards/default.yaml
+              name: grafana-provisioning
+              subPath: default-dashboard.yaml
+            - mountPath: /var/lib/grafana/dashboards/jambonz-dashboard.json
+              name: grafana-provisioning
+              subPath: jambonz-dashboard.json
+            - mountPath: /var/lib/grafana/dashboards/jambonz-heplify.json
+              name: grafana-provisioning
+              subPath: jambonz-heplify.json
       restartPolicy: Always
+      volumes:
+      - name: grafana-provisioning
+        configMap:
+          name: grafana-provisioning
+          items:
+          - key: datasource.yaml
+            path: datasource.yaml
+          - key: default-dashboard.yaml
+            path: default-dashboard.yaml
+          - key: jambonz-dashboard.json
+            path: jambonz-dashboard.json
+          - key: jambonz-heplify.json
+            path: jambonz-heplify.json
   volumeClaimTemplates:
   - metadata:
       name: grafana-claim

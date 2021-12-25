@@ -6,8 +6,11 @@ namespace: jambonz-monitoring
 resources:
 - influxdb/influxdb-statefulset.yaml
 - influxdb/influxdb-service.yaml
+- grafana/grafana-configmap.yaml
 - grafana/grafana-statefulset.yaml
 - grafana/grafana-service.yaml
 - grafana/grafana-ingress.yaml
 - telegraf/telegraf-statefulset.yaml
+- telegraf/telegraf-service.yaml
+- telegraf/telegraf-configmap.yaml
 - namespace.yaml
