@@ -31,13 +31,13 @@ spec:
                 name: jambonz-env
         - name: rtpengine 
           image: jambonz/rtpengine:latest 
-          args: ['rtpengine']
+          args: ['rtpengine', '--homer', 'heplify-server.jambonz-monitoring.svc.cluster.local:9060', '--homer-protocol', 'udp', '--homer-id', '11']
           envFrom:
             - configMapRef:
                 name: jambonz-env
           env:
             - name: LOGLEVEL
-              value: "7"
+              value: "5"
             - name: DRACHTIO_SECRET
               valueFrom:
                 secretKeyRef:

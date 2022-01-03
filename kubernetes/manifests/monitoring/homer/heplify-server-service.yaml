@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: heplify-server
+  name: heplify-server
+  namespace: jambonz-monitoring
+spec:
+  ports:
+    - name: "heplify-server"
+      port: 9060
+      targetPort: 9060
+      protocol: UDP
+    - name: "stats-scraper"
+      port: 9096
+      targetPort: 9096
+      protocol: TCP
+  selector:
+    app: heplify-server
+  clusterIP: None

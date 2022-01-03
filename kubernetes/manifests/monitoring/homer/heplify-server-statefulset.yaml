@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: heplify-server
+  labels:
+    app: heplify-server
+  namespace: jambonz-monitoring
+spec:
+  serviceName: heplify-server
+  replicas: 1
+  selector:
+    matchLabels:
+      app: heplify-server
+  template:
+    metadata:
+      labels:
+        app: heplify-server
+    spec:
+      containers:
+        - name: heplify-server
+          image: sipcapture/heplify-server:master
+          args: ['./heplify-server', '-config', '/etc/heplify-server.toml']
+          ports:
+            - containerPort: 9060
+              protocol: UDP
+            - containerPort: 9096
+              protocol: TCP
+          resources: {}
+          volumeMounts:
+            - mountPath: /etc/heplify-server.toml
+              name: heplify-server-conf
+              subPath: heplify-server.toml
+      volumes:
+      - name: heplify-server-conf
+        configMap:
+          name: heplify-server-conf
+          items:
+          - key: heplify-server.toml
+            path: heplify-server.toml

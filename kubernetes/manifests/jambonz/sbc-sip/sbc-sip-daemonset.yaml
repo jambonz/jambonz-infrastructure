@@ -33,7 +33,7 @@ spec:
       containers:
         - name: drachtio
           image: drachtio/drachtio-server:k8s
-          args: ['drachtio', '--loglevel', 'info', '--cloud-deployment', '--sofia-loglevel', '3']
+          args: ['drachtio', '--loglevel', 'info', '--cloud-deployment', '--sofia-loglevel', '3', '--homer', 'heplify-server.jambonz-monitoring.svc.cluster.local:9060', '--homer-id', '10']
           envFrom:
             - configMapRef:
                 name: jambonz-env

@@ -1,0 +1,143 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  namespace: jambonz-monitoring
+  name: webapp-conf
+data:
+  bootstrapped: |
+    bootstrapping
+  webapp_config.json: |
+    {
+      "auth_settings": {
+        "_comment": "The type param can be internal, ldap, http_auth",
+        "token_expire": 1200,
+        "type": "internal"
+      },
+      "database_config": {
+        "help": "Settings for PGSQL Database (settings)",
+        "host": "postgres",
+        "keepalive": true,
+        "name": "homer_config",
+        "node": "LocalConfig",
+        "pass": "homerSeven",
+        "user": "root"
+      },
+      "database_data": {
+        "localnode": {
+          "help": "Settings for PGSQL Database (data)",
+          "host": "postgres",
+          "keepalive": true,
+          "name": "homer_data",
+          "node": "LocalNode",
+          "pass": "homerSeven",
+          "user": "root"
+        }
+      },
+      "decoder_shark": {
+        "_comment": "Here you can do packet decoding to using tshark application. Please define uid, gid if you run the app under root",
+        "active": false,
+        "bin": "/usr/bin/tshark",
+        "protocols": [
+          "1_call",
+          "1_registration",
+          "1_default"
+        ]
+      },
+      "grafana_config": {
+        "help": "Settings for Grafana",
+        "host": "http://grafana:3000",
+        "path": "/grafana",
+        "token": ""
+      },
+      "hep_relay": {
+        "help": "UDP socket to send HEP data on",
+        "host": "heplify-server",
+        "port": 9060
+      },
+      "http_auth": {
+        "skipverify": true,
+        "url": "http://localhost:1323"
+      },
+      "http_settings": {
+        "debug": false,
+        "gzip": true,
+        "gzip_static": true,
+        "help": "Settings for the HOMER Webapp Server. If you have gzip_static = false, please be sure that your dist directory has uncompressed .js files",
+        "host": "0.0.0.0",
+        "port": 80,
+        "root": "/usr/local/homer/dist"
+      },
+      "https_settings": {
+        "cert": "/usr/local/homer/tls/cert.pem",
+        "enable": false,
+        "help": "SSL settings for homer-app",
+        "host": "0.0.0.0",
+        "key": "/usr/local/homer/tls/key.pem",
+        "port": 443
+      },
+      "influxdb_config": {
+        "database": "homer",
+        "help": "Settings for InfluxDB Database (optional)",
+        "host": "http://influxdb:8086",
+        "name": "homer_config",
+        "pass": "influx_password",
+        "policy": "autogen",
+        "user": "influx_user"
+      },
+      "ldap_config": {
+        "admingroup": "admin",
+        "adminmode": true,
+        "anonymous": false,
+        "attributes": [
+          "dn",
+          "givenName",
+          "sn",
+          "mail",
+          "uid"
+        ],
+        "base": "dc=example,dc=com",
+        "binddn": "uid=readonlysuer,ou=People,dc=example,dc=com",
+        "bindpassword": "readonlypassword",
+        "groupattribute": "cn",
+        "groupfilter": "(memberUid=%s)",
+        "host": "ldap.example.com",
+        "port": 389,
+        "skiptls": true,
+        "skipverify": true,
+        "userdn": "uid=%s,ou=People,dc=example,dc=com",
+        "userfilter": "(uid=%s)",
+        "usergroup": "HOMER_user",
+        "usermode": true,
+        "usessl": false
+      },
+      "loki_config": {
+        "api": "loki/api/v1",
+        "help": "Settings for LOKI Database (optional)",
+        "host": "http://127.0.0.1:3100",
+        "param_query": "query_range",
+        "pass": "admin",
+        "user": "admin"
+      },
+      "prometheus_config": {
+        "api": "api/v1",
+        "help": "Settings for Prometheus Database (optional)",
+        "host": "http://127.0.0.1:9090",
+        "pass": "admin",
+        "user": "admin"
+      },
+      "system_settings": {
+        "_loglevels": "can be: fatal, error, warn, info, debug, trace",
+        "help": "Settings for HOMER logs",
+        "hostname": "ip-172-31-23-156",
+        "loglevel": "debug",
+        "logname": "homer-app.log",
+        "logpath": "/usr/local/homer/log",
+        "logstdout": true,
+        "uuid": "4bd92b25-0dd8-4326-a984-08da79dcc569"
+      },
+      "transaction_settings": {
+        "deduplicate": {
+          "global": false
+        }
+      }
+    }

@@ -22,7 +22,7 @@ spec:
           name: influxdb
           env:
             - name: INFLUXDB_LOGGING_LEVEL
-              value: debug
+              value: info
           ports:
             - containerPort: 8086
           resources: {}
