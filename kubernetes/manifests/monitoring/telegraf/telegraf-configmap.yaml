@@ -215,7 +215,6 @@ data:
     [[inputs.kernel]]
       # no configuration
 
-
     # Read metrics about memory usage
     [[inputs.mem]]
       # no configuration
@@ -256,6 +255,11 @@ data:
     [[inputs.socket_listener]]
       service_address = "tcp://127.0.0.1:8094"
       data_format = "influx"
+
+    # scrape stats from heplify-server
+    [[inputs.prometheus]]
+      urls = ["http://heplify-server:9096/metrics"]
+      namedrop = ["go*","process*","promhttp*"]
 
     # # Statsd UDP/TCP Server
     [[inputs.statsd]]
