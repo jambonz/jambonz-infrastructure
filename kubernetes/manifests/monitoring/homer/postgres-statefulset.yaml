@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  labels:
+    app: postgres
+  name: postgres
+  namespace: jambonz-monitoring
+spec:
+  serviceName: postgres
+  replicas: 1
+  selector:
+    matchLabels:
+      app: postgres
+  template:
+    metadata:
+      name: postgres
+      labels:
+        app: postgres
+    spec:
+      containers:
+        - image: postgres:11-alpine
+          name: postgres
+          env:
+            - name: POSTGRES_PASSWORD
+              value: homerSeven
+            - name: POSTGRES_USER
+              value: root
+          ports:
+            - containerPort: 5432
+          resources: {}
+          volumeMounts:
+            - mountPath: /var/lib/postgresql
+              name: postgres-claim
+      restartPolicy: Always
+  volumeClaimTemplates:
+  - metadata:
+      name: postgres-claim
+    spec:
+      accessModes: ["ReadWriteOnce"]
+      resources:
+        requests:
+          storage: 30Gi

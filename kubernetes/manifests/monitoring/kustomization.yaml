@@ -1,0 +1,25 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: jambonz-monitoring
+
+resources:
+- influxdb/influxdb-statefulset.yaml
+- influxdb/influxdb-service.yaml
+- grafana/grafana-configmap.yaml
+- grafana/grafana-statefulset.yaml
+- grafana/grafana-service.yaml
+- grafana/grafana-ingress.yaml
+- telegraf/telegraf-statefulset.yaml
+- telegraf/telegraf-service.yaml
+- telegraf/telegraf-configmap.yaml
+- homer/postgres-statefulset.yaml
+- homer/postgres-service.yaml
+- homer/heplify-server-configmap.yaml
+- homer/heplify-server-statefulset.yaml
+- homer/heplify-server-service.yaml
+- homer/webapp-configmap.yaml
+- homer/webapp-deployment.yaml
+- homer/webapp-service.yaml
+- homer/webapp-ingress.yaml
+- namespace.yaml

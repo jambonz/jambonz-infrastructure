@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sbc-register
+  labels:
+    app: sbc-register
+  namespace: jambonz
+spec:
+  selector:
+    matchLabels:
+      app: sbc-register
+  template:
+    metadata:
+      labels:
+        app: sbc-register
+    spec:
+      initContainers:
+        - args:
+            - wait
+            - --for=condition=complete
+            - --timeout=300s
+            - job/db-create
+          image: d3fk/kubectl:v1.18
+          name: db-create-wait
+      containers:
+        - name: sbc-registrar
+          image: jambonz/sbc-registrar:latest
+          envFrom:
+            - configMapRef:
+                name: jambonz-env
+          env:
+            - name: DRACHTIO_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: jambonz-secrets
+                  key: DRACHTIO_SECRET
+            - name: DRACHTIO_PORT
+              value: "4000"

@@ -61,9 +61,7 @@ Parameters:
 Mappings:
   AWSRegion2AMI:
     us-east-1:
-      Ami: ami-01c840e45dc7fa298
-    us-east-2:
-      Ami: ami-03b1d3f36900155bb
+      Ami: ami-035bcc6fac991af1b
 Resources:
   VPC:
     Type: 'AWS::EC2::VPC'
@@ -105,6 +103,9 @@ Resources:
               INSTANCE_ID="$(curl -s
               http://169.254.169.254/latest/meta-data/instance-id)" 
             - >
+              AWS_REGION_NAME="$(curl -s
+              http://169.254.169.254/latest/meta-data/placement/region)" 
+            - >
               NEW_DB_PASSWD="$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1)" 
             - >
               echo "alter user 'admin'@'%' identified by '${NEW_DB_PASSWD}'" | 
@@ -114,6 +115,9 @@ Resources:
               /home/admin/apps/ecosystem.config.js 
             - >
               sudo sed -i -e "s/\(.*\)PRIVATE_IP\(.*\)/\1${PRIVATE_IPV4}\2/g"
+              /home/admin/apps/ecosystem.config.js 
+            - >
+              sudo sed -i -e "s/\(.*\)AWS_REGION_NAME\(.*\)/\1${AWS_REGION_NAME}\2/g"
               /home/admin/apps/ecosystem.config.js 
             - >
               JAMBONES_ADMIN_INITIAL_PASSWORD=${INSTANCE_ID} JAMBONES_MYSQL_USER=admin 

@@ -1,0 +1,52 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: api-server
+  name: api-server
+  namespace: jambonz
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: api-server
+  template:
+    metadata:
+      labels:
+        app: api-server
+    spec:
+      nodeSelector:
+        kubernetes.io/arch: amd64
+      initContainers:
+        - args:
+            - wait
+            - --for=condition=complete
+            - --timeout=300s
+            - job/db-create
+          image: d3fk/kubectl:v1.18
+          name: db-create-wait
+      containers:
+        - name: api-server
+          image: jambonz/jambonz-api-server:latest
+          envFrom:
+            - configMapRef:
+                name: jambonz-env
+          env:
+            - name: HTTP_PORT
+              value: "3000"
+            - name: JAMBONE_API_VERSION
+              value: v1
+            - name: JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: jambonz-secrets
+                  key: JWT_SECRET
+            - name: JAMBONES_MYSQL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: jambonz-secrets
+                  key: MYSQL_PASSWORD
+          ports:
+            - containerPort: 3000
+          resources: {}
+      restartPolicy: Always

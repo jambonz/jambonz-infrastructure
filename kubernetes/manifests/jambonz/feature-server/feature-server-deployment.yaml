@@ -1,0 +1,101 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: feature-server
+  labels:
+    app: feature-server
+  namespace: jambonz
+spec:
+  selector:
+    matchLabels:
+      app: feature-server
+  template:
+    metadata:
+      labels:
+        app: feature-server
+    spec:
+      initContainers:
+        - args:
+            - wait
+            - --for=condition=complete
+            - --timeout=300s
+            - job/db-create
+          image: d3fk/kubectl:v1.18
+          name: db-create-wait
+      containers:
+        - name: drachtio
+          image: drachtio/drachtio-server:k8s
+          imagePullPolicy: Always
+          lifecycle:
+            preStop:
+              exec:
+                command: [
+                  "/bin/sh",
+                  "-c",
+                  "while $(curl --output /dev/null --silent --head --fail-early http://127.0.0.1:3000); do printf '.'; sleep 10; done"
+                ]
+          args: ['drachtio', '--contact', 'sip:*:5060;transport=udp,tcp']
+          ports:
+            - containerPort: 9022
+        - name: freeswitch
+          image: drachtio/drachtio-freeswitch-mrf:1.10.5
+          lifecycle:
+            preStop:
+              exec:
+                command: [
+                  "/bin/sh",
+                  "-c",
+                  "while $(curl --output /dev/null --silent --head --fail-early http://127.0.0.1:3000); do printf '.'; sleep 10; done"
+                ]
+          volumeMounts:
+            - mountPath: /tmp 
+              name: temp-audio-volume
+          ports:
+            - containerPort: 8081
+        - name: feature-server 
+          image: jambonz/feature-server:k8s
+          imagePullPolicy: Always
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 3000
+          lifecycle:
+            preStop:
+              exec:
+                command: ["/bin/sh", "-c", "/opt/app/bin/k8s-pre-stop-hook.js"]
+          volumeMounts:
+            - mountPath: /tmp 
+              name: temp-audio-volume
+          envFrom:
+            - configMapRef:
+                name: jambonz-env
+          env:
+            - name: HTTP_PORT
+              value: "3000"
+            - name: "JAMBONES_FEATURE_SERVERS"
+              value: "localhost:9022:cymru"
+            - name: JAMBONES_FREESWITCH
+              value: "localhost:8021:JambonzR0ck$"
+            - name: DRACHTIO_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: jambonz-secrets
+                  key: DRACHTIO_SECRET
+            - name: JAMBONES_MYSQL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: jambonz-secrets
+                  key: MYSQL_PASSWORD
+            - name: JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: jambonz-secrets
+                  key: JWT_SECRET
+          ports:
+            - containerPort: 3000
+          resources: {}
+      restartPolicy: Always
+      volumes:
+      - name: temp-audio-volume
+        emptyDir: {}
+      terminationGracePeriodSeconds: 900

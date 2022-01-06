@@ -1,0 +1,54 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  labels:
+    app: influxdb
+  name: influxdb
+  namespace: jambonz-monitoring
+spec:
+  serviceName: influxdb
+  replicas: 1
+  selector:
+    matchLabels:
+      app: influxdb
+  template:
+    metadata:
+      name: influxdb
+      labels:
+        app: influxdb
+    spec:
+      containers:
+        - image: influxdb:1.8
+          name: influxdb
+          env:
+            - name: INFLUXDB_LOGGING_LEVEL
+              value: info
+          ports:
+            - containerPort: 8086
+          resources: {}
+          volumeMounts:
+            - mountPath: /var/lib/influxdb
+              name: influxdb-claim
+          livenessProbe:
+            httpGet:
+              path: /ping
+              port: 8086
+            initialDelaySeconds: 90
+            timeoutSeconds: 5
+            periodSeconds: 15
+          readinessProbe:
+            httpGet:
+              path: /ping
+              port: 8086
+            initialDelaySeconds: 20
+            periodSeconds: 15
+            timeoutSeconds: 5        
+      restartPolicy: Always
+  volumeClaimTemplates:
+  - metadata:
+      name: influxdb-claim
+    spec:
+      accessModes: ["ReadWriteOnce"]
+      resources:
+        requests:
+          storage: 20Gi

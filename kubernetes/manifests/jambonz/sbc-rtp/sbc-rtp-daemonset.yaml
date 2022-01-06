@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  namespace: jambonz
+  name: jambonz-sbc-rtp
+  labels:
+    app: jambonz-sbc-rtp
+spec:
+  selector:
+    matchLabels:
+      app: jambonz-sbc-rtp
+  template:
+    metadata:
+      labels:
+        app: jambonz-sbc-rtp
+    spec:
+      nodeSelector:
+        voip-environment: edge
+      hostNetwork: true
+      dnsPolicy: ClusterFirstWithHostNet
+      tolerations:
+        - key: "voip-edge"
+          operator: "Exists"
+          effect: "NoSchedule"
+      containers:
+        - name: rtpengine-sidecar
+          image: jambonz/rtpengine-sidecar:k8s
+          imagePullPolicy: Always
+          envFrom:
+            - configMapRef:
+                name: jambonz-env
+        - name: rtpengine 
+          image: jambonz/rtpengine:latest 
+          args: ['rtpengine', '--homer', 'heplify-server.jambonz-monitoring.svc.cluster.local:9060', '--homer-protocol', 'udp', '--homer-id', '11']
+          envFrom:
+            - configMapRef:
+                name: jambonz-env
+          env:
+            - name: LOGLEVEL
+              value: "5"
+            - name: DRACHTIO_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: jambonz-secrets
+                  key: DRACHTIO_SECRET
+          ports:
+            - containerPort: 22222
+      restartPolicy: Always

@@ -22,7 +22,7 @@ tar xvfz SpeechSDK-Linux-1.19.0.tar.gz
 cd SpeechSDK-Linux-1.19.0
 sudo cp -r include /usr/local/include/MicrosoftSpeechSDK
 sudo cp -r lib/ /usr/local/lib/MicrosoftSpeechSDK
-sudo ln -s /usr/local/lib/MicrosoftSpeechSDK/lib/x64/libMicrosoft.CognitiveServices.Speech.core.so /usr/local/lib/libMicrosoft.CognitiveServices.Speech.core.so
+sudo ln -s /usr/local/lib/MicrosoftSpeechSDK/x64/libMicrosoft.CognitiveServices.Speech.core.so /usr/local/lib/libMicrosoft.CognitiveServices.Speech.core.so
 cd
 rm -Rf /tmpSpeechSDK-Linux-1.19.0
 rm -Rf /tmpSpeechSDK-Linux-1.19.0.tar.gz

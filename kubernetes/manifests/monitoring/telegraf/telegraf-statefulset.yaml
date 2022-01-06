@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  labels:
+    app: telegraf
+  name: telegraf
+  namespace: jambonz-monitoring
+spec:
+  serviceName: telegraf
+  replicas: 1
+  selector:
+    matchLabels:
+      app: telegraf
+  template:
+    metadata:
+      name: telegraf
+      labels:
+        app: telegraf
+    spec:
+      containers:
+        - image: telegraf:1.19
+          name: telegraf
+          ports:
+            - containerPort: 8125
+          resources: {}
+          volumeMounts:
+            - mountPath: /etc/telegraf/telegraf.conf
+              name: telegraf-conf
+              subPath: telegraf.conf
+      restartPolicy: Always
+      volumes:
+      - name: telegraf-conf
+        configMap:
+          name: telegraf-conf
+          items:
+          - key: telegraf.conf
+            path: telegraf.conf

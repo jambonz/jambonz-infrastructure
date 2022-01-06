@@ -1,0 +1,83 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  labels:
+    app: grafana
+  name: grafana
+  namespace: jambonz-monitoring
+spec:
+  serviceName: grafana
+  replicas: 1
+  selector:
+    matchLabels:
+      app: grafana
+  template:
+    metadata:
+      name: grafana
+      labels:
+        app: grafana
+    spec:
+      securityContext:
+          runAsUser: 472
+          fsGroup: 472
+      containers:
+        - image: grafana/grafana-oss:latest
+          name: grafana
+          ports:
+            - containerPort: 3000
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /login
+              port: 3000
+              scheme: HTTP
+            initialDelaySeconds: 10
+            periodSeconds: 30
+            successThreshold: 1
+            timeoutSeconds: 2
+          livenessProbe:
+            failureThreshold: 3
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            successThreshold: 1
+            tcpSocket:
+              port: 3000
+            timeoutSeconds: 1
+          resources: {}
+          volumeMounts:
+            - mountPath: /var/lib/grafana
+              name: grafana-claim
+            - mountPath: /etc/grafana/provisioning/datasources/datasource.yaml
+              name: grafana-provisioning
+              subPath: datasource.yaml
+            - mountPath: /etc/grafana/provisioning/dashboards/default.yaml
+              name: grafana-provisioning
+              subPath: default-dashboard.yaml
+            - mountPath: /var/lib/grafana/dashboards/jambonz-dashboard.json
+              name: grafana-provisioning
+              subPath: jambonz-dashboard.json
+            - mountPath: /var/lib/grafana/dashboards/jambonz-heplify.json
+              name: grafana-provisioning
+              subPath: jambonz-heplify.json
+      restartPolicy: Always
+      volumes:
+      - name: grafana-provisioning
+        configMap:
+          name: grafana-provisioning
+          items:
+          - key: datasource.yaml
+            path: datasource.yaml
+          - key: default-dashboard.yaml
+            path: default-dashboard.yaml
+          - key: jambonz-dashboard.json
+            path: jambonz-dashboard.json
+          - key: jambonz-heplify.json
+            path: jambonz-heplify.json
+  volumeClaimTemplates:
+  - metadata:
+      name: grafana-claim
+    spec:
+      accessModes: ["ReadWriteOnce"]
+      resources:
+        requests:
+          storage: 2Gi

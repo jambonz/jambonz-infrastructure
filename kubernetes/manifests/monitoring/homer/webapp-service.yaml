@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: homer-webapp
+  name: homer-webapp
+  namespace: jambonz-monitoring
+spec:
+  ports:
+    - name: homer-webapp
+      port: 80
+      targetPort: 80
+  type: NodePort
+  selector:
+    app: homer-webapp
