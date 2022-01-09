@@ -32,8 +32,8 @@ spec:
           name: db-create-wait
       containers:
         - name: drachtio
-          image: drachtio/drachtio-server:k8s
-          args: ['drachtio', '--loglevel', 'info', '--cloud-deployment', '--sofia-loglevel', '3', '--homer', 'heplify-server.jambonz-monitoring.svc.cluster.local:9060', '--homer-id', '10']
+          image: drachtio/drachtio-server:latest
+          args: ['drachtio', '--loglevel', 'info', '--cloud-deployment', '--sofia-loglevel', '3', '--homer', 'heplify-server.jambonz-monitoring:9060', '--homer-id', '10']
           envFrom:
             - configMapRef:
                 name: jambonz-env
@@ -43,6 +43,8 @@ spec:
                 secretKeyRef:
                   name: jambonz-secrets
                   key: DRACHTIO_SECRET
+            - name: SOFIA_SEARCH_DOMAINS
+              value: "1"
           ports:
             - containerPort: 9022
               protocol: TCP
@@ -56,7 +58,7 @@ spec:
               name: jambonz-sbc-sip-conf
               subPath: drachtio.conf.xml
         - name: sbc-options-handler
-          image: jambonz/sbc-options-handler:k8s
+          image: jambonz/sbc-options-handler:main
           imagePullPolicy: Always 
           envFrom:
             - configMapRef:

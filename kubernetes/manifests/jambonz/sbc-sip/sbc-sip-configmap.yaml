@@ -10,7 +10,8 @@ data:
         <!-- udp port to listen on for client connections and shared secret used to authenticate clients -->
         <admin port="9022" secret="cymru">0.0.0.0</admin>
         <request-handlers>
-          <request-handler sip-method="*">http://sbc-call-router.jambonz.svc.cluster.local:3000</request-handler>
+          <request-handler sip-method="INVITE" http-method="POST">http://sbc-call-router:3000</request-handler>
+          <request-handler sip-method="REGISTER">http://sbc-call-router:3000</request-handler>
         </request-handlers>
         <sip>
           <udp-mtu>4096</udp-mtu>

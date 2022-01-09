@@ -9,18 +9,17 @@ data:
   NODE_ENV: production
   CLOUD: gcp
   K8S: "1"
-  K8S_FEATURE_SERVER_SERVICE_NAME: feature-server.jambonz.svc.cluster.local
-  K8S_RTPENGINE_SERVICE_NAME: rtpengine-ng.jambonz.svc.cluster.local:22222
-  K8S_SBC_REGISTER_SERVICE_NAME: sbc-registrar.jambonz.svc.cluster.local:4000
-  K8S_SBC_OPTIONS_SERVICE_NAME: sbc-options.jambonz.svc.cluster.local:4000
-  K8S_SBC_INBOUND_SERVICE_NAME: sbc-inbound.jambonz.svc.cluster.local:4000
-  K8S_SBC_OUTBOUND_SERVICE_NAME: sbc-outbound.jambonz.svc.cluster.local:4000
-  JAMBONES_TIME_SERIES_HOST: influxdb.jambonz-monitoring.svc.cluster.local
-  JAMBONES_NETWORK_CIDR: "10.128.0.0/9,10.72.0.0/14"
+  K8S_FEATURE_SERVER_SERVICE_NAME: feature-server
+  K8S_RTPENGINE_SERVICE_NAME: rtpengine-ng:22222
+  K8S_SBC_REGISTER_SERVICE_NAME: sbc-registrar:4000
+  K8S_SBC_OPTIONS_SERVICE_NAME: sbc-options:4000
+  K8S_SBC_INBOUND_SERVICE_NAME: sbc-inbound:4000
+  K8S_SBC_OUTBOUND_SERVICE_NAME: sbc-outbound:4000
+  JAMBONES_TIME_SERIES_HOST: influxdb.jambonz-monitoring
   JAMBONES_CLUSTER_ID: jbeast2
   JAMBONES_LOGLEVEL: debug
   ENABLE_METRICS: "1"
-  STATS_HOST: telegraf.jambonz-monitoring.svc.cluster.local
+  STATS_HOST: telegraf.jambonz-monitoring
   STATS_PORT: "8125"
   STATS_PROTOCOL: tcp
   STATS_TELEGRAF: "1"

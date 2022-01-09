@@ -24,7 +24,7 @@ spec:
           name: db-create-wait
       containers:
         - name: sbc-inbound
-          image: jambonz/sbc-inbound:k8s
+          image: jambonz/sbc-inbound:latest
           imagePullPolicy: Always
           lifecycle:
             preStop:
