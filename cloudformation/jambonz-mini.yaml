@@ -61,7 +61,7 @@ Parameters:
 Mappings:
   AWSRegion2AMI:
     us-east-1:
-      Ami: ami-035bcc6fac991af1b
+      Ami: ami-08ddd8f6532025858
 Resources:
   VPC:
     Type: 'AWS::EC2::VPC'
@@ -93,6 +93,28 @@ Resources:
           - ''
           - - |
               #!/bin/bash -xe
+            - > 
+              cd /home/admin/apps/fsw-clear-old-calls && npm ci && npm install -g .
+            - > 
+              cd /home/admin/apps/jambonz-api-server && npm install && npm ci
+            - > 
+              cd /home/admin/apps/jambonz-webapp && npm ci 
+            - > 
+              cd /home/admin/apps/sbc-options-handler && npm ci
+            - > 
+              cd /home/admin/apps/sbc-inbound  && npm ci 
+            - > 
+              cd /home/admin/apps/sbc-outbound && npm ci 
+            - > 
+              cd /home/admin/apps/sbc-registrar && npm ci 
+            - > 
+              cd /home/admin/apps/sbc-call-router  && npm ci 
+            - > 
+              cd /home/admin/apps/jambonz-smpp-esme && npm install
+            - > 
+              cd /home/admin/apps/sbc-rtpengine-sidecar && npm ci 
+            - > 
+              cd /home/admin/apps/jambonz-feature-server && npm install
             - >
               PRIVATE_IPV4="$(curl -s
               http://169.254.169.254/latest/meta-data/local-ipv4)" 
