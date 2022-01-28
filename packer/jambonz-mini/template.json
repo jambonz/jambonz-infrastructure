@@ -4,8 +4,8 @@
     "ssh_username": "admin",
     "ami_description": "jambonz all-in-one AMI", 
     "instance_type": "t2.xlarge",
-    "drachtio_version": "v0.8.13-rc1",
-    "jambonz_version": "v0.7.1",
+    "drachtio_version": "v0.8.14",
+    "jambonz_version": "v0.7.2",
     "jambonz_user": "admin",
     "jambonz_password": "JambonzR0ck$",
     "install_telegraf": "yes",
@@ -15,7 +15,7 @@
     "install_homer":  "yes",
     "install_nodered":  "no",
     "influxdb_ip":  "127.0.0.1",
-    "rtp_engine_version": "mr10.0.1.4",
+    "rtp_engine_version": "mr10.2.1.5",
     "rtp_engine_min_port": "40000",
     "rtp_engine_max_port": "60000"
   },
@@ -57,7 +57,7 @@
         "while [ ! -f /var/lib/cloud/instance/boot-finished ]; do echo 'Waiting for cloud-init...'; sleep 1; done",
         "sudo apt-get update",
         "sudo apt-get -y install python lsof gcc g++ make cmake build-essential git autoconf automake default-mysql-client redis-tools \\",
-        "curl telnet libtool libtool-bin libssl-dev libcurl4-openssl-dev libz-dev systemd-coredump liblz4-tool \\",
+        "curl argon2 telnet libtool libtool-bin libssl-dev libcurl4-openssl-dev libz-dev systemd-coredump liblz4-tool \\",
         "iptables-dev libavformat-dev liblua5.1-0-dev libavfilter-dev libavcodec-dev libswresample-dev \\",
         "libevent-dev libpcap-dev libxmlrpc-core-c3-dev markdown libjson-glib-dev lsb-release \\",
         "libhiredis-dev gperf libspandsp-dev default-libmysqlclient-dev htop dnsutils gdb \\",
@@ -65,7 +65,6 @@
         "libspeex-dev libspeexdsp-dev libedit-dev libtiff-dev yasm libswscale-dev haveged jq fail2ban \\",
         "libopus-dev libsndfile-dev libshout3-dev libmpg123-dev libmp3lame-dev libopusfile-dev",
         "sudo chmod a+w /usr/local/src",
-        "mkdir ~/credentials",
         "mkdir ~/apps",
         "cd ~/apps",
         "git clone https://github.com/jambonz/sbc-options-handler.git -b {{user `jambonz_version`}}",
@@ -92,6 +91,10 @@
     },
     {
       "type": "shell",
+      "script": "scripts/install_nodejs.sh"
+    },
+    {
+      "type": "shell",
       "execute_command": "chmod +x {{ .Path }}; sudo '{{ .Path }}' {{user `install_influxdb`}}",
       "script": "scripts/install_influxdb.sh"
     },
@@ -103,10 +106,6 @@
     {
       "type": "shell",
       "script": "scripts/install_nginx.sh"
-    },
-    {
-      "type": "shell",
-      "script": "scripts/install_nodejs.sh"
     },
     {
       "type": "shell",
