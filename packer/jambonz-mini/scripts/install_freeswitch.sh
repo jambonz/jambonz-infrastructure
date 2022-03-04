@@ -6,7 +6,7 @@ GRPC_VERSION=c66d2cc
 GOOGLE_API_VERSION=e9da6f8b469c52b83f900e820be30762e9e05c57
 AWS_SDK_VERSION=1.8.129
 LWS_VERSION=v3.2.3
-MODULES_VERSION=v0.5.5
+MODULES_VERSION=v0.5.6
 
 echo "freeswitch version to install is ${FREESWITCH_VERSION}"
 echo "drachtio modules version to install is ${MODULES_VERSION}"
@@ -18,14 +18,14 @@ echo "LWS_VERSION version to install is ${LWS_VERSION}"
 export LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH
 
 cd /tmp
-tar xvfz SpeechSDK-Linux-1.19.0.tar.gz
-cd SpeechSDK-Linux-1.19.0
+tar xvfz SpeechSDK-Linux-1.20.0.tar.gz
+cd SpeechSDK-Linux-1.20.0
 sudo cp -r include /usr/local/include/MicrosoftSpeechSDK
 sudo cp -r lib/ /usr/local/lib/MicrosoftSpeechSDK
 sudo ln -s /usr/local/lib/MicrosoftSpeechSDK/x64/libMicrosoft.CognitiveServices.Speech.core.so /usr/local/lib/libMicrosoft.CognitiveServices.Speech.core.so
 cd
-rm -Rf /tmpSpeechSDK-Linux-1.19.0
-rm -Rf /tmpSpeechSDK-Linux-1.19.0.tar.gz
+rm -Rf /tmpSpeechSDK-Linux-1.20.0
+rm -Rf /tmpSpeechSDK-Linux-1.20.0.tar.gz
 
 git config --global pull.rebase true
 cd /usr/local/src
@@ -61,7 +61,7 @@ cd /usr/local/src/libwebsockets
 sudo mkdir -p build && cd build && sudo cmake .. -DCMAKE_BUILD_TYPE=RelWithDebInfo && sudo make && sudo make install
 
 # build libfvad
-cd /usr/local/src/libfvad
+cd /usr/local/src/freeswitch/libs/libfvad
 sudo autoreconf -i && sudo ./configure && sudo make -j 4 && sudo make install
 
 # build spandsp
@@ -106,10 +106,12 @@ cp /tmp/Makefile.am.extra /usr/local/src/freeswitch/Makefile.am
 cp /tmp/modules.conf.in.extra /usr/local/src/freeswitch/build/modules.conf.in
 cp /tmp/modules.conf.vanilla.xml.extra /usr/local/src/freeswitch/conf/vanilla/autoload_configs/modules.conf.xml
 cp /tmp/switch_rtp.c.patch /usr/local/src/freeswitch/src
+cp /tmp/switch_core_media.c.patch /usr/local/src/freeswitch/src
 
 # patch freeswitch
 cd /usr/local/src/freeswitch/src
 patch < switch_rtp.c.patch
+patch < switch_core_media.c.patch
 
 # build freeswitch
 echo "building freeswitch"

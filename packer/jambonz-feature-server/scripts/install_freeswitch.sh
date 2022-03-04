@@ -61,7 +61,7 @@ cd /usr/local/src/libwebsockets
 sudo mkdir -p build && cd build && sudo cmake .. -DCMAKE_BUILD_TYPE=RelWithDebInfo && sudo make && sudo make install
 
 # build libfvad
-cd /usr/local/src/libfvad
+cd /usr/local/src/freeswitch/libs/libfvad
 sudo autoreconf -i && sudo ./configure && sudo make -j 4 && sudo make install
 
 # build spandsp
@@ -106,10 +106,12 @@ cp /tmp/Makefile.am.extra /usr/local/src/freeswitch/Makefile.am
 cp /tmp/modules.conf.in.extra /usr/local/src/freeswitch/build/modules.conf.in
 cp /tmp/modules.conf.vanilla.xml.extra /usr/local/src/freeswitch/conf/vanilla/autoload_configs/modules.conf.xml
 cp /tmp/switch_rtp.c.patch /usr/local/src/freeswitch/src
+cp /tmp/switch_core_media.c.patch /usr/local/src/freeswitch/src
 
 # patch freeswitch
 cd /usr/local/src/freeswitch/src
 patch < switch_rtp.c.patch
+patch < switch_core_media.c.patch
 
 # build freeswitch
 echo "building freeswitch"

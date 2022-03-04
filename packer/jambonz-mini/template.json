@@ -5,7 +5,7 @@
     "ami_description": "jambonz all-in-one AMI", 
     "instance_type": "t2.xlarge",
     "drachtio_version": "v0.8.14",
-    "jambonz_version": "v0.7.2",
+    "jambonz_version": "v0.7.3",
     "jambonz_user": "admin",
     "jambonz_password": "JambonzR0ck$",
     "install_telegraf": "yes",
@@ -87,11 +87,12 @@
     },
     {
       "type": "shell",
-      "script": "scripts/install_chrony.sh"
+      "script": "scripts/install_nodejs.sh"
     },
     {
       "type": "shell",
-      "script": "scripts/install_nodejs.sh"
+      "execute_command": "chmod +x {{ .Path }}; sudo '{{ .Path }}' {{user `jambonz_version`}} {{user `jambonz_user`}} {{user `jambonz_password`}}",
+      "script": "scripts/install_app.sh"
     },
     {
       "type": "shell",
@@ -100,7 +101,7 @@
     },
     {
       "type": "shell",
-      "execute_command": "chmod +x {{ .Path }}; sudo '{{ .Path }}' {{build `ID`}}",
+      "execute_command": "chmod +x {{ .Path }}; sudo '{{ .Path }}' {{build `ID`}} {{user `apiban_username`}} {{user `apiban_password`}}",
       "script": "scripts/install_apiban.sh"
     },
     {
@@ -158,11 +159,6 @@
     {
       "type": "shell",
       "script": "scripts/install_fail2ban.sh"
-    },
-    {
-      "type": "shell",
-      "execute_command": "chmod +x {{ .Path }}; sudo '{{ .Path }}' {{user `jambonz_version`}} {{user `jambonz_user`}} {{user `jambonz_password`}}",
-      "script": "scripts/install_app.sh"
     },
     {
       "type": "shell",

@@ -61,7 +61,7 @@ Parameters:
 Mappings:
   AWSRegion2AMI:
     us-east-1:
-      Ami: ami-08ddd8f6532025858
+      Ami: ami-070ec74766e893dd8
 Resources:
   VPC:
     Type: 'AWS::EC2::VPC'
@@ -93,28 +93,6 @@ Resources:
           - ''
           - - |
               #!/bin/bash -xe
-            - > 
-              cd /home/admin/apps/fsw-clear-old-calls && npm ci && npm install -g .
-            - > 
-              cd /home/admin/apps/jambonz-api-server && npm install && npm ci
-            - > 
-              cd /home/admin/apps/jambonz-webapp && npm ci 
-            - > 
-              cd /home/admin/apps/sbc-options-handler && npm ci
-            - > 
-              cd /home/admin/apps/sbc-inbound  && npm ci 
-            - > 
-              cd /home/admin/apps/sbc-outbound && npm ci 
-            - > 
-              cd /home/admin/apps/sbc-registrar && npm ci 
-            - > 
-              cd /home/admin/apps/sbc-call-router  && npm ci 
-            - > 
-              cd /home/admin/apps/jambonz-smpp-esme && npm install
-            - > 
-              cd /home/admin/apps/sbc-rtpengine-sidecar && npm ci 
-            - > 
-              cd /home/admin/apps/jambonz-feature-server && npm install
             - >
               PRIVATE_IPV4="$(curl -s
               http://169.254.169.254/latest/meta-data/local-ipv4)" 
@@ -136,10 +114,19 @@ Resources:
               sudo sed -i -e "s/\(.*\)JAMBONES_MYSQL_PASSWORD.*/\1JAMBONES_MYSQL_PASSWORD: '${NEW_DB_PASSWD}',/g"
               /home/admin/apps/ecosystem.config.js 
             - >
+              APIBANKEY=$(curl -X POST -u jambonz:1a074994242182a9e0b67eae93978826 -d "{\"client\": \"${INSTANCE_ID}\"}" -s https://apiban.org/sponsor/newkey | jq -r '.ApiKey')
+            - >
+              sudo sed -i -e "s/API-KEY-HERE/${APIBANKEY}/g" /usr/local/bin/apiban/config.json
+            - >
+              sudo /usr/local/bin/apiban/apiban-iptables-client FULL
+            - >
               sudo sed -i -e "s/\(.*\)PRIVATE_IP\(.*\)/\1${PRIVATE_IPV4}\2/g"
               /home/admin/apps/ecosystem.config.js 
             - >
               sudo sed -i -e "s/\(.*\)AWS_REGION_NAME\(.*\)/\1${AWS_REGION_NAME}\2/g"
+              /home/admin/apps/ecosystem.config.js 
+            - >
+              sudo sed -i -e "s/\(.*\)--JAMBONES_API_BASE_URL--\(.*\)/\1http:\/\/${PUBLIC_IPV4}\/v1\2/g"
               /home/admin/apps/ecosystem.config.js 
             - >
               JAMBONES_ADMIN_INITIAL_PASSWORD=${INSTANCE_ID} JAMBONES_MYSQL_USER=admin 

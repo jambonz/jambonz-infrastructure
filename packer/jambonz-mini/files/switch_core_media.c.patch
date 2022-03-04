@@ -1,0 +1,11 @@
+--- switch_core_media_new.c	2022-02-14 12:30:36.000000000 -0500
++++ switch_core_media.c	2022-02-10 11:19:05.000000000 -0500
+@@ -2749,7 +2749,7 @@
+ 	*(buf + datalen) = '\0';
+ 
+ 	while (*buf & 0x80) {
+-		if (count >= MAX_RED_FRAMES || buf + 3 > e) {
++		if (buf + 3 > e) {
+ 			*new_datalen = 0;
+ 			return 0;
+ 		}
