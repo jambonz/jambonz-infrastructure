@@ -61,7 +61,7 @@ Parameters:
 Mappings:
   AWSRegion2AMI:
     us-east-1:
-      Ami: ami-070ec74766e893dd8
+      Ami: ami-0e2b5e5e6a5fa46ce
 Resources:
   VPC:
     Type: 'AWS::EC2::VPC'
@@ -142,9 +142,11 @@ Resources:
               echo "REACT_APP_ENABLE_SUBSPACE=1" >>
               /home/admin/apps/jambonz-webapp/.env 
             - >
-              cd /home/admin/apps/jambonz-webapp && npm run build 
-            - |
-              # update ecosystem.config.js with private ip 
+              REACT_APP_API_BASE_URL=http://${PUBLIC_IPV4}/api/v1
+            - >
+              TAG="<script>window.JAMBONZ = { APP_API_BASE_URL: '${REACT_APP_API_BASE_URL}'};</script>"
+            - >
+              sed -i -e "\@</head>@i\ $TAG" /home/admin/apps/jambonz-webapp/build/index.html
             - >
               sudo -u admin bash -c "pm2 restart
               /home/admin/apps/ecosystem.config.js" 

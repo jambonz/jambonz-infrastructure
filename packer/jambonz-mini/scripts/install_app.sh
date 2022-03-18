@@ -13,7 +13,7 @@ cd /home/admin/apps/fsw-clear-old-calls && npm ci --unsafe-perm && sudo npm inst
 echo "building jambonz-api-server.."
 cd /home/admin/apps/jambonz-api-server && npm ci --unsafe-perm
 echo "building jambonz-webapp.."
-cd /home/admin/apps/jambonz-webapp && npm ci --unsafe-perm 
+cd /home/admin/apps/jambonz-webapp && npm ci --unsafe-perm && npm run build
 echo "building sbc-options-handler.."
 cd /home/admin/apps/sbc-options-handler && npm ci --unsafe-perm
 echo "building sbc-inbound.."
