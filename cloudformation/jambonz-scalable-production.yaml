@@ -8,7 +8,7 @@ Mappings:
       SbcRtpAmi: ami-080cd1b1866f6e4c7
       FsAmi: ami-0d5660935da86a3b5
       WebserverAmi: ami-0eb0eeaf07446071c
-      MonitoringServerAmi: ami-0bc1970eb788057f2
+      MonitoringServerAmi: ami-098dba4d4bc6702fd
 
 Parameters:
   KeyName:
