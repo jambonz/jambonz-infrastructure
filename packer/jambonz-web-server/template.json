@@ -3,8 +3,8 @@
     "region": "us-east-1",
     "ssh_username": "admin",
     "ami_description": "jambonz webserver", 
-    "instance_type": "t2.medium",
-    "jambonz_version": "v0.7.4",
+    "instance_type": "t2.xlarge",
+    "jambonz_version": "v0.7.5-rc5",
     "install_datadog": "no",
     "install_telegraf": "yes"
   },
@@ -32,11 +32,6 @@
         "delete_on_termination": true
       }
     ],
-    "security_group_filter": {
-      "filters": {
-        "tag:Class": "packer"
-      }
-    },
     "tags": {
       "Name": "jambonz-webserver"
     },
@@ -99,10 +94,10 @@
     {
       "type": "shell",
       "inline": [
+        "sudo rm -Rf /tmp/*",
         "sudo rm /root/.ssh/authorized_keys",
         "sudo rm /home/admin/.ssh/authorized_keys"
       ]
     }
-
   ]
 }

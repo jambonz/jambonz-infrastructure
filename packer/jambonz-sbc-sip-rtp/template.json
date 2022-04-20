@@ -147,6 +147,7 @@
     {
       "type": "shell",
       "inline": [
+        "sudo rm -Rf /tmp/*",
         "sudo rm /root/.ssh/authorized_keys",
         "sudo rm /home/admin/.ssh/authorized_keys"
       ]

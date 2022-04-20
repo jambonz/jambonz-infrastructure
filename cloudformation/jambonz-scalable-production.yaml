@@ -3,12 +3,12 @@ AWSTemplateFormatVersion: "2010-09-09"
 
 Mappings:
   AWSRegion2AMI:
-    us-east-2:
-      SbcSipAmi: ami-0acd81797b9f83c0e
-      SbcRtpAmi: ami-0b8c64e7cb1fc31bd
-      FsAmi: ami-079996c440a18f271
-      WebserverAmi: ami-0192f4288eb9fe005
-      MonitoringServerAmi: ami-0cba14d085a19f503
+    eu-west-1:
+      SbcSipAmi: ami-0f6ba44ac3543e61c
+      SbcRtpAmi: ami-080cd1b1866f6e4c7
+      FsAmi: ami-0d5660935da86a3b5
+      WebserverAmi: ami-0eb0eeaf07446071c
+      MonitoringServerAmi: ami-0bc1970eb788057f2
 
 Parameters:
   KeyName:
@@ -24,20 +24,21 @@ Parameters:
       - t2.medium
       - t2.large
       - t2.xlarge
-      - t2.2xlarge
       - t3.small
       - t3.medium
       - t3.large
       - t3.xlarge
-      - t3.2xlarge
+      - t3a.small
+      - t3a.medium
+      - t3a.large
+      - t3a.xlarge
+      - c5.large
+      - c5.xlarge
+      - c5.2xlarge
       - c5n.large
       - c5n.xlarge
       - c5n.2xlarge
-      - c5n.4xlarge
-      - c5n.9xlarge
-      - c5n.18xlarge
-      - c5n.metal
-    
+      - c5n.metal    
   InstanceTypeSbcRtp:
     Description: "the EC2 instance type to use for the SBC Media server"
     Type: String
@@ -47,20 +48,21 @@ Parameters:
       - t2.medium
       - t2.large
       - t2.xlarge
-      - t2.2xlarge
       - t3.small
       - t3.medium
       - t3.large
       - t3.xlarge
-      - t3.2xlarge
+      - t3a.small
+      - t3a.medium
+      - t3a.large
+      - t3a.xlarge
+      - c5.large
+      - c5.xlarge
+      - c5.2xlarge
       - c5n.large
       - c5n.xlarge
       - c5n.2xlarge
-      - c5n.4xlarge
-      - c5n.9xlarge
-      - c5n.18xlarge
-      - c5n.metal
-
+      - c5n.metal    
   InstanceTypeFeatureServer:
     Description: "the EC2 instance type to use for the Feature Server"
     Type: String
@@ -70,20 +72,21 @@ Parameters:
       - t2.medium
       - t2.large
       - t2.xlarge
-      - t2.2xlarge
       - t3.small
       - t3.medium
       - t3.large
       - t3.xlarge
-      - t3.2xlarge
+      - t3a.small
+      - t3a.medium
+      - t3a.large
+      - t3a.xlarge
+      - c5.large
+      - c5.xlarge
+      - c5.2xlarge
       - c5n.large
       - c5n.xlarge
       - c5n.2xlarge
-      - c5n.4xlarge
-      - c5n.9xlarge
-      - c5n.18xlarge
-      - c5n.metal
-
+      - c5n.metal    
   InstanceTypeWebserver:
     Description: "the EC2 instance type to use for webServer"
     Type: String
@@ -93,20 +96,21 @@ Parameters:
       - t2.medium
       - t2.large
       - t2.xlarge
-      - t2.2xlarge
       - t3.small
       - t3.medium
       - t3.large
       - t3.xlarge
-      - t3.2xlarge
+      - t3a.small
+      - t3a.medium
+      - t3a.large
+      - t3a.xlarge
+      - c5.large
+      - c5.xlarge
+      - c5.2xlarge
       - c5n.large
       - c5n.xlarge
       - c5n.2xlarge
-      - c5n.4xlarge
-      - c5n.9xlarge
-      - c5n.18xlarge
-      - c5n.metal
-
+      - c5n.metal    
   InstanceTypeMonitoringServer:
     Description: "the EC2 instance type for the monitoring server"
     Type: String
@@ -116,20 +120,21 @@ Parameters:
       - t2.medium
       - t2.large
       - t2.xlarge
-      - t2.2xlarge
       - t3.small
       - t3.medium
       - t3.large
       - t3.xlarge
-      - t3.2xlarge
+      - t3a.small
+      - t3a.medium
+      - t3a.large
+      - t3a.xlarge
+      - c5.large
+      - c5.xlarge
+      - c5.2xlarge
       - c5n.large
       - c5n.xlarge
       - c5n.2xlarge
-      - c5n.4xlarge
-      - c5n.9xlarge
-      - c5n.18xlarge
-      - c5n.metal
-
+      - c5n.metal    
   ElastiCacheNodeType:
     Type: String
     Default: 'cache.t2.medium'
@@ -165,12 +170,10 @@ Parameters:
       - cache.r5.4xlarge
       - cache.r5.12xlarge
       - cache.r5.24xlarge
-
   AuroraDBMinCapacity:
     Description: "min capacity for database"
     Type: Number
     Default: 1
-    
   AuroraDBMaxCapacity:
     Description: "max capacity for database"
     Type: Number
@@ -185,7 +188,6 @@ Parameters:
       - 64
       - 128
       - 256
-    
   Prefix:
     Description: "Name of VPC and other identifiers - lower case letters only"
     Type: "String"
@@ -244,6 +246,10 @@ Parameters:
     Type: String
     Description: "secret to use for encrypting jwt and other data"
     Default: "G=u$Dj%-97#TffYf"
+  URLPortal:
+    Type: String
+    Description: "DNS name you will point to the jambonz webserver(s)"
+    Default: "yourdomain.com"
 
 Resources:
 ###########################################
@@ -434,16 +440,6 @@ Resources:
           ToPort: 5060
           CidrIp: !Ref VpcCIDR
           Description: Allow sip from VPC
-        - IpProtocol: tcp
-          FromPort: 5080
-          ToPort: 5080
-          CidrIp: !Ref VpcCIDR
-          Description: Allow freeswitch sip from VPC
-        - IpProtocol: udp
-          FromPort: 5080
-          ToPort: 5080
-          CidrIp: !Ref VpcCIDR
-          Description: Allow freeswitch sip from VPC
         - IpProtocol: udp
           FromPort: 25000
           ToPort: 40000
@@ -646,7 +642,7 @@ Resources:
         - IpProtocol: tcp
           FromPort: 9080
           ToPort: 9080
-          CidrIp: !Ref AllowedHttpCidr
+          CidrIp: !Ref VpcCIDR
           Description: Allow access to homer webapp
         - IpProtocol: udp
           FromPort: 9060
@@ -658,6 +654,21 @@ Resources:
           ToPort: 1880
           CidrIp: !Ref AllowedHttpCidr
           Description: Allow access to Node-RED
+        - IpProtocol: tcp
+          FromPort: 16686
+          ToPort: 16686
+          CidrIp: !Ref VpcCIDR
+          Description: Allow access to Jaeger
+        - IpProtocol: udp
+          FromPort: 6831
+          ToPort: 6831
+          CidrIp:  !Ref VpcCIDR
+          Description: Jaeger collector - compact
+        - IpProtocol: udp
+          FromPort: 6832
+          ToPort: 6832
+          CidrIp:  !Ref VpcCIDR
+          Description: Jaeger collector
       SecurityGroupEgress:
         - IpProtocol: -1
           FromPort: 0
@@ -990,6 +1001,7 @@ Resources:
                     NODE_ENV: 'production',
                     JAMBONES_LOGLEVEL: 'info',
                     JAMBONES_NETWORK_CIDR: '${VPC_CIDR}',
+                    MIN_CALL_LIMIT: 9999,
                     RTPENGINE_PING_INTERVAL: 30000,
                     DRACHTIO_HOST: '127.0.0.1',
                     DRACHTIO_PORT: 9022,
@@ -1213,6 +1225,8 @@ Resources:
                     STATS_PORT: 8125,
                     STATS_PROTOCOL: 'tcp',
                     STATS_TELEGRAF: 1,
+                    JAMBONES_OTEL_ENABLED: 1,
+                    OTEL_EXPORTER_JAEGER_AGENT_HOST: '${MONITORING_SERVER_IP}',
                     AWS_SNS_TOPIC_ARM: '${AWS_SNS_TOPIC_ARN}',
                     AWS_REGION: '${AWS_REGION}',
                     JAMBONES_NETWORK_CIDR: '${VPC_CIDR}',
@@ -1554,12 +1568,13 @@ Resources:
             
               # jambonz webapp
               echo "building webapp.."
-              echo "REACT_APP_API_BASE_URL=http://$PUBLIC_IP/api/v1" > /home/admin/apps/jambonz-webapp/.env.local
-              echo "REACT_APP_SERVICE_PROVIDER_SID=2708b1b3-2736-40ea-b502-c53d8396247f" >> /home/admin/apps/jambonz-webapp/.env.local
-            
-              cd  /home/admin/apps/jambonz-webapp/
-              npm run build
-            
+              echo "REACT_APP_API_BASE_URL=http://${URLPortal}/api/v1" > /home/admin/apps/jambonz-webapp/.env
+              echo "REACT_APP_MOBILE_BREAKPOINT=767px" >> /home/admin/apps/jambonz-webapp/.env
+              echo "REACT_APP_ENABLE_SUBSPACE=1" >> /home/admin/apps/jambonz-webapp/.env
+              REACT_APP_API_BASE_URL=http://${URLPortal}/api/v1
+              TAG="<script>window.JAMBONZ = { APP_API_BASE_URL: '$REACT_APP_API_BASE_URL'};</script>"
+              sed -i -e "\@</head>@i\ $TAG" /home/admin/apps/jambonz-webapp/build/index.html
+        
               echo "writing /home/admin/apps/ecosystem.config.js.."
               cat << EOF > /home/admin/apps/ecosystem.config.js
               module.exports = {
@@ -1656,7 +1671,7 @@ Resources:
               }
               server {
                 listen 80;
-                server_name grafana.your_domain.com; 
+                server_name grafana.${URLPortal}; 
                 location / {
                   proxy_pass http://${MONITORING_SERVER_IP}:3000; 
                   proxy_http_version 1.1;
@@ -1668,9 +1683,21 @@ Resources:
               }
               server {
                 listen 80;
-                server_name homer.your_domain.com; 
+                server_name homer.${URLPortal}; 
                 location / {
                   proxy_pass http://${MONITORING_SERVER_IP}:9080; 
+                  proxy_http_version 1.1;
+                  proxy_set_header Upgrade \$http_upgrade;
+                  proxy_set_header Connection 'upgrade';
+                  proxy_set_header Host \$host;
+                  proxy_cache_bypass \$http_upgrade;
+                }
+              }
+              server {
+                listen 80;
+                server_name jaeger.${URLPortal}; 
+                location / {
+                  proxy_pass http://${MONITORING_SERVER_IP}:16686; 
                   proxy_http_version 1.1;
                   proxy_set_header Upgrade \$http_upgrade;
                   proxy_set_header Connection 'upgrade';
@@ -1693,6 +1720,7 @@ Resources:
               AWS_REGION: !Ref AWS::Region
               JAMBONES_TIME_SERIES_HOST: !GetAtt MonitoringServerEC2.PrivateIp
               JWT_SECRET: !Ref EncryptionSecret
+              URLPortal: !Ref URLPortal
 
   WebServerPlacementGroup:
     Type: AWS::EC2::PlacementGroup
@@ -1725,7 +1753,7 @@ Resources:
 Outputs: 
   WebPortalURL:
     Description: jambonz portal URL, log in with admin/admin and change password
-    Value: !Join [ "", [ "http://", !Ref "WebServerEIP1" ] ]
+    Value: !Join [ "", [ "http://", !Ref "URLPortal" ] ]
     Export:
       Name: !Sub '${Prefix}-webserver-url'
 

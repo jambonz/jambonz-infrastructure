@@ -4,8 +4,8 @@
     "ssh_username": "admin",
     "ami_description": "jambonz feature server",
     "instance_type": "t2.xlarge",
-    "drachtio_version": "v0.8.14",
-    "jambonz_version": "v0.7.2",
+    "drachtio_version": "v0.8.16",
+    "jambonz_version": "v0.7.5-rc5",
     "install_telegraf": "yes",
     "install_datadog": "no",
     "datadog_key" : "",
@@ -36,11 +36,6 @@
         "delete_on_termination": true
       }
     ],
-    "security_group_filter": {
-      "filters": {
-        "tag:Class": "packer"
-      }
-    },
     "tags": {
       "Name": "jambonz-feature-server"
     },
@@ -119,6 +114,7 @@
     {
       "type": "shell",
       "inline": [
+        "sudo rm -Rf /tmp/*",
         "sudo rm /root/.ssh/authorized_keys",
         "sudo rm /home/admin/.ssh/authorized_keys"
       ]

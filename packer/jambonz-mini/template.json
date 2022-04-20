@@ -25,7 +25,7 @@
     "source_ami_filter": {
       "filters": {
         "virtualization-type": "hvm",
-        "name": "debian-10-amd64-*",
+        "name": "debian-10-{{user `architecture`}}-*",
         "root-device-type": "ebs"
       },
       "owners": ["136693071363"],
@@ -87,6 +87,20 @@
     },
     {
       "type": "shell",
+      "script": "scripts/install_freeswitch.sh"
+    },
+    {
+      "type": "shell",
+      "execute_command": "chmod +x {{ .Path }}; sudo '{{ .Path }}' {{user `drachtio_version`}}",
+      "script": "scripts/install_drachtio.sh"
+    },
+    {
+      "type": "shell",
+      "execute_command": "chmod +x {{ .Path }}; sudo '{{ .Path }}' {{user `rtp_engine_version`}}",
+      "script": "scripts/install_rtpengine.sh"
+    },
+    {
+      "type": "shell",
       "script": "scripts/install_nodejs.sh"
     },
     {
@@ -144,25 +158,17 @@
     },
     {
       "type": "shell",
-      "script": "scripts/install_freeswitch.sh"
-    },
-    {
-      "type": "shell",
-      "execute_command": "chmod +x {{ .Path }}; sudo '{{ .Path }}' {{user `drachtio_version`}}",
-      "script": "scripts/install_drachtio.sh"
-    },
-    {
-      "type": "shell",
-      "execute_command": "chmod +x {{ .Path }}; sudo '{{ .Path }}' {{user `rtp_engine_version`}}",
-      "script": "scripts/install_rtpengine.sh"
-    },
-    {
-      "type": "shell",
       "script": "scripts/install_fail2ban.sh"
     },
     {
       "type": "shell",
+      "execute_command": "chmod +x {{ .Path }}; sudo '{{ .Path }}' {{user `install_jaeger`}}",
+      "script": "scripts/install_jaeger.sh"
+    },
+    {
+      "type": "shell",
       "inline": [
+        "sudo rm -Rf /tmp/*",
         "sudo rm /root/.ssh/authorized_keys",
         "sudo rm /home/admin/.ssh/authorized_keys"
       ]

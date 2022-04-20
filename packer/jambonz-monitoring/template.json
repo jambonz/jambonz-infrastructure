@@ -3,13 +3,14 @@
     "region": "us-east-1",
     "ssh_username": "admin",
     "ami_description": "jambonz monitoring server", 
-    "instance_type": "t2.medium",
-    "jambonz_version": "v0.7.0",
+    "instance_type": "t2.xlarge",
+    "jambonz_version": "v0.7.5-rc5",
     "homer_user": "homer_user",
     "homer_password": "XcapJTqy11LnsYRtxXGPTYQkAnI",
     "install_influxdb":  "yes",
     "install_homer":  "yes",
-    "install_nodered":  "yes",
+    "install_jaeger":  "yes",
+    "install_nodered":  "no",
     "influxdb_ip":  "127.0.0.1",
     "tag_name": "jambonz-monitoring-server"
   },
@@ -37,11 +38,6 @@
         "delete_on_termination": true
       }
     ],
-    "security_group_filter": {
-      "filters": {
-        "tag:Class": "packer"
-      }
-    },
     "tags": {
       "Name": "{{user `tag_name`}}"
     },
@@ -98,6 +94,19 @@
       "type": "shell",
       "execute_command": "chmod +x {{ .Path }}; sudo '{{ .Path }}' {{user `install_influxdb`}}",
       "script": "scripts/install_grafana.sh"
+    },
+    {
+      "type": "shell",
+      "execute_command": "chmod +x {{ .Path }}; sudo '{{ .Path }}' {{user `install_jaeger`}}",
+      "script": "scripts/install_jaeger.sh"
+    },
+    {
+      "type": "shell",
+      "inline": [
+        "sudo rm -Rf /tmp/*",
+        "sudo rm /root/.ssh/authorized_keys",
+        "sudo rm /home/admin/.ssh/authorized_keys"
+      ]
     }
   ]
 }
