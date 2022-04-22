@@ -61,7 +61,7 @@ Parameters:
 Mappings:
   AWSRegion2AMI:
     us-east-1:
-      Ami: ami-0e2b5e5e6a5fa46ce
+      Ami: ami-0e3b870e22e6d02d3
 Resources:
   VPC:
     Type: 'AWS::EC2::VPC'
@@ -188,6 +188,11 @@ Resources:
           IpProtocol: tcp
           FromPort: 9080
           ToPort: 9080
+          CidrIp: !Ref AllowedHttpCidr
+        - Description: jaeger
+          IpProtocol: tcp
+          FromPort: 16686
+          ToPort: 16686
           CidrIp: !Ref AllowedHttpCidr
         - Description: grafana
           IpProtocol: tcp

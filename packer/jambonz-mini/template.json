@@ -5,7 +5,7 @@
     "ami_description": "jambonz all-in-one AMI", 
     "instance_type": "t2.xlarge",
     "drachtio_version": "v0.8.16",
-    "jambonz_version": "v0.7.4",
+    "jambonz_version": "v0.7.5-rc6",
     "jambonz_user": "admin",
     "jambonz_password": "JambonzR0ck$",
     "install_telegraf": "yes",
@@ -25,7 +25,7 @@
     "source_ami_filter": {
       "filters": {
         "virtualization-type": "hvm",
-        "name": "debian-10-{{user `architecture`}}-*",
+        "name": "debian-10-amd64-*",
         "root-device-type": "ebs"
       },
       "owners": ["136693071363"],
