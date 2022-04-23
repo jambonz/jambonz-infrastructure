@@ -266,6 +266,8 @@ module.exports = {
     watch: false,
     env: {
       NODE_ENV: 'production',
+      JAMBONES_OTEL_ENABLED: 1,
+      OTEL_EXPORTER_JAEGER_AGENT_HOST: '127.0.0.1',
       ENABLE_METRICS: 1,
       STATS_HOST: '127.0.0.1',
       STATS_PORT: 8125,
