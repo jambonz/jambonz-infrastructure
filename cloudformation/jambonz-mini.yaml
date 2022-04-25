@@ -58,10 +58,24 @@ Parameters:
     ConstraintDescription: must be a valid network CIDR
     AllowedPattern: \d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\/\d{1,2}
     Default: 10.0.0.0/16
+  URLPortal:
+    Type: String
+    Description: "(Optional) A DNS name that you will point to the jambonz webserver(s)"
+    Default: ""
+
+Conditions:
+  DontCreateDNS: !Equals
+    - !Ref URLPortal
+    - ""
+  CreateDNS: !Not
+    - !Equals 
+      - !Ref URLPortal
+      - ""
+
 Mappings:
   AWSRegion2AMI:
     us-east-1:
-      Ami: ami-080944408a6eb862d
+      Ami: ami-0d76d07c75edef82f
 Resources:
   VPC:
     Type: 'AWS::EC2::VPC'
@@ -88,75 +102,114 @@ Resources:
           DeviceIndex: '0'
           DeleteOnTermination: true
           SubnetId: !Ref PublicSubnet
-      UserData: !Base64 
-        'Fn::Join':
-          - ''
-          - - |
+      UserData:
+        Fn::Base64: 
+          Fn::Sub:
+            - |
               #!/bin/bash -xe
-            - >
-              PRIVATE_IPV4="$(curl -s
-              http://169.254.169.254/latest/meta-data/local-ipv4)" 
-            - >
-              PUBLIC_IPV4="$(curl -s
-              http://169.254.169.254/latest/meta-data/public-ipv4)" 
-            - >
-              INSTANCE_ID="$(curl -s
-              http://169.254.169.254/latest/meta-data/instance-id)" 
-            - >
-              AWS_REGION_NAME="$(curl -s
-              http://169.254.169.254/latest/meta-data/placement/region)" 
-            - >
+
+              # get instance metadata
+              PRIVATE_IPV4="$(curl -s http://169.254.169.254/latest/meta-data/local-ipv4)" 
+              PUBLIC_IPV4="$(curl -s http://169.254.169.254/latest/meta-data/public-ipv4)" 
+              INSTANCE_ID="$(curl -s http://169.254.169.254/latest/meta-data/instance-id)" 
+              AWS_REGION_NAME="$(curl -s http://169.254.169.254/latest/meta-data/placement/region)" 
+              
+              # change the database password to the instance id
               NEW_DB_PASSWD="$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1)" 
-            - >
-              echo "alter user 'admin'@'%' identified by '${NEW_DB_PASSWD}'" | 
-              mysql -h localhost -u admin -D jambones -pJambonzR0ck$ 
-            - >
-              sudo sed -i -e "s/\(.*\)JAMBONES_MYSQL_PASSWORD.*/\1JAMBONES_MYSQL_PASSWORD: '${NEW_DB_PASSWD}',/g"
-              /home/admin/apps/ecosystem.config.js 
-            - >
-              APIBANKEY=$(curl -X POST -u jambonz:1a074994242182a9e0b67eae93978826 -d "{\"client\": \"${INSTANCE_ID}\"}" -s https://apiban.org/sponsor/newkey | jq -r '.ApiKey')
-            - >
-              sudo sed -i -e "s/API-KEY-HERE/${APIBANKEY}/g" /usr/local/bin/apiban/config.json
-            - >
+              echo "alter user 'admin'@'%' identified by '$NEW_DB_PASSWD'" | mysql -h localhost -u admin -D jambones -pJambonzR0ck$ 
+              sudo sed -i -e "s/\(.*\)JAMBONES_MYSQL_PASSWORD.*/\1JAMBONES_MYSQL_PASSWORD: '$NEW_DB_PASSWD',/g" /home/admin/apps/ecosystem.config.js 
+              
+              # get an apiban key
+              APIBANKEY=$(curl -X POST -u jambonz:1a074994242182a9e0b67eae93978826 -d "{\"client\": \"$INSTANCE_ID\"}" -s https://apiban.org/sponsor/newkey | jq -r '.ApiKey')
+              sudo sed -i -e "s/API-KEY-HERE/$APIBANKEY/g" /usr/local/bin/apiban/config.json
               sudo /usr/local/bin/apiban/apiban-iptables-client FULL
-            - >
-              sudo sed -i -e "s/\(.*\)PRIVATE_IP\(.*\)/\1${PRIVATE_IPV4}\2/g"
-              /home/admin/apps/ecosystem.config.js 
-            - >
-              sudo sed -i -e "s/\(.*\)AWS_REGION_NAME\(.*\)/\1${AWS_REGION_NAME}\2/g"
-              /home/admin/apps/ecosystem.config.js 
-            - >
-              sudo sed -i -e "s/\(.*\)--JAMBONES_API_BASE_URL--\(.*\)/\1http:\/\/${PUBLIC_IPV4}\/v1\2/g"
-              /home/admin/apps/ecosystem.config.js 
-            - >
-              JAMBONES_ADMIN_INITIAL_PASSWORD=${INSTANCE_ID} JAMBONES_MYSQL_USER=admin 
-              JAMBONES_MYSQL_PASSWORD=${NEW_DB_PASSWD} JAMBONES_MYSQL_DATABASE=jambones JAMBONES_MYSQL_HOST=localhost 
-              /home/admin/apps/jambonz-api-server/db/reset_admin_password.js
-            - >
-              echo "REACT_APP_API_BASE_URL=http://${PUBLIC_IPV4}/api/v1" >
-              /home/admin/apps/jambonz-webapp/.env 
-            - >
-              echo "REACT_APP_MOBILE_BREAKPOINT=767px" >>
-              /home/admin/apps/jambonz-webapp/.env 
-            - >
-              echo "REACT_APP_ENABLE_SUBSPACE=1" >>
-              /home/admin/apps/jambonz-webapp/.env 
-            - >
-              REACT_APP_API_BASE_URL=http://${PUBLIC_IPV4}/api/v1
-            - >
-              TAG="<script>window.JAMBONZ = { APP_API_BASE_URL: '${REACT_APP_API_BASE_URL}'};</script>"
-            - >
-              sed -i -e "\@</head>@i\ $TAG" /home/admin/apps/jambonz-webapp/build/index.html
-            - >
-              sudo -u admin bash -c "pm2 restart
-              /home/admin/apps/ecosystem.config.js" 
-            - >
+              
+              # replace ip addresses in the ecosystem.config.js file
+              sudo sed -i -e "s/\(.*\)PRIVATE_IP\(.*\)/\1$PRIVATE_IPV4\2/g" /home/admin/apps/ecosystem.config.js 
+              sudo sed -i -e "s/\(.*\)AWS_REGION_NAME\(.*\)/\1$AWS_REGION_NAME\2/g" /home/admin/apps/ecosystem.config.js 
+              sudo sed -i -e "s/\(.*\)--JAMBONES_API_BASE_URL--\(.*\)/\1http:\/\/$PUBLIC_IPV4\/v1\2/g" /home/admin/apps/ecosystem.config.js 
+              
+              # reset the database
+              JAMBONES_ADMIN_INITIAL_PASSWORD=$INSTANCE_ID JAMBONES_MYSQL_USER=admin JAMBONES_MYSQL_PASSWORD=$NEW_DB_PASSWD JAMBONES_MYSQL_DATABASE=jambones JAMBONES_MYSQL_HOST=localhost /home/admin/apps/jambonz-api-server/db/reset_admin_password.js
+              
+              # configure webapp
+              if [[ -z "${URLPortal}" ]]; then
+                # portals will be accessed by IP address of server
+                echo "REACT_APP_API_BASE_URL=http://$PUBLIC_IPV4/api/v1" > /home/admin/apps/jambonz-webapp/.env 
+                echo "REACT_APP_MOBILE_BREAKPOINT=767px" >> /home/admin/apps/jambonz-webapp/.env 
+                echo "REACT_APP_ENABLE_SUBSPACE=1" >> /home/admin/apps/jambonz-webapp/.env 
+                REACT_APP_API_BASE_URL=http://$PUBLIC_IPV4/api/v1 TAG="<script>window.JAMBONZ = { APP_API_BASE_URL: '$REACT_APP_API_BASE_URL'};</script>"
+                sed -i -e "\@</head>@i\ $TAG" /home/admin/apps/jambonz-webapp/build/index.html
+              else
+                # portals will be accessed by DNS name
+                echo "REACT_APP_API_BASE_URL=http://${URLPortal}/api/v1" > /home/admin/apps/jambonz-webapp/.env 
+                echo "REACT_APP_MOBILE_BREAKPOINT=767px" >> /home/admin/apps/jambonz-webapp/.env 
+                echo "REACT_APP_ENABLE_SUBSPACE=1" >> /home/admin/apps/jambonz-webapp/.env 
+                REACT_APP_API_BASE_URL=http://${URLPortal}/api/v1 TAG="<script>window.JAMBONZ = { APP_API_BASE_URL: '$REACT_APP_API_BASE_URL'};</script>"
+                sed -i -e "\@</head>@i\ $TAG" /home/admin/apps/jambonz-webapp/build/index.html
+
+                # configure nginx for homer and grafana on the monitoring server
+                sudo cat << EOF > /etc/nginx/sites-available/default 
+                server {
+                    listen 80;
+                    server_name _;
+                    location /api/ {
+                        rewrite ^/api/(.*)$ /\$1 break;
+                        proxy_pass http://localhost:3002;
+                        proxy_set_header Host \$host;
+                    }
+                    location / {
+                        proxy_pass http://localhost:3001;
+                        proxy_set_header Host \$host;
+                    }
+                }
+                server {
+                  listen 80;
+                  server_name grafana.${URLPortal}; 
+                  location / {
+                    proxy_pass http://localhost:3010; 
+                    proxy_http_version 1.1;
+                    proxy_set_header Upgrade \$http_upgrade;
+                    proxy_set_header Connection 'upgrade';
+                    proxy_set_header Host \$host;
+                    proxy_cache_bypass \$http_upgrade;
+                  }
+                }
+                server {
+                  listen 80;
+                  server_name homer.${URLPortal}; 
+                  location / {
+                    proxy_pass http://localhost:9080; 
+                    proxy_http_version 1.1;
+                    proxy_set_header Upgrade \$http_upgrade;
+                    proxy_set_header Connection 'upgrade';
+                    proxy_set_header Host \$host;
+                    proxy_cache_bypass \$http_upgrade;
+                  }
+                }
+                server {
+                  listen 80;
+                  server_name jaeger.${URLPortal}; 
+                  location / {
+                    proxy_pass http://localhost:16686; 
+                    proxy_http_version 1.1;
+                    proxy_set_header Upgrade \$http_upgrade;
+                    proxy_set_header Connection 'upgrade';
+                    proxy_set_header Host \$host;
+                    proxy_cache_bypass \$http_upgrade;
+                  }
+                }
+              EOF
+              
+                sudo systemctl restart nginx
+              fi
+              sudo -u admin bash -c "pm2 restart /home/admin/apps/ecosystem.config.js" 
               sudo -u admin bash -c "pm2 save"
-            - >
               sudo env PATH=$PATH:/usr/bin /usr/lib/node_modules/pm2/bin/pm2 startup systemd -u admin --hp /home/admin
-            - >
+              
+              # restart heplify-server
               sudo systemctl restart heplify-server
-            - |+
+            - URLPortal: !Ref URLPortal
 
   jambonzSecurityGroup:
     Type: 'AWS::EC2::SecurityGroup'
@@ -255,7 +308,7 @@ Resources:
       AllocationId: !GetAtt EIP.AllocationId
 
 Outputs:
-  URL:
+  PortalHttpURL:
     Value: !Join 
       - ''
       - - 'http://'
@@ -263,6 +316,41 @@ Outputs:
           - jambonzInstance
           - PublicIp
     Description: URL for the jambonz portal
+    Condition: DontCreateDNS
+  PortalURL:
+    Value: !Join 
+      - ''
+      - - 'http://'
+        - !Ref URLPortal
+    Description: URL for the jambonz portal
+    Condition: CreateDNS
+  GrafanaURL:
+    Value: !Join 
+      - ''
+      - - 'http://grafana.'
+        - !Ref URLPortal
+    Description: URL for the grafana portal
+    Condition: CreateDNS
+  JaegerURL:
+    Value: !Join 
+      - ''
+      - - 'http://jaeger.'
+        - !Ref URLPortal
+    Description: URL for the jaeger portal
+    Condition: CreateDNS
+  HomerURL:
+    Value: !Join 
+      - ''
+      - - 'http://homer.'
+        - !Ref URLPortal
+    Description: URL for the homer portal
+    Condition: CreateDNS
+  ServerIP:
+    Value: !GetAtt 
+      - jambonzInstance
+      - PublicIp
+    Description: Server IP address - create a DNS record for this domain as well as subdomains grafana, homer, and jaeger
+    Condition: CreateDNS
   User:
     Value: admin
     Description: Login username for the jambonz portal

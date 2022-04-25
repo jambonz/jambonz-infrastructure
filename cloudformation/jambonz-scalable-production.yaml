@@ -12,7 +12,7 @@ Mappings:
 
 Parameters:
   KeyName:
-    Default: "name of an aws keypair that you have downloaded and will use to access the EC2 instances via ssh"
+    Description: "The keypair that you will use to access the EC2 instances via ssh"
     Type: "AWS::EC2::KeyPair::KeyName"
 
   InstanceTypeSbcSip:
