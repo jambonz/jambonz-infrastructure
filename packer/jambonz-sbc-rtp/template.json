@@ -4,7 +4,7 @@
     "ssh_username": "admin",
     "ami_description": "jambonz SBC media server", 
     "drachtio_version": "v0.8.16",
-    "jambonz_version": "v0.7.5-rc5",
+    "jambonz_version": "v0.7.5-rc8",
     "instance_type": "t2.xlarge",
     "rtp_engine_version": "mr10.2.1.5",
     "rtp_engine_min_port": "40000",
