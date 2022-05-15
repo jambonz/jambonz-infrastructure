@@ -24,7 +24,7 @@
             <archive>/var/log/drachtio/archive</archive>
             <size>100</size>
             <maxSize>10000</maxSize>
-            <auto-flush>true</auto-flush>
+            <auto-flush>false</auto-flush>
         </file>
 
         <sofia-loglevel>3</sofia-loglevel>

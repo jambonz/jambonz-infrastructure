@@ -3,6 +3,9 @@ VERSION=$1
 
 echo "rtpengine version to install is ${VERSION}"
 
+# install linux headers
+apt-get install linux-headers-$(uname -r)
+
 cd /usr/local/src
 git clone https://github.com/BelledonneCommunications/bcg729.git
 cd bcg729
@@ -15,8 +18,20 @@ sudo mkdir -p build && cd build && sudo cmake .. -DCMAKE_BUILD_TYPE=RelWithDebIn
 
 cd /usr/local/src
 git clone https://github.com/sipwise/rtpengine.git -b ${VERSION}
-cd rtpengine/daemon
-make with_transcoding=yes
+cd rtpengine
+make with_transcoding=yes with_iptables_option=yes with-kernel
+
+# copy iptables extension into place
+cp ./iptables-extension/libxt_RTPENGINE.so `pkg-config xtables --variable=xtlibdir`
+
+# install kernel module
+mkdir /lib/modules/`uname -r`/updates/
+cp ./kernel-module/xt_RTPENGINE.ko /lib/modules/`uname -r`/updates
+depmod -a
+modprobe xt_RTPENGINE
+echo 'add 42' > /proc/rtpengine/control
+iptables -I INPUT -p udp --dport 40000:60000 -j RTPENGINE --id 42
+
 cp /usr/local/src/rtpengine/daemon/rtpengine /usr/local/bin
 sudo mv /tmp/rtpengine.service /etc/systemd/system
 sudo chmod 644 /etc/systemd/system/rtpengine.service

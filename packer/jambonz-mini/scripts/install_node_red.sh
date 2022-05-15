@@ -2,12 +2,8 @@
 
 if [ "$1" == "yes" ]; then 
 
-# install node
-curl -sL https://deb.nodesource.com/setup_14.x | sudo bash - && sudo apt-get install -y nodejs
-sudo npm install -g pino-pretty pm2 pm2-logrotate grunt
-
 #install node-red
-mkdir apps && cd $_
+mkdir -p apps && cd $_
 git clone https://github.com/node-red/node-red.git
 cd node-red
 sudo npm install --unsafe-perm

@@ -250,6 +250,24 @@ Parameters:
     Type: String
     Description: "DNS name you will point to the jambonz webserver(s)"
     Default: "yourdomain.com"
+  StatsSampleRate: 
+    Type: Number
+    Description: sampling rate for metrics, a number between 0 and 1 inclusive
+    Default: 1
+  EnableTracing: 
+    Type: Number
+    Description: enable opentelemetry application tracing?
+    AllowedValues:
+      - 0
+      - 1 
+    Default: 1
+  EnableHomer: 
+    Type: Number
+    Description: enable homer sip traces?
+    AllowedValues:
+      - 0
+      - 1 
+    Default: 1
 
 Resources:
 ###########################################
@@ -922,6 +940,7 @@ Resources:
                     STATS_PORT: 8125,
                     STATS_PROTOCOL: 'tcp',
                     STATS_TELEGRAF: 1,
+                    STATS_SAMPLE_RATE: ${JAMBONES_SAMPLE_RATE},
                     JAMBONES_NETWORK_CIDR: '${VPC_CIDR}'
                   }
                 },
@@ -948,6 +967,7 @@ Resources:
                     STATS_PORT: 8125,
                     STATS_PROTOCOL: 'tcp',
                     STATS_TELEGRAF: 1,
+                    STATS_SAMPLE_RATE: ${JAMBONES_SAMPLE_RATE},
                     JAMBONES_NETWORK_CIDR: '${VPC_CIDR}'
                   }
                 },
@@ -982,6 +1002,7 @@ Resources:
                     STATS_HOST: '127.0.0.1',
                     STATS_PORT: 8125,
                     STATS_PROTOCOL: 'tcp',
+                    STATS_SAMPLE_RATE: ${JAMBONES_SAMPLE_RATE},
                     STATS_TELEGRAF: 1
                   }
                 },
@@ -1019,6 +1040,7 @@ Resources:
                     STATS_HOST: '127.0.0.1',
                     STATS_PORT: 8125,
                     STATS_PROTOCOL: 'tcp',
+                    STATS_SAMPLE_RATE: ${JAMBONES_SAMPLE_RATE}
                     STATS_TELEGRAF: 1
                   }
                 },
@@ -1058,6 +1080,7 @@ Resources:
                     STATS_PORT: 8125,
                     STATS_PROTOCOL: 'tcp',
                     STATS_TELEGRAF: 1,
+                    STATS_SAMPLE_RATE: ${JAMBONES_SAMPLE_RATE},
                     MS_TEAMS_SIP_PROXY_IPS: '52.114.148.0, 52.114.132.46, 52.114.75.24, 52.114.76.76, 52.114.7.24, 52.114.14.70'
                   }
                 }
@@ -1071,11 +1094,13 @@ Resources:
               sudo sed -i -e "s/influxdb:8086/${MONITORING_SERVER_IP}:8086/g"  /etc/telegraf/telegraf.conf
               sudo systemctl restart telegraf
 
-              echo "restarting drachtio server"
               # point drachtio server to the HEP endpoint on the monitoring server
-              sudo sed -i -e "s/--address 0.0.0.0 --port 9022/--address 0.0.0.0 --port 9022 --homer ${MONITORING_SERVER_IP}:9060 --homer-id 10/g"  /etc/systemd/system/drachtio.service
-              sudo systemctl daemon-reload
-              sudo systemctl restart drachtio
+              if [[ "$ENABLE_HOMER" == "1" ]]; then
+                  echo "enabling HEP and restarting drachtio server"
+                  sudo sed -i -e "s/--address 0.0.0.0 --port 9022/--address 0.0.0.0 --port 9022 --homer ${MONITORING_SERVER_IP}:9060 --homer-id 10/g"  /etc/systemd/system/drachtio.service
+                  sudo systemctl daemon-reload
+                  sudo systemctl restart drachtio
+              fi
 
               echo "starting jambonz apps"
               sudo -u admin bash -c "pm2 restart /home/admin/apps/ecosystem.config.js"
@@ -1091,6 +1116,8 @@ Resources:
               JAMBONES_MYSQL_PASSWORD: !Ref MySQLPassword
               JAMBONES_REDIS_HOST: !GetAtt ElastiCacheCluster.RedisEndpoint.Address
               JAMBONES_CLUSTER_ID: !Ref Prefix
+              JAMBONES_SAMPLE_RATE: !Ref StatsSampleRate
+              ENABLE_HOMER: !Ref EnableHomer
               MONITORING_SERVER_IP: !GetAtt MonitoringServerEC2.PrivateIp
               AWS_SNS_TOPIC_ARN: !Ref SbcSipServerSNSTopic
               JAMBONES_TIME_SERIES_HOST: !GetAtt MonitoringServerEC2.PrivateIp
@@ -1225,7 +1252,8 @@ Resources:
                     STATS_PORT: 8125,
                     STATS_PROTOCOL: 'tcp',
                     STATS_TELEGRAF: 1,
-                    JAMBONES_OTEL_ENABLED: 1,
+                    STATS_SAMPLE_RATE: ${JAMBONES_SAMPLE_RATE},
+                    JAMBONES_OTEL_ENABLED: ${OTEL_TRACING},
                     OTEL_EXPORTER_JAEGER_AGENT_HOST: '${MONITORING_SERVER_IP}',
                     AWS_SNS_TOPIC_ARM: '${AWS_SNS_TOPIC_ARN}',
                     AWS_REGION: '${AWS_REGION}',
@@ -1272,6 +1300,8 @@ Resources:
               JAMBONES_REDIS_HOST: !GetAtt ElastiCacheCluster.RedisEndpoint.Address
               AWS_SNS_TOPIC_ARN: !Ref FeatureServerSNSTopic
               AWS_REGION: !Ref AWS::Region
+              JAMBONES_SAMPLE_RATE: !Ref StatsSampleRate
+              OTEL_TRACING: !Ref EnableTracing
               JAMBONES_CLUSTER_ID: !Ref Prefix
               MONITORING_SERVER_IP: !GetAtt MonitoringServerEC2.PrivateIp
               JAMBONES_TIME_SERIES_HOST: !GetAtt MonitoringServerEC2.PrivateIp
@@ -1407,6 +1437,7 @@ Resources:
                     STATS_HOST: '127.0.0.1',
                     STATS_PORT: 8125,
                     STATS_PROTOCOL: 'tcp',
+                    STATS_SAMPLE_RATE: ${JAMBONES_SAMPLE_RATE},
                     STATS_TELEGRAF: 1
                   }
                 }
@@ -1433,6 +1464,7 @@ Resources:
               JAMBONES_MYSQL_USER: !Ref MySQLUsername
               JAMBONES_MYSQL_PASSWORD: !Ref MySQLPassword
               JAMBONES_CLUSTER_ID: !Ref Prefix
+              JAMBONES_SAMPLE_RATE: !Ref StatsSampleRate
               JAMBONES_REDIS_HOST: !GetAtt ElastiCacheCluster.RedisEndpoint.Address
               AWS_SNS_TOPIC_ARN: !Ref SbcRTPServerSNSTopic
               MONITORING_SERVER_IP: !GetAtt MonitoringServerEC2.PrivateIp
@@ -1611,6 +1643,7 @@ Resources:
                     STATS_PORT: 8125,
                     STATS_PROTOCOL: 'tcp',
                     STATS_TELEGRAF: 1,
+                    STATS_SAMPLE_RATE: ${JAMBONES_SAMPLE_RATE},
                     HTTP_PORT:  3000,
                     JWT_SECRET: '${JWT_SECRET}'
                     },
@@ -1716,6 +1749,7 @@ Resources:
               JAMBONES_MYSQL_PASSWORD: !Ref MySQLPassword
               JAMBONES_REDIS_HOST: !GetAtt ElastiCacheCluster.RedisEndpoint.Address
               JAMBONES_CLUSTER_ID: !Ref Prefix
+              JAMBONES_SAMPLE_RATE: !Ref StatsSampleRate
               MONITORING_SERVER_IP:  !GetAtt MonitoringServerEC2.PrivateIp
               AWS_REGION: !Ref AWS::Region
               JAMBONES_TIME_SERIES_HOST: !GetAtt MonitoringServerEC2.PrivateIp

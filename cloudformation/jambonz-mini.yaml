@@ -75,7 +75,7 @@ Conditions:
 Mappings:
   AWSRegion2AMI:
     us-east-1:
-      Ami: ami-0d76d07c75edef82f
+      Ami: ami-090715b37d30780d5
 Resources:
   VPC:
     Type: 'AWS::EC2::VPC'
@@ -107,6 +107,11 @@ Resources:
           Fn::Sub:
             - |
               #!/bin/bash -xe
+
+              #install rtpengine kernel module 
+              #echo "installing rtpengine kernel module"
+              #modprobe xt_RTPENGINE
+              #iptables -I INPUT -p udp -j RTPENGINE --id 42
 
               # get instance metadata
               PRIVATE_IPV4="$(curl -s http://169.254.169.254/latest/meta-data/local-ipv4)" 

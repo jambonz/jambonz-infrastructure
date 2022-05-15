@@ -10,8 +10,12 @@ sudo debconf-set-selections <<< "mysql-community-server mysql-community-server/r
 sudo debconf-set-selections <<< "mysql-community-server mysql-community-server/re-root-pass password JambonzR0ck\$"
 sudo debconf-set-selections <<< "mysql-community-server mysql-server/default-auth-override select Use Legacy Authentication Method (Retain MySQL 5.x Compatibility)"
 sudo DEBIAN_FRONTEND=noninteractive apt install -y default-mysql-server
-sudo systemctl enable mysql
-sudo systemctl restart mysql
+#cd /etc/systemd/system
+#rm mysql.service 
+#sudo systemctl enable mysql
+echo "starting mysql"
+sudo systemctl start mysql
+echo "creating database"
 
 # create the database and the user
 mysql -h localhost -u root -pJambonzR0ck\$ << END
@@ -24,5 +28,8 @@ flush privileges;
 END
 
 # create the schema
+echo "creating schema"
 mysql -h localhost -u $DB_USER -p$DB_PASS -D jambones < /home/admin/apps/jambonz-api-server/db/jambones-sql.sql
+echo "seeding initial data"
 mysql -h localhost -u $DB_USER -p$DB_PASS -D jambones < /home/admin/apps/jambonz-api-server/db/seed-production-database-open-source.sql
+

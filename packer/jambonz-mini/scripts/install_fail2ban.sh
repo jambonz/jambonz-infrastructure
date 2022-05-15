@@ -1,31 +1,33 @@
 #!/bin/bash
 
 sudo cp /etc/fail2ban/jail.conf /etc/fail2ban/jail.local
-sudo bash -c "cat >> /etc/fail2ban/jail.local" << EOF
+
+# comment out: overhead too high and apiban suffices
+#sudo bash -c "cat >> /etc/fail2ban/jail.local" << EOF
 
 
-[drachtio-tcp]
-maxretry = 1
-bantime = 86400
-enabled  = true
-filter   = drachtio
-port     = 5060
-protocol = tcp
-logpath  = /var/log/drachtio/drachtio.log
+#[drachtio-tcp]
+#maxretry = 1
+#bantime = 86400
+#enabled  = true
+#filter   = drachtio
+#port     = 5060
+#protocol = tcp
+#logpath  = /var/log/drachtio/drachtio.log
+#
+#[drachtio-udp]
+#maxretry = 1
+#bantime = 86400
+#enabled  = true
+#filter   = drachtio
+#port     = 5060
+#protocol = udp
+#logpath  = /var/log/drachtio/drachtio.log
+#
+#EOF
 
-[drachtio-udp]
-maxretry = 1
-bantime = 86400
-enabled  = true
-filter   = drachtio
-port     = 5060
-protocol = udp
-logpath  = /var/log/drachtio/drachtio.log
-
-EOF
-
-sudo cp /tmp/drachtio-fail2ban.conf /etc/fail2ban/filter.d/drachtio.conf
-sudo chmod 0644 /etc/fail2ban/filter.d/drachtio.conf
+#sudo cp /tmp/drachtio-fail2ban.conf /etc/fail2ban/filter.d/drachtio.conf
+#sudo chmod 0644 /etc/fail2ban/filter.d/drachtio.conf
 
 # add nginx jails and filters
 sudo cp /tmp/nginx-noscript.jail /etc/fail2ban/jail.d/nginx-noscript.conf
