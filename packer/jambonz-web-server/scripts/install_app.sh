@@ -4,9 +4,13 @@ VERSION=$1
 cd /home/admin/apps
 cp /tmp/ecosystem.config.js .
 
-cd /home/admin/apps/jambonz-api-server && sudo npm install --unsafe-perm
-cd /home/admin/apps/jambonz-webapp && sudo npm install --unsafe-perm && npm run build
-cd /home/admin/apps/public-apps && sudo npm install --unsafe-perm
+echo "building jambonz-api-server.."
+cd /home/admin/apps/jambonz-api-server && npm ci --unsafe-perm
+echo "building jambonz-webapp.."
+cd /home/admin/apps/jambonz-webapp && npm ci --unsafe-perm && npm run build
+echo "building public-apps.."
+mkdir -p /home/admin/apps/public-apps
+cd /home/admin/apps/public-apps && npm ci --unsafe-perm
 
 sudo npm install -g pino-pretty pm2 pm2-logrotate gulp grunt
 

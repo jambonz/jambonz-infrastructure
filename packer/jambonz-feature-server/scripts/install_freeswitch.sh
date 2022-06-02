@@ -18,14 +18,14 @@ echo "LWS_VERSION version to install is ${LWS_VERSION}"
 export LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH
 
 cd /tmp
-tar xvfz SpeechSDK-Linux-1.20.0.tar.gz
-cd SpeechSDK-Linux-1.20.0
+tar xvfz SpeechSDK-Linux-1.21.0.tar.gz
+cd SpeechSDK-Linux-1.21.0
 sudo cp -r include /usr/local/include/MicrosoftSpeechSDK
 sudo cp -r lib/ /usr/local/lib/MicrosoftSpeechSDK
 sudo ln -s /usr/local/lib/MicrosoftSpeechSDK/x64/libMicrosoft.CognitiveServices.Speech.core.so /usr/local/lib/libMicrosoft.CognitiveServices.Speech.core.so
 cd
-rm -Rf /tmpSpeechSDK-Linux-1.20.0
-rm -Rf /tmpSpeechSDK-Linux-1.20.0.tar.gz
+rm -Rf /tmpSpeechSDK-Linux-1.21.0
+rm -Rf /tmpSpeechSDK-Linux-1.21.0.tar.gz
 
 git config --global pull.rebase true
 cd /usr/local/src

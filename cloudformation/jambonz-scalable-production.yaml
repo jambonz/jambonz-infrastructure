@@ -4,11 +4,11 @@ AWSTemplateFormatVersion: "2010-09-09"
 Mappings:
   AWSRegion2AMI:
     eu-west-1:
-      SbcSipAmi: ami-0f6ba44ac3543e61c
-      SbcRtpAmi: ami-080cd1b1866f6e4c7
-      FsAmi: ami-0d5660935da86a3b5
-      WebserverAmi: ami-0eb0eeaf07446071c
-      MonitoringServerAmi: ami-098dba4d4bc6702fd
+      SbcSipAmi: ami-0cbc5e0bb7e933065
+      SbcRtpAmi: ami-05c83bae865ca64a8
+      FsAmi: ami-0ab8aec3b49e4d15a
+      WebserverAmi: ami-02e90b9bad0811506
+      MonitoringServerAmi: ami-094af6205e6cefe90
 
 Parameters:
   KeyName:
@@ -257,13 +257,6 @@ Parameters:
   EnableTracing: 
     Type: Number
     Description: enable opentelemetry application tracing?
-    AllowedValues:
-      - 0
-      - 1 
-    Default: 1
-  EnableHomer: 
-    Type: Number
-    Description: enable homer sip traces?
     AllowedValues:
       - 0
       - 1 
@@ -818,18 +811,6 @@ Resources:
           Key: Name
           Value: !Sub '${Prefix}-sbc-sip-2'
 
-  SbcSipServerEIP3:
-    Type: AWS::EC2::EIP
-    Properties:
-      Domain: vpc
-      Tags:
-        -
-          Key: Environment
-          Value: !Sub '${Prefix}-sbc-sip'
-        -
-          Key: Name
-          Value: !Sub '${Prefix}-sbc-sip-3'
-
  # --- SIP server EC2 IAM role
   SbcSipServerIamRole:
     Type: AWS::IAM::Role
@@ -1040,7 +1021,7 @@ Resources:
                     STATS_HOST: '127.0.0.1',
                     STATS_PORT: 8125,
                     STATS_PROTOCOL: 'tcp',
-                    STATS_SAMPLE_RATE: ${JAMBONES_SAMPLE_RATE}
+                    STATS_SAMPLE_RATE: ${JAMBONES_SAMPLE_RATE},
                     STATS_TELEGRAF: 1
                   }
                 },
@@ -1094,13 +1075,10 @@ Resources:
               sudo sed -i -e "s/influxdb:8086/${MONITORING_SERVER_IP}:8086/g"  /etc/telegraf/telegraf.conf
               sudo systemctl restart telegraf
 
-              # point drachtio server to the HEP endpoint on the monitoring server
-              if [[ "$ENABLE_HOMER" == "1" ]]; then
-                  echo "enabling HEP and restarting drachtio server"
-                  sudo sed -i -e "s/--address 0.0.0.0 --port 9022/--address 0.0.0.0 --port 9022 --homer ${MONITORING_SERVER_IP}:9060 --homer-id 10/g"  /etc/systemd/system/drachtio.service
-                  sudo systemctl daemon-reload
-                  sudo systemctl restart drachtio
-              fi
+              echo "enabling HEP and restarting drachtio server"
+              sudo sed -i -e "s/--address 0.0.0.0 --port 9022/--address 0.0.0.0 --port 9022 --homer ${MONITORING_SERVER_IP}:9060 --homer-id 10/g"  /etc/systemd/system/drachtio.service
+              sudo systemctl daemon-reload
+              sudo systemctl restart drachtio
 
               echo "starting jambonz apps"
               sudo -u admin bash -c "pm2 restart /home/admin/apps/ecosystem.config.js"
@@ -1117,7 +1095,6 @@ Resources:
               JAMBONES_REDIS_HOST: !GetAtt ElastiCacheCluster.RedisEndpoint.Address
               JAMBONES_CLUSTER_ID: !Ref Prefix
               JAMBONES_SAMPLE_RATE: !Ref StatsSampleRate
-              ENABLE_HOMER: !Ref EnableHomer
               MONITORING_SERVER_IP: !GetAtt MonitoringServerEC2.PrivateIp
               AWS_SNS_TOPIC_ARN: !Ref SbcSipServerSNSTopic
               JAMBONES_TIME_SERIES_HOST: !GetAtt MonitoringServerEC2.PrivateIp
@@ -1648,6 +1625,9 @@ Resources:
                     STATS_TELEGRAF: 1,
                     STATS_SAMPLE_RATE: ${JAMBONES_SAMPLE_RATE},
                     HTTP_PORT:  3000,
+                    HOMER_BASE_URL: 'http://${MONITORING_SERVER_IP}:9080',
+                    HOMER_USERNAME: 'admin',
+                    HOMER_PASSWORD: 'sipcapture',
                     JWT_SECRET: '${JWT_SECRET}'
                     },
                 },

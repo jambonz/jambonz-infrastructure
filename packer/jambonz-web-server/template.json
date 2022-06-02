@@ -4,7 +4,7 @@
     "ssh_username": "admin",
     "ami_description": "jambonz webserver", 
     "instance_type": "t2.xlarge",
-    "jambonz_version": "v0.7.5-rc10",
+    "jambonz_version": "v0.7.5",
     "install_datadog": "no",
     "install_telegraf": "yes"
   },
@@ -94,6 +94,9 @@
     {
       "type": "shell",
       "inline": [
+        "echo iptables-persistent iptables-persistent/autosave_v4 boolean true | sudo debconf-set-selections",
+        "echo iptables-persistent iptables-persistent/autosave_v6 boolean true | sudo debconf-set-selections",
+        "sudo apt-get -y install iptables-persistent",
         "sudo rm -Rf /tmp/*",
         "sudo rm /root/.ssh/authorized_keys",
         "sudo rm /home/admin/.ssh/authorized_keys"

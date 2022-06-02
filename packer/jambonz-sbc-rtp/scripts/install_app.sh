@@ -3,7 +3,7 @@
 cd /home/admin/apps
 cp /tmp/ecosystem.config.js .
 
-cd /home/admin/apps/sbc-rtpengine-sidecar && sudo npm install --unsafe-perm
+cd /home/admin/apps/sbc-rtpengine-sidecar && npm ci --unsafe-perm
 
 sudo npm install -g pino-pretty pm2 pm2-logrotate gulp grunt
 

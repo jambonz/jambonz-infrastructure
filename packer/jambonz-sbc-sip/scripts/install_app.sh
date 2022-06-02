@@ -6,12 +6,12 @@ mkdir apps
 cp /tmp/ecosystem.config.js apps
 cd apps
 
-cd /home/admin/apps/sbc-inbound && sudo npm install --unsafe-perm
-cd /home/admin/apps/sbc-outbound && sudo npm install --unsafe-perm
-cd /home/admin/apps/sbc-registrar && sudo npm install --unsafe-perm
-cd /home/admin/apps/sbc-call-router && sudo npm install --unsafe-perm
-cd /home/admin/apps/sbc-options-handler && sudo npm install --unsafe-perm
-cd /home/admin/apps/jambonz-smpp-esme && sudo npm install --unsafe-perm
+cd /home/admin/apps/sbc-inbound && npm ci --unsafe-perm
+cd /home/admin/apps/sbc-outbound && npm ci --unsafe-perm
+cd /home/admin/apps/sbc-registrar && npm ci --unsafe-perm
+cd /home/admin/apps/sbc-call-router && npm ci --unsafe-perm
+cd /home/admin/apps/sbc-options-handler && npm ci --unsafe-perm
+cd /home/admin/apps/jambonz-smpp-esme && npm ci --unsafe-perm
 
 sudo npm install -g pino-pretty pm2 pm2-logrotate gulp grunt
 

@@ -4,8 +4,8 @@
     "ssh_username": "admin",
     "ami_description": "jambonz SBC SIP", 
     "instance_type": "t2.xlarge",
-    "drachtio_version": "v0.8.16",
-    "jambonz_version": "v0.7.5-rc10",
+    "drachtio_version": "v0.8.17",
+    "jambonz_version": "v0.7.5",
     "install_datadog": "no",
     "datadog_key" : "",
     "install_telegraf": "yes"
@@ -111,11 +111,10 @@
     },
     {
       "type": "shell",
-      "script": "scripts/install_fail2ban.sh"
-    },
-    {
-      "type": "shell",
       "inline": [
+        "echo iptables-persistent iptables-persistent/autosave_v4 boolean true | sudo debconf-set-selections",
+        "echo iptables-persistent iptables-persistent/autosave_v6 boolean true | sudo debconf-set-selections",
+        "sudo apt-get -y install iptables-persistent",
         "sudo rm -Rf /tmp/*",
         "sudo rm /root/.ssh/authorized_keys",
         "sudo rm /home/admin/.ssh/authorized_keys"
