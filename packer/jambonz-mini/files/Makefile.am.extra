@@ -406,7 +406,7 @@ libs/googleapis/gens/google/cloud/dialogflow/v2beta1/session.pb.cc \
 libs/googleapis/gens/google/cloud/dialogflow/v2beta1/webhook.grpc.pb.cc \
 libs/googleapis/gens/google/cloud/dialogflow/v2beta1/webhook.pb.cc
 
-libfreeswitch_libgoogleapis_la_CPPFLAGS = -I/usr/local/include -I$(GOOGLEAPIS_GENS_PATH) -std=c++11  -pthread
+libfreeswitch_libgoogleapis_la_CPPFLAGS = -I/usr/local/include -I$(GOOGLEAPIS_GENS_PATH) -std=c++17  -pthread
 
 CORE_LIBS+=libfreeswitch_libgoogleapis.la
 noinst_LTLIBRARIES += libfreeswitch_libgoogleapis.la

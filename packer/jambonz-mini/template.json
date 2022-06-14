@@ -5,7 +5,7 @@
     "ami_description": "jambonz all-in-one AMI", 
     "instance_type": "t2.xlarge",
     "drachtio_version": "v0.8.17",
-    "jambonz_version": "v0.7.5",
+    "jambonz_version": "v0.7.6-rc1",
     "jambonz_user": "admin",
     "jambonz_password": "JambonzR0ck$",
     "install_telegraf": "yes",
@@ -26,7 +26,7 @@
     "source_ami_filter": {
       "filters": {
         "virtualization-type": "hvm",
-        "name": "debian-10-amd64-*",
+        "name": "debian-11-amd64-*",
         "root-device-type": "ebs"
       },
       "owners": ["136693071363"],
@@ -57,9 +57,11 @@
       "inline": [
         "while [ ! -f /var/lib/cloud/instance/boot-finished ]; do echo 'Waiting for cloud-init...'; sleep 1; done",
         "sudo apt-get update",
+        "sudo apt-get remove --auto-remove nftables",
+        "sudo apt-get purge nftables",
         "sudo apt-get -y install python lsof gcc g++ make cmake build-essential git autoconf automake default-mysql-client redis-tools \\",
         "curl argon2 telnet libtool libtool-bin libssl-dev libcurl4-openssl-dev libz-dev systemd-coredump liblz4-tool \\",
-        "iptables-dev linux-headers-$(uname -r) libavformat-dev liblua5.1-0-dev libavfilter-dev libavcodec-dev libswresample-dev \\",
+        "libxtables-dev libip6tc-dev libip4tc-dev  libiptc-dev linux-headers-$(uname -r) libavformat-dev liblua5.1-0-dev libavfilter-dev libavcodec-dev libswresample-dev \\",
         "libevent-dev libpcap-dev libxmlrpc-core-c3-dev markdown libjson-glib-dev lsb-release \\",
         "libhiredis-dev gperf libspandsp-dev default-libmysqlclient-dev htop dnsutils gdb \\",
         "gnupg2 wget pkg-config ca-certificates libjpeg-dev libsqlite3-dev libpcre3-dev libldns-dev \\",
@@ -68,6 +70,7 @@
         "sudo chmod a+w /usr/local/src",
         "mkdir ~/apps",
         "cd ~/apps",
+        "git config --global advice.detachedHead false",
         "git clone https://github.com/jambonz/sbc-options-handler.git -b {{user `jambonz_version`}}",
         "git clone https://github.com/jambonz/sbc-call-router.git -b {{user `jambonz_version`}}",
         "git clone https://github.com/jambonz/fsw-clear-old-calls.git -b {{user `jambonz_version`}}",
@@ -92,13 +95,13 @@
     },
     {
       "type": "shell",
-      "execute_command": "chmod +x {{ .Path }}; sudo '{{ .Path }}' {{user `drachtio_version`}}",
-      "script": "scripts/install_drachtio.sh"
+      "execute_command": "chmod +x {{ .Path }}; sudo '{{ .Path }}' {{user `rtp_engine_version`}}",
+      "script": "scripts/install_rtpengine.sh"
     },
     {
       "type": "shell",
-      "execute_command": "chmod +x {{ .Path }}; sudo '{{ .Path }}' {{user `rtp_engine_version`}}",
-      "script": "scripts/install_rtpengine.sh"
+      "execute_command": "chmod +x {{ .Path }}; sudo '{{ .Path }}' {{user `drachtio_version`}}",
+      "script": "scripts/install_drachtio.sh"
     },
     {
       "type": "shell",
