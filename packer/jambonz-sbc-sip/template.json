@@ -5,7 +5,7 @@
     "ami_description": "jambonz SBC SIP", 
     "instance_type": "t2.xlarge",
     "drachtio_version": "v0.8.17",
-    "jambonz_version": "v0.7.5",
+    "jambonz_version": "v0.7.6-rc2",
     "install_datadog": "no",
     "datadog_key" : "",
     "install_telegraf": "yes"
@@ -16,7 +16,7 @@
     "source_ami_filter": {
       "filters": {
         "virtualization-type": "hvm",
-        "name": "debian-10-amd64-*",
+        "name": "debian-11-amd64-*",
         "root-device-type": "ebs"
       },
       "owners": ["136693071363"],
@@ -47,9 +47,11 @@
       "inline": [
         "while [ ! -f /var/lib/cloud/instance/boot-finished ]; do echo 'Waiting for cloud-init...'; sleep 1; done",
         "sudo apt-get update",
+        "sudo apt-get remove --auto-remove nftables",
+        "sudo apt-get purge nftables",
         "sudo apt-get -y install python gcc g++ make cmake build-essential git autoconf automake default-mysql-client redis-tools \\",
         "jq curl telnet libtool libtool-bin libssl-dev libcurl4-openssl-dev libz-dev systemd-coredump liblz4-tool \\",
-        "iptables-dev libavformat-dev liblua5.1-0-dev libavfilter-dev libavcodec-dev libswresample-dev \\",
+        "libxtables-dev libip6tc-dev libip4tc-dev  libiptc-dev libavformat-dev liblua5.1-0-dev libavfilter-dev libavcodec-dev libswresample-dev \\",
         "libevent-dev libpcap-dev libxmlrpc-core-c3-dev markdown libjson-glib-dev lsb-release \\",
         "libhiredis-dev gperf libspandsp-dev default-libmysqlclient-dev htop dnsutils gdb libtcmalloc-minimal4 \\",
         "gnupg2 wget pkg-config ca-certificates libjpeg-dev libsqlite3-dev libpcre3-dev libldns-dev \\",
@@ -59,6 +61,7 @@
         "ssh-keyscan github.com >> ~/.ssh/known_hosts",
         "mkdir ~/apps",
         "cd ~/apps",
+        "git config --global advice.detachedHead false",
         "git clone https://github.com/jambonz/sbc-options-handler.git",
         "git clone https://github.com/jambonz/sbc-outbound.git -b {{user `jambonz_version`}}",
         "git clone https://github.com/jambonz/sbc-inbound.git -b {{user `jambonz_version`}}",

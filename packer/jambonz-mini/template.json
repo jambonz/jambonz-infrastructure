@@ -5,7 +5,7 @@
     "ami_description": "jambonz all-in-one AMI", 
     "instance_type": "t2.xlarge",
     "drachtio_version": "v0.8.17",
-    "jambonz_version": "v0.7.6-rc1",
+    "jambonz_version": "v0.7.6-rc2",
     "jambonz_user": "admin",
     "jambonz_password": "JambonzR0ck$",
     "install_telegraf": "yes",
@@ -16,7 +16,7 @@
     "install_jaeger":  "yes",
     "install_nodered":  "no",
     "influxdb_ip":  "127.0.0.1",
-    "rtp_engine_version": "mr10.2.1.5",
+    "rtp_engine_version": "mr10.4.1.4",
     "rtp_engine_min_port": "40000",
     "rtp_engine_max_port": "60000"
   },

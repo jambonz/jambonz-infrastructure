@@ -7,7 +7,7 @@ applications/mod_google_transcribe
 applications/mod_dialogflow
 #applications/mod_abstraction
 #applications/mod_av
-#applications/mod_avmd
+applications/mod_avmd
 #applications/mod_bert
 #applications/mod_blacklist
 #applications/mod_callcenter

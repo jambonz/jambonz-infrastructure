@@ -18,14 +18,14 @@ echo "LWS_VERSION version to install is ${LWS_VERSION}"
 export LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH
 
 cd /tmp
-tar xvfz SpeechSDK-Linux-1.21.0.tar.gz
-cd SpeechSDK-Linux-1.21.0
+tar xvfz SpeechSDK-Linux-1.22.0.tar.gz
+cd SpeechSDK-Linux-1.22.0
 sudo cp -r include /usr/local/include/MicrosoftSpeechSDK
 sudo cp -r lib/ /usr/local/lib/MicrosoftSpeechSDK
 sudo ln -s /usr/local/lib/MicrosoftSpeechSDK/x64/libMicrosoft.CognitiveServices.Speech.core.so /usr/local/lib/libMicrosoft.CognitiveServices.Speech.core.so
 cd
-rm -Rf /tmpSpeechSDK-Linux-1.21.0
-rm -Rf /tmpSpeechSDK-Linux-1.21.0.tar.gz
+rm -Rf /tmpSpeechSDK-Linux-1.22.0
+rm -Rf /tmpSpeechSDK-Linux-1.22.0.tar.gz
 
 git config --global pull.rebase true
 cd /usr/local/src
@@ -133,9 +133,8 @@ sudo cp /usr/local/src/freeswitch/conf/vanilla/autoload_configs/modules.conf.xml
 sudo cp /tmp/freeswitch.service /etc/systemd/system
 sudo chown root:root -R /usr/local/freeswitch
 sudo chmod 644 /etc/systemd/system/freeswitch.service
-sudo sed -i -e "s/global_codec_prefs=OPUS,G722,PCMU,PCMA,H264,VP8/global_codec_prefs=${PREFERRED_CODEC_LIST}/g" /usr/local/freeswitch/conf/vars.xml
-sudo sed -i -e "s/outbound_codec_prefs=OPUS,G722,PCMU,PCMA,H264,VP8/outbound_codec_prefs=${PREFERRED_CODEC_LIST}/g" /usr/local/freeswitch/conf/vars.xml
-sudo sed -i -e "/outbound_codec_prefs=/a  <X-PRE-PROCESS cmd=\"set\" data=\"media_server_name=${MEDIA_SERVER_NAME}\"/>" /usr/local/freeswitch/conf/vars.xml
+sudo sed -i -e 's/global_codec_prefs=OPUS,G722,PCMU,PCMA,H264,VP8/global_codec_prefs=PCMU,PCMA,OPUS,G722/g' /usr/local/freeswitch/conf/vars.xml
+sudo sed -i -e 's/outbound_codec_prefs=OPUS,G722,PCMU,PCMA,H264,VP8/outbound_codec_prefs=PCMU,PCMA,OPUS,G722/g' /usr/local/freeswitch/conf/vars.xml
 sudo systemctl enable freeswitch
 sudo cp /tmp/freeswitch_log_rotation /etc/cron.daily/freeswitch_log_rotation
 sudo chown root:root /etc/cron.daily/freeswitch_log_rotation
