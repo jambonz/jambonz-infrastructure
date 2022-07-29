@@ -66,7 +66,7 @@
         "libhiredis-dev gperf libspandsp-dev default-libmysqlclient-dev htop dnsutils gdb \\",
         "gnupg2 wget pkg-config ca-certificates libjpeg-dev libsqlite3-dev libpcre3-dev libldns-dev \\",
         "libspeex-dev libspeexdsp-dev libedit-dev libtiff-dev yasm libswscale-dev haveged jq fail2ban \\",
-        "libopus-dev libsndfile-dev libshout3-dev libmpg123-dev libmp3lame-dev libopusfile-dev",
+        "libopus-dev libsndfile-dev libshout3-dev libmpg123-dev libmp3lame-dev libopusfile-dev libgoogle-perftools-dev",
         "sudo chmod a+w /usr/local/src",
         "mkdir ~/apps",
         "cd ~/apps",

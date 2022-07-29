@@ -51,7 +51,7 @@
         "curl telnet libtool libtool-bin libssl-dev libcurl4-openssl-dev libz-dev systemd-coredump liblz4-tool \\",
         "libxtables-dev libip6tc-dev libip4tc-dev  libiptc-dev libavformat-dev lsb-release fail2ban \\",
         "nginx python3-certbot-nginx default-libmysqlclient-dev htop dnsutils gdb \\",
-        "gnupg2 wget pkg-config ca-certificates libjpeg-dev libsqlite3-dev libpcre3-dev libldns-dev",
+        "gnupg2 wget pkg-config ca-certificates libjpeg-dev libsqlite3-dev libpcre3-dev libldns-dev libgoogle-perftools-dev",
         "sudo chmod a+w /usr/local/src",
         "ssh-keyscan github.com >> ~/.ssh/known_hosts",
         "mkdir ~/apps",

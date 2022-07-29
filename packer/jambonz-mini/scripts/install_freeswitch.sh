@@ -56,6 +56,23 @@ sudo cp -r /usr/local/src/drachtio-freeswitch-modules/modules/mod_dialogflow /us
 sudo sed -i -r -e 's/(.*AM_CFLAGS\))/\1 -g -O0/g' /usr/local/src/freeswitch/src/mod/applications/mod_audio_fork/Makefile.am
 sudo sed -i -r -e 's/(.*-std=c++11)/\1 -g -O0/g' /usr/local/src/freeswitch/src/mod/applications/mod_audio_fork/Makefile.am
 
+# copy Makefiles into place
+cp /tmp/configure.ac.extra /usr/local/src/freeswitch/configure.ac
+cp /tmp/Makefile.am.extra /usr/local/src/freeswitch/Makefile.am
+cp /tmp/modules.conf.in.extra /usr/local/src/freeswitch/build/modules.conf.in
+cp /tmp/modules.conf.vanilla.xml.extra /usr/local/src/freeswitch/conf/vanilla/autoload_configs/modules.conf.xml
+cp /tmp/avmd.conf.xml /usr/local/src/freeswitch/conf/vanilla/autoload_configs/avmd_conf.xml
+cp /tmp/switch_rtp.c.patch /usr/local/src/freeswitch/src
+cp /tmp/switch_core_media.c.patch /usr/local/src/freeswitch/src
+cp /tmp/mod_avmd.c.patch /usr/local/src/freeswitch/src/mod/applications/mod_avmd
+
+# patch freeswitch
+cd /usr/local/src/freeswitch/src
+patch < switch_rtp.c.patch
+patch < switch_core_media.c.patch
+cd mod/applications/mod_avmd
+patch < mod_avmd.c.patch
+
 # build libwebsockets
 cd /usr/local/src/libwebsockets
 sudo mkdir -p build && cd build && sudo cmake .. -DCMAKE_BUILD_TYPE=RelWithDebInfo && sudo make && sudo make install
@@ -99,19 +116,6 @@ echo "Ref: https://github.com/GoogleCloudPlatform/cpp-samples/issues/113"
 sed -i 's/\$fields/fields/' google/maps/routes/v1/route_service.proto
 sed -i 's/\$fields/fields/' google/maps/routes/v1alpha/route_service.proto
 LANGUAGE=cpp make -j 4
-
-# copy Makefiles into place
-cp /tmp/configure.ac.extra /usr/local/src/freeswitch/configure.ac
-cp /tmp/Makefile.am.extra /usr/local/src/freeswitch/Makefile.am
-cp /tmp/modules.conf.in.extra /usr/local/src/freeswitch/build/modules.conf.in
-cp /tmp/modules.conf.vanilla.xml.extra /usr/local/src/freeswitch/conf/vanilla/autoload_configs/modules.conf.xml
-cp /tmp/switch_rtp.c.patch /usr/local/src/freeswitch/src
-cp /tmp/switch_core_media.c.patch /usr/local/src/freeswitch/src
-
-# patch freeswitch
-cd /usr/local/src/freeswitch/src
-patch < switch_rtp.c.patch
-patch < switch_core_media.c.patch
 
 # build freeswitch
 echo "building freeswitch"
