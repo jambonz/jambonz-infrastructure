@@ -121,7 +121,7 @@ LANGUAGE=cpp make -j 4
 echo "building freeswitch"
 cd /usr/local/src/freeswitch
 sudo ./bootstrap.sh -j
-sudo ./configure --with-lws=yes --with-extra=yes
+sudo ./configure --enable-tcmalloc=yes --with-lws=yes --with-extra=yes
 sudo make -j 4
 sudo make install
 sudo make cd-sounds-install cd-moh-install
