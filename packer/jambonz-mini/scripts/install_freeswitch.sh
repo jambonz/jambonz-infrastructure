@@ -6,7 +6,7 @@ GRPC_VERSION=c66d2cc
 GOOGLE_API_VERSION=e9da6f8b469c52b83f900e820be30762e9e05c57
 AWS_SDK_VERSION=1.8.129
 LWS_VERSION=v3.2.3
-MODULES_VERSION=v0.5.12
+MODULES_VERSION=v0.5.16
 
 echo "freeswitch version to install is ${FREESWITCH_VERSION}"
 echo "drachtio modules version to install is ${MODULES_VERSION}"
@@ -18,14 +18,14 @@ echo "LWS_VERSION version to install is ${LWS_VERSION}"
 export LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH
 
 cd /tmp
-tar xvfz SpeechSDK-Linux-1.22.0.tar.gz
-cd SpeechSDK-Linux-1.22.0
+tar xvfz SpeechSDK-Linux-1.23.0.tar.gz
+cd SpeechSDK-Linux-1.23.0
 sudo cp -r include /usr/local/include/MicrosoftSpeechSDK
 sudo cp -r lib/ /usr/local/lib/MicrosoftSpeechSDK
 sudo ln -s /usr/local/lib/MicrosoftSpeechSDK/x64/libMicrosoft.CognitiveServices.Speech.core.so /usr/local/lib/libMicrosoft.CognitiveServices.Speech.core.so
 cd
-rm -Rf /tmpSpeechSDK-Linux-1.22.0
-rm -Rf /tmpSpeechSDK-Linux-1.22.0.tar.gz
+rm -Rf /tmp/SpeechSDK-Linux-1.23.0
+rm -Rf /tmp/SpeechSDK-Linux-1.23.0.tar.gz
 
 git config --global pull.rebase true
 cd /usr/local/src
