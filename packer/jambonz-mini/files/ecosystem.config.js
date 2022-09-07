@@ -270,6 +270,7 @@ module.exports = {
       OTEL_EXPORTER_JAEGER_AGENT_HOST: '127.0.0.1',
       OTEL_TRACES_SAMPLER: 'parentbased_traceidratio',
       OTEL_TRACES_SAMPLER_ARG: 1.0,
+      VMD_HINTS_FILE: '/home/admin/apps/jambonz-feature-server/data/example-voicemail-greetings.json',
       ENABLE_METRICS: 1,
       STATS_HOST: '127.0.0.1',
       STATS_PORT: 8125,
