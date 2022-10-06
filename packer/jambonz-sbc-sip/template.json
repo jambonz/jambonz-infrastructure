@@ -82,7 +82,7 @@
     },
     {
       "type": "shell",
-      "script": "scripts/install_chrony.sh"
+      "script": "scripts/install_os_tuning.sh"
     },
     {
       "type": "shell",

@@ -70,6 +70,10 @@
     },
     {
       "type": "shell",
+      "script": "scripts/install_os_tuning.sh"
+    },
+    {
+      "type": "shell",
       "script": "scripts/install_nginx.sh"
     },
     {
