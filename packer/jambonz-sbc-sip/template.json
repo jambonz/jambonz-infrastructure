@@ -5,7 +5,7 @@
     "ami_description": "jambonz SBC SIP", 
     "instance_type": "t2.xlarge",
     "drachtio_version": "v0.8.18",
-    "jambonz_version": "v0.7.6",
+    "jambonz_version": "v0.7.7",
     "install_datadog": "no",
     "datadog_key" : "",
     "install_telegraf": "yes"
@@ -62,12 +62,11 @@
         "mkdir ~/apps",
         "cd ~/apps",
         "git config --global advice.detachedHead false",
-        "git clone https://github.com/jambonz/sbc-options-handler.git",
+        "git clone https://github.com/jambonz/sbc-sip-sidecar.git -b {{user `jambonz_version`}}",
         "git clone https://github.com/jambonz/sbc-outbound.git -b {{user `jambonz_version`}}",
         "git clone https://github.com/jambonz/sbc-inbound.git -b {{user `jambonz_version`}}",
-        "git clone https://github.com/jambonz/sbc-registrar.git -b {{user `jambonz_version`}}",
         "git clone https://github.com/jambonz/jambonz-smpp-esme.git -b {{user `jambonz_version`}}",
-        "git clone https://github.com/jambonz/sbc-call-router.git"
+        "git clone https://github.com/jambonz/sbc-call-router.git  -b {{user `jambonz_version`}}"
       ]
     },
     {

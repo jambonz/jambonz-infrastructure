@@ -5,7 +5,7 @@
     "ami_description": "jambonz feature server",
     "instance_type": "t2.xlarge",
     "drachtio_version": "v0.8.18",
-    "jambonz_version": "v0.7.6",
+    "jambonz_version": "v0.7.7",
     "install_telegraf": "yes",
     "install_datadog": "no",
     "datadog_key" : "",

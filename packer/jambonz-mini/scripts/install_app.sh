@@ -14,15 +14,13 @@ echo "building jambonz-api-server.."
 cd /home/admin/apps/jambonz-api-server && npm ci --unsafe-perm
 echo "building jambonz-webapp.."
 cd /home/admin/apps/jambonz-webapp && npm ci --unsafe-perm && npm run build
-echo "building sbc-options-handler.."
-cd /home/admin/apps/sbc-options-handler && npm ci --unsafe-perm
+echo "building sbc-sip-sidecar.."
+cd /home/admin/apps/sbc-sip-sidecar && npm ci --unsafe-perm
 echo "building sbc-inbound.."
 cd /home/admin/apps/sbc-inbound  && npm ci --unsafe-perm 
 echo "building sbc-outbound.."
 cd /home/admin/apps/sbc-outbound && npm ci --unsafe-perm 
 echo "building sbc-registrar.."
-cd /home/admin/apps/sbc-registrar && npm ci --unsafe-perm 
-echo "building sbc-call-router.."
 cd /home/admin/apps/sbc-call-router  && npm ci --unsafe-perm 
 echo "building jambonz-smpp-esme.."
 cd /home/admin/apps/jambonz-smpp-esme && npm ci --unsafe-perm

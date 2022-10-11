@@ -2,15 +2,14 @@
 VERSION=$1
 
 cd /home/admin
-mkdir apps
+mkdir -p apps
 cp /tmp/ecosystem.config.js apps
 cd apps
 
 cd /home/admin/apps/sbc-inbound && npm ci --unsafe-perm
 cd /home/admin/apps/sbc-outbound && npm ci --unsafe-perm
-cd /home/admin/apps/sbc-registrar && npm ci --unsafe-perm
 cd /home/admin/apps/sbc-call-router && npm ci --unsafe-perm
-cd /home/admin/apps/sbc-options-handler && npm ci --unsafe-perm
+cd /home/admin/apps/sbc-sip-sidecar && npm ci --unsafe-perm
 cd /home/admin/apps/jambonz-smpp-esme && npm ci --unsafe-perm
 
 sudo npm install -g pino-pretty pm2 pm2-logrotate gulp grunt
