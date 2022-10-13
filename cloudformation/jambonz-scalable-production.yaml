@@ -896,12 +896,12 @@ Resources:
                   }
                 },                  
                 {
-                  name: 'sbc-options-handler',
-                  cwd: '/home/admin/apps/sbc-options-handler',
+                  name: 'sbc-sip-sidecar',
+                  cwd: '/home/admin/apps/sbc-sip-sidecar',
                   script: 'app.js',
                   instance_var: 'INSTANCE_ID',
-                  out_file: '/home/admin/.pm2/logs/jambonz-sbc-options-handler.log',
-                  err_file: '/home/admin/.pm2/logs/jambonz-sbc-options-handler.log',
+                  out_file: '/home/admin/.pm2/logs/sbc-sip-sidecar.log',
+                  err_file: '/home/admin/.pm2/logs/sbc-sip-sidecar.log',
                   exec_mode: 'fork',
                   instances: 1,
                   autorestart: true,
@@ -950,41 +950,6 @@ Resources:
                     STATS_TELEGRAF: 1,
                     STATS_SAMPLE_RATE: ${JAMBONES_SAMPLE_RATE},
                     JAMBONES_NETWORK_CIDR: '${VPC_CIDR}'
-                  }
-                },
-                {
-                  name: 'sbc-registrar',
-                  cwd: '/home/admin/apps/sbc-registrar',
-                  script: 'app.js',
-                  instance_var: 'INSTANCE_ID',
-                  out_file: '/home/admin/.pm2/logs/jambonz-sbc-registrar.log',
-                  err_file: '/home/admin/.pm2/logs/jambonz-sbc-registrar.log',
-                  exec_mode: 'fork',
-                  instances: 1,
-                  autorestart: true,
-                  watch: false,
-                  max_memory_restart: '1G',
-                  env: {
-                    NODE_ENV: 'production',
-                    JAMBONES_LOGLEVEL: 'info',
-                    RTPENGINE_PING_INTERVAL: 30000,
-                    DRACHTIO_HOST: '127.0.0.1',
-                    DRACHTIO_PORT: 9022,
-                    DRACHTIO_SECRET: 'cymru',
-                    JAMBONES_MYSQL_HOST: '${JAMBONES_MYSQL_HOST}',
-                    JAMBONES_MYSQL_USER: '${JAMBONES_MYSQL_USER}',
-                    JAMBONES_MYSQL_PASSWORD: '${JAMBONES_MYSQL_PASSWORD}',
-                    JAMBONES_MYSQL_DATABASE: 'jambones',
-                    JAMBONES_MYSQL_CONNECTION_LIMIT: 10,
-                    JAMBONES_REDIS_HOST: '${JAMBONES_REDIS_HOST}',
-                    JAMBONES_REDIS_PORT: 6379,
-                    JAMBONES_TIME_SERIES_HOST: '${JAMBONES_TIME_SERIES_HOST}',
-                    ENABLE_METRICS: 1,
-                    STATS_HOST: '127.0.0.1',
-                    STATS_PORT: 8125,
-                    STATS_PROTOCOL: 'tcp',
-                    STATS_SAMPLE_RATE: ${JAMBONES_SAMPLE_RATE},
-                    STATS_TELEGRAF: 1
                   }
                 },
                 {
