@@ -72,9 +72,7 @@ Conditions:
 Mappings:
   AWSRegion2AMI:
     us-east-1:
-      Ami: ami-058b3b998f9aaf904
-    us-east-2:
-      Ami: ami-0a90fc3be9dbc3e92
+      Ami: ami-0882648e532b4f890
 Resources:
   VPC:
     Type: 'AWS::EC2::VPC'

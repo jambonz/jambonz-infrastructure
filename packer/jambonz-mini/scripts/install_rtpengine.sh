@@ -16,7 +16,7 @@ sudo mkdir -p build && cd build && sudo cmake .. -DCMAKE_BUILD_TYPE=RelWithDebIn
 cd /usr/local/src
 git clone https://github.com/sipwise/rtpengine.git -b ${VERSION}
 cd rtpengine
-make with_transcoding=yes with_iptables_option=yes with-kernel
+make -j 4  with_transcoding=yes with_iptables_option=yes with-kernel
 
 # copy iptables extension into place
 cp ./iptables-extension/libxt_RTPENGINE.so `pkg-config xtables --variable=xtlibdir`

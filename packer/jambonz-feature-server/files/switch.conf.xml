@@ -62,7 +62,7 @@
     <!--Most channels to create per second -->
     <param name="sessions-per-second" value="50"/>
     <!-- Default Global Log Level - value is one of debug,info,notice,warning,err,crit,alert -->
-    <param name="loglevel" value="info"/>
+    <param name="loglevel" value="notice"/>
 
     <!-- Set the core DEBUG level (0-10) -->
     <!-- <param name="debug-level" value="10"/> -->
@@ -182,4 +182,3 @@
   </settings>
 
 </configuration>
-

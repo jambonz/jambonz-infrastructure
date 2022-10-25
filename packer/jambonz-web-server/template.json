@@ -3,8 +3,8 @@
     "region": "us-east-1",
     "ssh_username": "admin",
     "ami_description": "jambonz webserver", 
-    "instance_type": "t2.xlarge",
-    "jambonz_version": "v0.7.7",
+    "instance_type": "t3.xlarge",
+    "jambonz_version": "v0.7.7-6",
     "install_datadog": "no",
     "install_telegraf": "yes"
   },
