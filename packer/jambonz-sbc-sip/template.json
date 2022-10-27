@@ -5,7 +5,7 @@
     "ami_description": "jambonz SBC SIP", 
     "instance_type": "t3.xlarge",
     "drachtio_version": "v0.8.18",
-    "jambonz_version": "v0.7.7-6",
+    "jambonz_version": "v0.7.7-7",
     "install_datadog": "no",
     "datadog_key" : "",
     "install_telegraf": "yes"
