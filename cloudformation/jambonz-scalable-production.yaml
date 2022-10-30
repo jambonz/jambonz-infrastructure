@@ -433,12 +433,12 @@ Resources:
       SecurityGroupIngress:
         - IpProtocol: tcp
           FromPort: 3000
-          ToPort: 3000
+          ToPort: 3009
           CidrIp: !Ref VpcCIDR
           Description: Allow HTTP from sbc/api server
         - IpProtocol: tcp
-          FromPort: 3001
-          ToPort: 3001
+          FromPort: 3010
+          ToPort: 3019
           CidrIp:   !Ref AllowedHttpCidr
           Description: Allow http access from AWS SNS
         - IpProtocol: tcp
@@ -504,6 +504,16 @@ Resources:
       VpcId: !Ref VPC
       SecurityGroupIngress:
         - IpProtocol: tcp
+          FromPort: 3000
+          ToPort: 3009
+          CidrIp: !Ref VpcCIDR
+          Description: Allow HTTP from sbc/api server
+        - IpProtocol: tcp
+          FromPort: 3010
+          ToPort: 3019
+          CidrIp:   !Ref AllowedHttpCidr
+          Description: Allow http access from AWS SNS
+        - IpProtocol: tcp
           FromPort: 5060
           ToPort: 5060
           CidrIp:  !Ref VpcCIDR
@@ -568,11 +578,6 @@ Resources:
           ToPort: 9090
           CidrIp:  !Ref VpcCIDR
           Description: Allow access to prometheus scrape port from VPC
-        - IpProtocol: tcp
-          FromPort: 3001
-          ToPort: 3001
-          CidrIp:   '0.0.0.0/0'
-          Description: Allow http access from AWS SNS
         - IpProtocol: udp
           FromPort: 22224
           ToPort: 22225
