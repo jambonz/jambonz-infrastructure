@@ -4,8 +4,20 @@ A [packer](https://www.packer.io/) template to build an AMI containing everythin
 
 ## Installing 
 
+To build an amd64 image:
+
 ```
 $  packer build -color=false template.json
+```
+
+To build an arm64 image:
+
+```
+$  packer build -color=false \
+--var="ami_base_image_arch=arm64" \
+--var="ami_base_image_owner=903794441882" \
+--var="instance_type=t4g.xlarge" \
+template.json
 ```
 
 ### variables
