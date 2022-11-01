@@ -53,18 +53,29 @@ Parameters:
       - c6g.2xlarge
       - c6g.metal    
   InstanceTypeWebserver:
-    Description: "the EC2 instance type to use for webServer (arm64)"
+    Description: "the EC2 instance type to use for webServer (amd64)"
     Type: String
     Default: c6gn.large
     AllowedValues:
-      - c6gn.large
-      - c6gn.xlarge
-      - c6gn.2xlarge
-      - c6g.large
-      - c6g.xlarge
-      - c6g.2xlarge
-      - c6g.metal    
-  InstanceTypeMonitoringServer:
+      - t2.small
+      - t2.medium
+      - t2.large
+      - t2.xlarge
+      - t3.small
+      - t3.medium
+      - t3.large
+      - t3.xlarge
+      - t3a.small
+      - t3a.medium
+      - t3a.large
+      - t3a.xlarge
+      - c5.large
+      - c5.xlarge
+      - c5.2xlarge
+      - c5n.large
+      - c5n.xlarge
+      - c5n.2xlarge
+      - c5n.metal      InstanceTypeMonitoringServer:
     Description: "the EC2 instance type for the monitoring server (amd64)"
     Type: String
     Default: t2.small
