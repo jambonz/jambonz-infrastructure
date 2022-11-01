@@ -5,7 +5,7 @@
     "ami_description": "jambonz feature server",
     "instance_type": "t3.xlarge",
     "drachtio_version": "v0.8.18",
-    "jambonz_version": "v0.7.7-7",
+    "jambonz_version": "v0.7.7-9",
     "ami_base_image_arch": "amd64",
     "ami_base_image_owner": "136693071363",
     "install_telegraf": "yes",
@@ -101,6 +101,7 @@
     {
       "type": "shell",
       "environment_vars": [
+        "ARCH={{user `ami_base_image_arch`}}",
         "MEDIA_SERVER_NAME={{user `mediaserver_name`}}",
         "PREFERRED_CODEC_LIST={{user `preferred_codec_list`}}"
       ],

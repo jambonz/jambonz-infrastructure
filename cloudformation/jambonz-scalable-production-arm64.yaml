@@ -3,12 +3,12 @@ AWSTemplateFormatVersion: "2010-09-09"
 
 Mappings:
   AWSRegion2AMI:
-    us-east-1:
+    us-west-2:
       SbcSipAmi: ami-0d5d64b630b94e10b
-      SbcRtpAmi: ami-00d07f1a65fac121e
-      FsAmi: ami-0dd1b09d6d1d87715
-      WebserverAmi: ami-00b79f2518729a7d2
-      MonitoringServerAmi: ami-093dc7cfc55972dcc
+      SbcRtpAmi: ami-0c25ad87327d17f00
+      FsAmi: ami-01953dc444a7be6b6
+      WebserverAmi: ami-07c2c6351d018b7b8
+      MonitoringServerAmi: ami-0a403e2e1b083d869
 
 Parameters:
   KeyName:
@@ -16,103 +16,56 @@ Parameters:
     Type: "AWS::EC2::KeyPair::KeyName"
 
   InstanceTypeSbcSip:
-    Description: "the EC2 instance type for the SBC SIP server"
+    Description: "the EC2 instance type for the SBC SIP server (arm64)"
     Type: String
-    Default: t2.small
+    Default: c6gn.xlarge
     AllowedValues:
-      - t2.small
-      - t2.medium
-      - t2.large
-      - t2.xlarge
-      - t3.small
-      - t3.medium
-      - t3.large
-      - t3.xlarge
-      - t3a.small
-      - t3a.medium
-      - t3a.large
-      - t3a.xlarge
-      - c5.large
-      - c5.xlarge
-      - c5.2xlarge
-      - c5n.large
-      - c5n.xlarge
-      - c5n.2xlarge
-      - c5n.metal    
+      - c6gn.large
+      - c6gn.xlarge
+      - c6gn.2xlarge
+      - c6g.large
+      - c6g.xlarge
+      - c6g.2xlarge
+      - c6g.metal    
   InstanceTypeSbcRtp:
-    Description: "the EC2 instance type to use for the SBC Media server"
+    Description: "the EC2 instance type to use for the SBC Media server (arm64)"
     Type: String
-    Default: t2.small
+    Default: c6gn.xlarge
     AllowedValues:
-      - t2.small
-      - t2.medium
-      - t2.large
-      - t2.xlarge
-      - t3.small
-      - t3.medium
-      - t3.large
-      - t3.xlarge
-      - t3a.small
-      - t3a.medium
-      - t3a.large
-      - t3a.xlarge
-      - c5.large
-      - c5.xlarge
-      - c5.2xlarge
-      - c5n.large
-      - c5n.xlarge
-      - c5n.2xlarge
-      - c5n.metal    
+      - c6gn.large
+      - c6gn.xlarge
+      - c6gn.2xlarge
+      - c6g.large
+      - c6g.xlarge
+      - c6g.2xlarge
+      - c6g.metal    
+
   InstanceTypeFeatureServer:
-    Description: "the EC2 instance type to use for the Feature Server"
+    Description: "the EC2 instance type to use for the Feature Server (arm64)"
     Type: String
-    Default: t2.small
+    Default: c6gn.xlarge
     AllowedValues:
-      - t2.small
-      - t2.medium
-      - t2.large
-      - t2.xlarge
-      - t3.small
-      - t3.medium
-      - t3.large
-      - t3.xlarge
-      - t3a.small
-      - t3a.medium
-      - t3a.large
-      - t3a.xlarge
-      - c5.large
-      - c5.xlarge
-      - c5.2xlarge
-      - c5n.large
-      - c5n.xlarge
-      - c5n.2xlarge
-      - c5n.metal    
+      - c6gn.large
+      - c6gn.xlarge
+      - c6gn.2xlarge
+      - c6g.large
+      - c6g.xlarge
+      - c6g.2xlarge
+      - c6g.metal    
   InstanceTypeWebserver:
-    Description: "the EC2 instance type to use for webServer"
+    Description: "the EC2 instance type to use for webServer (arm64)"
     Type: String
-    Default: t2.small
+    Default: c6gn.large
     AllowedValues:
-      - t2.small
-      - t2.medium
-      - t2.large
-      - t2.xlarge
-      - t3.small
-      - t3.medium
-      - t3.large
-      - t3.xlarge
-      - t3a.small
-      - t3a.medium
-      - t3a.large
-      - t3a.xlarge
-      - c5.large
-      - c5.xlarge
-      - c5.2xlarge
-      - c5n.large
-      - c5n.xlarge
-      - c5n.2xlarge
-      - c5n.metal    
+      - c6gn.large
+      - c6gn.xlarge
+      - c6gn.2xlarge
+      - c6g.large
+      - c6g.xlarge
+      - c6g.2xlarge
+      - c6g.metal    
   InstanceTypeMonitoringServer:
-    Description: "the EC2 instance type for the monitoring server"
+    Description: "the EC2 instance type for the monitoring server (amd64)"
     Type: String
     Default: t2.small
     AllowedValues:
@@ -197,6 +150,7 @@ Parameters:
     Type: String
     AllowedPattern: \d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\/\d{1,2}
     ConstraintDescription: must be a valid network CIDR
+    Default: 0.0.0.0/0
   AllowedHttpCidr:
     Description: Please set CIDR to x.x.x.x/32 to allow one specific IP address http(s) access, 0.0.0.0/0 to allow all IP addresses access, or another CIDR range.
     Type: String

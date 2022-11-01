@@ -4,7 +4,7 @@
     "ssh_username": "admin",
     "ami_description": "jambonz monitoring server", 
     "instance_type": "t2.xlarge",
-    "jambonz_version": "v0.7.7-7",
+    "jambonz_version": "v0.7.7-9",
     "homer_user": "homer_user",
     "homer_password": "XcapJTqy11LnsYRtxXGPTYQkAnI",
     "install_influxdb":  "yes",
@@ -28,7 +28,7 @@
     },
     "instance_type": "{{user `instance_type`}}",
     "ssh_username": "{{user `ssh_username`}}",
-    "ami_name": "jambonz-monitoring-server-{{user `jambonz_version`}}-{{isotime |clean_resource_name }}",
+    "ami_name": "jambonz-monitoring-server-{{user `jambonz_version`}}-amd64-{{isotime |clean_resource_name }}",
     "ami_description": "{{user `ami_description`}}",
     "launch_block_device_mappings": [
       {

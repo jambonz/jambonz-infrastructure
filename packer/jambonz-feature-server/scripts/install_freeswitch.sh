@@ -6,7 +6,7 @@ GRPC_VERSION=c66d2cc
 GOOGLE_API_VERSION=e9da6f8b469c52b83f900e820be30762e9e05c57
 AWS_SDK_VERSION=1.8.129
 LWS_VERSION=v3.2.3
-MODULES_VERSION=v0.5.18
+MODULES_VERSION=v0.6.0
 
 echo "freeswitch version to install is ${FREESWITCH_VERSION}"
 echo "drachtio modules version to install is ${MODULES_VERSION}"
@@ -22,10 +22,15 @@ tar xvfz SpeechSDK-Linux-1.24.0.tar.gz
 cd SpeechSDK-Linux-1.24.0
 sudo cp -r include /usr/local/include/MicrosoftSpeechSDK
 sudo cp -r lib/ /usr/local/lib/MicrosoftSpeechSDK
-sudo ln -s /usr/local/lib/MicrosoftSpeechSDK/x64/libMicrosoft.CognitiveServices.Speech.core.so /usr/local/lib/libMicrosoft.CognitiveServices.Speech.core.so
-cd
+if [ "$ARCH" == "arm64" ]; then
+  echo installing Microsoft arm64 libs...
+  sudo cp /usr/local/lib/MicrosoftSpeechSDK/arm64/libMicrosoft.*.so /usr/local/lib/
+fi 
+if [ "$ARCH" == "amd64" ]; then
+  echo installing Microsoft x64 libs...
+  sudo cp /usr/local/lib/MicrosoftSpeechSDK/x64/libMicrosoft.*.so /usr/local/lib/
+fi
 rm -Rf /tmp/SpeechSDK-Linux-1.24.0
-rm -Rf /tmp/SpeechSDK-Linux-1.24.0.tar.gz
 
 git config --global pull.rebase true
 cd /usr/local/src
@@ -36,7 +41,7 @@ git clone https://github.com/grpc/grpc -b master
 cd grpc && git checkout ${GRPC_VERSION} && cd ..
 
 cd freeswitch/libs
-
+git clone https://github.com/drachtio/nuance-asr-grpc-api.git -b main
 git clone https://github.com/freeswitch/spandsp.git -b master
 git clone https://github.com/freeswitch/sofia-sip.git -b master
 git clone https://github.com/dpirch/libfvad.git
@@ -50,6 +55,7 @@ sudo cp -r /usr/local/src/drachtio-freeswitch-modules/modules/mod_aws_transcribe
 sudo cp -r /usr/local/src/drachtio-freeswitch-modules/modules/mod_azure_transcribe /usr/local/src/freeswitch/src/mod/applications/mod_azure_transcribe
 sudo cp -r /usr/local/src/drachtio-freeswitch-modules/modules/mod_aws_lex /usr/local/src/freeswitch/src/mod/applications/mod_aws_lex
 sudo cp -r /usr/local/src/drachtio-freeswitch-modules/modules/mod_google_transcribe /usr/local/src/freeswitch/src/mod/applications/mod_google_transcribe
+sudo cp -r /usr/local/src/drachtio-freeswitch-modules/modules/mod_nuance_transcribe /usr/local/src/freeswitch/src/mod/applications/mod_nuance_transcribe
 sudo cp -r /usr/local/src/drachtio-freeswitch-modules/modules/mod_google_tts /usr/local/src/freeswitch/src/mod/applications/mod_google_tts
 sudo cp -r /usr/local/src/drachtio-freeswitch-modules/modules/mod_dialogflow /usr/local/src/freeswitch/src/mod/applications/mod_dialogflow
  
@@ -116,6 +122,11 @@ echo "Ref: https://github.com/GoogleCloudPlatform/cpp-samples/issues/113"
 sed -i 's/\$fields/fields/' google/maps/routes/v1/route_service.proto
 sed -i 's/\$fields/fields/' google/maps/routes/v1alpha/route_service.proto
 LANGUAGE=cpp make -j 4
+
+# build nuance protobufs
+echo "building protobuf stubs for Nuance asr"
+cd /usr/local/src/freeswitch/libs/nuance-asr-grpc-api
+LANGUAGE=cpp make 
 
 # build freeswitch
 echo "building freeswitch"
