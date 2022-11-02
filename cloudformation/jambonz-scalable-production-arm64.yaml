@@ -4,11 +4,11 @@ AWSTemplateFormatVersion: "2010-09-09"
 Mappings:
   AWSRegion2AMI:
     us-west-2:
-      SbcSipAmi: ami-0b3c491b912e285a8
-      SbcRtpAmi: ami-0cc52a925157737b5
-      FsAmi: ami-01cb71bf0b624bb75
-      WebserverAmi: ami-06cd8ec798c6264eb
-      MonitoringServerAmi: ami-00712f4c846e57045
+      SbcSipAmi: ami-0f00e10205cd87d2b
+      SbcRtpAmi: ami-0c7f63b2b2a4c706a
+      FsAmi: ami-066e962a323f09933
+      WebserverAmi: ami-03d4ac2a96f891cd0
+      MonitoringServerAmi: ami-06c91848cd4a787a9
 
 Parameters:
   KeyName:
@@ -219,7 +219,14 @@ Parameters:
   StatsSampleRate: 
     Type: Number
     Description: sampling rate for metrics, a number between 0 and 1 inclusive
-    Default: 1
+    Default: 1.0
+    MinValue: 0.0
+    MaxValue: 1.0
+  MysqlDataCachingTtl: 
+    Type: Number
+    Description: number of seconds to cache mysql query results locally (0=no caching)
+    Default: 0
+    MinValue: 0
   EnableTracing: 
     Type: Number
     Description: enable opentelemetry application tracing?
@@ -796,7 +803,7 @@ Resources:
           Action: ['sts:AssumeRole']
       ManagedPolicyArns:
         - arn:aws:iam::aws:policy/AmazonSNSFullAccess
-        - arn:aws:iam::aws:policy/AutoScalingReadOnlyAccess
+        - arn:aws:iam::aws:policy/AutoScalingFullAccess
         - arn:aws:iam::aws:policy/AmazonEC2FullAccess
 
   # --- SIP server EC2 Role Instance profile
@@ -856,6 +863,7 @@ Resources:
                     JAMBONES_LOGLEVEL: 'info',
                     JAMBONES_CLUSTER_ID: '${JAMBONES_CLUSTER_ID}',
                     AVOID_UDH: true,
+                    JAMBONES_MYSQL_REFRESH_TTL: ${JAMBONES_MYSQL_REFRESH_TTL},
                     JAMBONES_MYSQL_HOST: '${JAMBONES_MYSQL_HOST}',
                     JAMBONES_MYSQL_USER: '${JAMBONES_MYSQL_USER}',
                     JAMBONES_MYSQL_PASSWORD: '${JAMBONES_MYSQL_PASSWORD}',
@@ -880,6 +888,7 @@ Resources:
                   max_memory_restart: '1G',
                   env: {
                     NODE_ENV: 'production',
+                    JAMBONES_MYSQL_REFRESH_TTL: ${JAMBONES_MYSQL_REFRESH_TTL},
                     JAMBONES_CLUSTER_ID: '${JAMBONES_CLUSTER_ID}',
                     JAMBONES_LOGLEVEL: 'info',
                     DRACHTIO_HOST: '127.0.0.1',
@@ -944,7 +953,7 @@ Resources:
                   max_memory_restart: '1G',
                   env: {
                     NODE_ENV: 'production',
-                    JAMBONES_MYSQL_REFRESH_TTL: 30,
+                    JAMBONES_MYSQL_REFRESH_TTL: ${JAMBONES_MYSQL_REFRESH_TTL},
                     JAMBONES_LOGLEVEL: 'info',
                     JAMBONES_NETWORK_CIDR: '${VPC_CIDR}',
                     MIN_CALL_LIMIT: 9999,
@@ -983,7 +992,7 @@ Resources:
                   max_memory_restart: '1G',
                   env: {
                     NODE_ENV: 'production',
-                    JAMBONES_MYSQL_REFRESH_TTL: 30,
+                    JAMBONES_MYSQL_REFRESH_TTL: ${JAMBONES_MYSQL_REFRESH_TTL},
                     JAMBONES_NETWORK_CIDR: '${VPC_CIDR}',
                     JAMBONES_LOGLEVEL: 'info',
                     AWS_REGION: '${AWS_REGION}',
@@ -1046,6 +1055,7 @@ Resources:
               MONITORING_SERVER_IP: !GetAtt MonitoringServerEC2.PrivateIp
               AWS_SNS_TOPIC_ARN: !Ref SbcSipServerSNSTopic
               JAMBONES_TIME_SERIES_HOST: !GetAtt MonitoringServerEC2.PrivateIp
+              JAMBONES_MYSQL_REFRESH_TTL: !Ref MysqlDataCachingTtl
   SbcSipServerPlacementGroup:
     Type: AWS::EC2::PlacementGroup
     Properties:
@@ -1123,7 +1133,7 @@ Resources:
           Action: ['sts:AssumeRole']
       ManagedPolicyArns:
         - arn:aws:iam::aws:policy/AmazonSNSFullAccess
-        - arn:aws:iam::aws:policy/AutoScalingReadOnlyAccess
+        - arn:aws:iam::aws:policy/AutoScalingFullAccess
 
   # --- Feature server EC2 Role Instance profile
   FeatureServerInstanceProfile:
@@ -1172,7 +1182,7 @@ Resources:
                   max_memory_restart: '1G',
                   env: {
                     NODE_ENV: 'production',
-                    JAMBONES_MYSQL_REFRESH_TTL: 30,
+                    JAMBONES_MYSQL_REFRESH_TTL: ${JAMBONES_MYSQL_REFRESH_TTL},
                     ENABLE_METRICS: 1,
                     STATS_HOST: '127.0.0.1',
                     STATS_PORT: 8125,
@@ -1234,6 +1244,7 @@ Resources:
               MONITORING_SERVER_IP: !GetAtt MonitoringServerEC2.PrivateIp
               JAMBONES_TIME_SERIES_HOST: !GetAtt MonitoringServerEC2.PrivateIp
               JWT_SECRET: !Ref EncryptionSecret
+              JAMBONES_MYSQL_REFRESH_TTL: !Ref MysqlDataCachingTtl
 
   FeatureServerPlacementGroup:
     Type: AWS::EC2::PlacementGroup
@@ -1308,7 +1319,7 @@ Resources:
           Action: ['sts:AssumeRole']
       ManagedPolicyArns:
         - arn:aws:iam::aws:policy/AmazonSNSFullAccess
-        - arn:aws:iam::aws:policy/AutoScalingReadOnlyAccess
+        - arn:aws:iam::aws:policy/AutoScalingFullAccess
 
   # --- Feature server EC2 Role Instance profile
   SbcRTPServerInstanceProfile:
@@ -1483,7 +1494,7 @@ Resources:
           Action: ['sts:AssumeRole']
       ManagedPolicyArns:
         - arn:aws:iam::aws:policy/AmazonEC2FullAccess
-        - arn:aws:iam::aws:policy/AutoScalingReadOnlyAccess
+        - arn:aws:iam::aws:policy/AutoScalingFullAccess
 
   # --- Webserver EC2 Role Instance profile
   WebServerInstanceProfile:
@@ -1611,6 +1622,10 @@ Resources:
               EOF
             
               echo "finished writing config file"
+
+              echo "building jambonz-api-server"
+              sudo -u admin bash -c "cd /home/admin/apps/jambonz-api-server && npm ci"
+              echo "finish building jambonz-api-server"
             
               sudo -u admin bash -c "pm2 start /home/admin/apps/ecosystem.config.js"
               sudo env PATH=$PATH:/usr/bin /usr/lib/node_modules/pm2/bin/pm2 startup systemd -u admin --hp /home/admin

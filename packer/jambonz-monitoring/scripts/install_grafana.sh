@@ -10,7 +10,7 @@ sudo mv /tmp/grafana-dashboard-default.yaml /etc/grafana/provisioning/dashboards
 sudo mv /tmp/grafana-datasource.yml /etc/grafana/provisioning/datasources/datasource.yml
 
 sudo mv /tmp/grafana-dashboard-heplify.json /var/lib/grafana/dashboards
-sudo mv /tmp/grafana-dashboard-jambonz.json /var/lib/grafana/dashboards
+sudo mv /tmp/grafana-dashboard-jambonz-cluster.json /var/lib/grafana/dashboards/grafana-dashboard-jambonz.json
 sudo mv /tmp/grafana-dashboard-servers.json /var/lib/grafana/dashboards
 
 sudo chown -R grafana:grafana /var/lib/grafana/dashboards
