@@ -4,11 +4,11 @@ AWSTemplateFormatVersion: "2010-09-09"
 Mappings:
   AWSRegion2AMI:
     us-west-2:
-      SbcSipAmi: ami-0d5d64b630b94e10b
-      SbcRtpAmi: ami-0c25ad87327d17f00
-      FsAmi: ami-01953dc444a7be6b6
-      WebserverAmi: ami-07c2c6351d018b7b8
-      MonitoringServerAmi: ami-0a403e2e1b083d869
+      SbcSipAmi: ami-0b3c491b912e285a8
+      SbcRtpAmi: ami-0cc52a925157737b5
+      FsAmi: ami-01cb71bf0b624bb75
+      WebserverAmi: ami-06cd8ec798c6264eb
+      MonitoringServerAmi: ami-00712f4c846e57045
 
 Parameters:
   KeyName:
@@ -55,7 +55,7 @@ Parameters:
   InstanceTypeWebserver:
     Description: "the EC2 instance type to use for webServer (amd64)"
     Type: String
-    Default: c6gn.large
+    Default: t2.small
     AllowedValues:
       - t2.small
       - t2.medium
@@ -75,7 +75,8 @@ Parameters:
       - c5n.large
       - c5n.xlarge
       - c5n.2xlarge
-      - c5n.metal      InstanceTypeMonitoringServer:
+      - c5n.metal      
+  InstanceTypeMonitoringServer:
     Description: "the EC2 instance type for the monitoring server (amd64)"
     Type: String
     Default: t2.small
@@ -545,7 +546,7 @@ Resources:
           Description: Allow access to prometheus scrape port from VPC
         - IpProtocol: udp
           FromPort: 22224
-          ToPort: 22225
+          ToPort: 22233
           CidrIp:  !Ref VpcCIDR
           Description: Allow dtmf events from rtpengine-sidecard in the VPC
       SecurityGroupEgress:
@@ -576,7 +577,7 @@ Resources:
           Description: Allow Freeswitch sip from VPC
         - IpProtocol: udp
           FromPort: 22222
-          ToPort: 22222
+          ToPort: 22223
           CidrIp:  !Ref VpcCIDR
           Description: Allow rtpengine ng protocol from VPC
         - IpProtocol: tcp
@@ -943,6 +944,7 @@ Resources:
                   max_memory_restart: '1G',
                   env: {
                     NODE_ENV: 'production',
+                    JAMBONES_MYSQL_REFRESH_TTL: 30,
                     JAMBONES_LOGLEVEL: 'info',
                     JAMBONES_NETWORK_CIDR: '${VPC_CIDR}',
                     MIN_CALL_LIMIT: 9999,
@@ -981,6 +983,7 @@ Resources:
                   max_memory_restart: '1G',
                   env: {
                     NODE_ENV: 'production',
+                    JAMBONES_MYSQL_REFRESH_TTL: 30,
                     JAMBONES_NETWORK_CIDR: '${VPC_CIDR}',
                     JAMBONES_LOGLEVEL: 'info',
                     AWS_REGION: '${AWS_REGION}',
@@ -1169,6 +1172,7 @@ Resources:
                   max_memory_restart: '1G',
                   env: {
                     NODE_ENV: 'production',
+                    JAMBONES_MYSQL_REFRESH_TTL: 30,
                     ENABLE_METRICS: 1,
                     STATS_HOST: '127.0.0.1',
                     STATS_PORT: 8125,
