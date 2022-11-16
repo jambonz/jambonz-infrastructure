@@ -4,7 +4,7 @@
     "ssh_username": "admin",
     "ami_description": "jambonz monitoring server", 
     "instance_type": "t2.xlarge",
-    "jambonz_version": "v0.7.7-11",
+    "jambonz_version": "v0.7.7-14",
     "homer_user": "homer_user",
     "homer_password": "XcapJTqy11LnsYRtxXGPTYQkAnI",
     "install_influxdb":  "yes",
@@ -66,11 +66,6 @@
     {
       "type": "shell",
       "script": "scripts/install_os_tuning.sh"
-    },
-    {
-      "type": "shell",
-      "execute_command": "chmod +x {{ .Path }}; sudo '{{ .Path }}' {{user `install_nodered`}}",
-      "script": "scripts/install_node_red.sh"
     },
     {
       "type": "shell",

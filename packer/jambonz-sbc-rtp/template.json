@@ -4,7 +4,7 @@
     "ssh_username": "admin",
     "ami_description": "jambonz SBC RTP server", 
     "drachtio_version": "v0.8.18",
-    "jambonz_version": "v0.7.7-11",
+    "jambonz_version": "v0.7.7-14",
     "ami_base_image_arch": "amd64",
     "ami_base_image_owner": "136693071363",
     "instance_type": "t3.xlarge",

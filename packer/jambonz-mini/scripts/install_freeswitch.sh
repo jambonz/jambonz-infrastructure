@@ -6,7 +6,7 @@ GRPC_VERSION=c66d2cc
 GOOGLE_API_VERSION=e9da6f8b469c52b83f900e820be30762e9e05c57
 AWS_SDK_VERSION=1.8.129
 LWS_VERSION=v3.2.3
-MODULES_VERSION=v0.6.1
+MODULES_VERSION=v0.6.2
 
 echo "freeswitch version to install is ${FREESWITCH_VERSION}"
 echo "drachtio modules version to install is ${MODULES_VERSION}"
@@ -47,6 +47,7 @@ git clone https://github.com/awslabs/aws-c-common.git
 sudo cp -r /usr/local/src/drachtio-freeswitch-modules/modules/mod_audio_fork /usr/local/src/freeswitch/src/mod/applications/mod_audio_fork
 sudo cp -r /usr/local/src/drachtio-freeswitch-modules/modules/mod_aws_transcribe /usr/local/src/freeswitch/src/mod/applications/mod_aws_transcribe
 sudo cp -r /usr/local/src/drachtio-freeswitch-modules/modules/mod_azure_transcribe /usr/local/src/freeswitch/src/mod/applications/mod_azure_transcribe
+sudo cp -r /usr/local/src/drachtio-freeswitch-modules/modules/mod_deepgram_transcribe /usr/local/src/freeswitch/src/mod/applications/mod_deepgram_transcribe
 sudo cp -r /usr/local/src/drachtio-freeswitch-modules/modules/mod_aws_lex /usr/local/src/freeswitch/src/mod/applications/mod_aws_lex
 sudo cp -r /usr/local/src/drachtio-freeswitch-modules/modules/mod_google_transcribe /usr/local/src/freeswitch/src/mod/applications/mod_google_transcribe
 sudo cp -r /usr/local/src/drachtio-freeswitch-modules/modules/mod_nuance_transcribe /usr/local/src/freeswitch/src/mod/applications/mod_nuance_transcribe

@@ -5,7 +5,7 @@
     "ami_description": "jambonz all-in-one AMI", 
     "instance_type": "t2.xlarge",
     "drachtio_version": "v0.8.18",
-    "jambonz_version": "v0.7.7-11",
+    "jambonz_version": "v0.7.7-14",
     "jambonz_user": "admin",
     "jambonz_password": "JambonzR0ck$",
     "install_telegraf": "yes",
@@ -105,10 +105,6 @@
       "type": "shell",
       "execute_command": "chmod +x {{ .Path }}; sudo '{{ .Path }}' {{user `drachtio_version`}}",
       "script": "scripts/install_drachtio.sh"
-    },
-    {
-      "type": "shell",
-      "script": "scripts/install_nodejs.sh"
     },
     {
       "type": "shell",
