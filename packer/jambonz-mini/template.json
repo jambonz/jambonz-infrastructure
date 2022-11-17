@@ -108,6 +108,10 @@
     },
     {
       "type": "shell",
+      "script": "scripts/install_nodejs.sh"
+    },
+    {
+      "type": "shell",
       "execute_command": "chmod +x {{ .Path }}; sudo '{{ .Path }}' {{user `install_influxdb`}}",
       "script": "scripts/install_influxdb.sh"
     },
@@ -157,11 +161,6 @@
       "type": "shell",
       "execute_command": "chmod +x {{ .Path }}; sudo '{{ .Path }}'  {{user `jambonz_user`}} {{user `jambonz_password`}}",
       "script": "scripts/install_mysql.sh"
-    },
-    {
-      "type": "shell",
-      "execute_command": "chmod +x {{ .Path }}; sudo '{{ .Path }}' {{user `install_nodered`}}",
-      "script": "scripts/install_node_red.sh"
     },
     {
       "type": "shell",
