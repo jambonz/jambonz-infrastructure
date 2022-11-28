@@ -5,6 +5,7 @@ applications/mod_azure_transcribe
 applications/mod_deepgram_transcribe
 applications/mod_google_tts
 applications/mod_google_transcribe
+applications/mod_ibm_transcribe
 applications/mod_nuance_transcribe
 applications/mod_dialogflow
 #applications/mod_abstraction
