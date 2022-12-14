@@ -7,6 +7,8 @@
       <condition field="${sip_user_agent}" expression="^drachtio-fsmrf:(.*)$">
         <action application="answer"/>
         <action application="set" data="send_silence_when_idle=-1"/>
+        <action application="set" data="hangup_after_bridge=false"/>
+        <action application="set" data="park_after_bridge=true"/>
         <action application="socket" data="${sip_h_X-esl-outbound} async full"/>
       </condition>
     </extension>
