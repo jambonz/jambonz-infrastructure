@@ -73,6 +73,8 @@ Mappings:
   AWSRegion2AMI:
     us-east-1:
       Ami: ami-0cb7fff2c5966e90a
+    eu-west-2:
+      Ami: ami-0db9fabb096af3c1a
 Resources:
   VPC:
     Type: 'AWS::EC2::VPC'
