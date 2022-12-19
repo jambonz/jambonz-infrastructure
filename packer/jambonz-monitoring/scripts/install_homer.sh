@@ -9,6 +9,7 @@ sudo apt-get install -y homer-app heplify-server
 
 sudo sed -i -e "s/homer_user/$DB_USER/g" /usr/local/homer/etc/webapp_config.json
 sudo sed -i -e "s/homer_password/$DB_PASS/g" /usr/local/homer/etc/webapp_config.json
+sudo sed -i -e "s/localhost/127.0.0.1/g" /usr/local/homer/etc/webapp_config.json
 sudo homer-app -create-table-db-config 
 sudo homer-app -populate-table-db-config
 sudo sed -i -e "s/DBUser\s*=\s*\"postgres\"/DBUser          = \"$DB_USER\"/g" /etc/heplify-server.toml
