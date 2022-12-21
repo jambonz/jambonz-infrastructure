@@ -1,5 +1,7 @@
 # packer-jambonz-sbc-sip-rtp
 
+**This packer script is deprecated.  If clustering, use separate amis for SBC-IP and SBC-RTP**
+
 A [packer](https://www.packer.io/) template to build an AMI containing everything needed to run the SBC functionality of jambonz,
 
 ## Installing 
