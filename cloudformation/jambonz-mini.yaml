@@ -55,12 +55,35 @@ Parameters:
     ConstraintDescription: must be a valid network CIDR
     AllowedPattern: \d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\/\d{1,2}
     Default: 10.0.0.0/16
+  Cloudwatch:
+    Description: Send jambonz logs to cloudwatch
+    Type: String
+    Default: true
+    AllowedValues: [true, false]
+  CloudwatchLogRetention:
+    Description: "Number of days to retain cloudwatch logs"
+    Type: Number
+    Default: 3
+    AllowedValues:
+      - 1
+      - 3
+      - 5
+      - 7
+      - 14
+      - 30
+      - 60
+      - 90
+      - 120
+      - 150
   URLPortal:
     Type: String
     Description: "(Optional) A DNS name that you will point to the jambonz webserver(s)"
     Default: ""
 
 Conditions:
+  ShouldEnableCloudWatch: !Equals
+    - true
+    - !Ref Cloudwatch
   DontCreateDNS: !Equals
     - !Ref URLPortal
     - ""
@@ -72,10 +95,43 @@ Conditions:
 Mappings:
   AWSRegion2AMI:
     us-east-1:
-      Ami: ami-0cb7fff2c5966e90a
+      Ami: ami-05a5422837d6014b2
     eu-west-2:
-      Ami: ami-0db9fabb096af3c1a
+      Ami: ami-010c13544ceeb7270
 Resources:
+  IamCloudwatchRole:
+    Type: AWS::IAM::Role
+    Condition: ShouldEnableCloudWatch
+    Properties: 
+      Description: jambonz mini IAM role
+      RoleName: !Sub 'jambonz-mini-iam-role'
+      AssumeRolePolicyDocument:
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service: [ec2.amazonaws.com]
+          Action: ['sts:AssumeRole']
+      Path: /
+      Policies:
+        - PolicyName: root 
+          PolicyDocument: 
+            Version: "2012-10-17"
+            Statement: 
+              - Effect: Allow
+                Action: 
+                  - 'cloudwatch:PutMetricData'
+                  - 'ec2:DescribeVolumes'
+                  - 'ec2:DescribeTags'
+                  - 'logs:PutLogEvents'
+                  - 'logs:DescribeLogStreams'
+                  - 'logs:DescribeLogGroups'
+                  - 'logs:CreateLogStream'
+                  - 'logs:CreateLogGroup'
+                Resource: '*'
+              - Effect: Allow
+                Action:
+                  - 'ssm:GetParameter'
+                Resource: 'arn:aws:ssm:*:*:parameter/AmazonCloudWatch-*'
   VPC:
     Type: 'AWS::EC2::VPC'
     Properties:
@@ -87,10 +143,19 @@ Resources:
     Properties:
       VpcId: !Ref VPC
       CidrBlock: !Ref VpcCidr
+  jambonzInstanceProfile:
+    Type: 'AWS::IAM::InstanceProfile'
+    Condition: ShouldEnableCloudWatch
+    Properties:
+      Path: /
+      Roles:
+        - !Ref IamCloudwatchRole
   jambonzInstance:
     Type: 'AWS::EC2::Instance'
     Properties:
       InstanceType: !Ref InstanceType
+      IamInstanceProfile: 
+        !If [ShouldEnableCloudWatch, !Ref jambonzInstanceProfile, !Ref "AWS::NoValue"]
       ImageId: !FindInMap [ "AWSRegion2AMI", !Ref AWS::Region,  "Ami"]
       KeyName: !Ref KeyName
       NetworkInterfaces:
@@ -207,13 +272,26 @@ Resources:
               
                 sudo systemctl restart nginx
               fi
-              sudo -u admin bash -c "pm2 restart /home/admin/apps/ecosystem.config.js" 
-              sudo -u admin bash -c "pm2 save"
-              sudo env PATH=$PATH:/usr/bin /usr/lib/node_modules/pm2/bin/pm2 startup systemd -u admin --hp /home/admin
               
               # restart heplify-server
               sudo systemctl restart heplify-server
+
+              # enable cloudwatch
+              if [[ "${Cloudwatch}" == "true" ]]; then
+                echo "Enabling Cloudwatch for jambonz logs"
+                sudo sed -i -e "s/retention_in_days\": 3/retention_in_days\": ${CloudwatchLogRetention}/g" /opt/aws/amazon-cloudwatch-agent/bin/config.json 
+                sudo /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a fetch-config -m ec2 -s -c file:/opt/aws/amazon-cloudwatch-agent/bin/config.json
+              else
+                echo "Cloudwatch is not enabled for jambonz logs"
+                sudo sed -i -e "s/combine_logs: true/combine_logs: false/g" /home/admin/apps/ecosystem.config.js 
+              fi
+              sudo -u admin bash -c "pm2 restart /home/admin/apps/ecosystem.config.js" 
+              sudo -u admin bash -c "pm2 save"
+              sudo env PATH=$PATH:/usr/bin /usr/lib/node_modules/pm2/bin/pm2 startup systemd -u admin --hp /home/admin
+
             - URLPortal: !Ref URLPortal
+              Cloudwatch: !Ref Cloudwatch
+              CloudwatchLogRetention: !Ref CloudwatchLogRetention
 
   jambonzSecurityGroup:
     Type: 'AWS::EC2::SecurityGroup'
@@ -221,10 +299,25 @@ Resources:
       VpcId: !Ref VPC
       GroupDescription: 'Allow sip, rtp, http and ssh access'
       SecurityGroupIngress:
-        - Description: sip
+        - Description: sip over udp
           IpProtocol: udp
           FromPort: 5060
           ToPort: 5060
+          CidrIp: !Ref AllowedSipCidr
+        - Description: sip over tcp
+          IpProtocol: tcp
+          FromPort: 5060
+          ToPort: 5060
+          CidrIp: !Ref AllowedSipCidr
+        - Description: sip over tls
+          IpProtocol: tcp
+          FromPort: 5061
+          ToPort: 5061
+          CidrIp: !Ref AllowedSipCidr
+        - Description: sip over wss
+          IpProtocol: tcp
+          FromPort: 8443
+          ToPort: 8443
           CidrIp: !Ref AllowedSipCidr
         - Description: rtp
           IpProtocol: udp

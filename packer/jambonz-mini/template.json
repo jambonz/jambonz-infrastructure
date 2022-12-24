@@ -14,6 +14,7 @@
     "install_influxdb":  "yes",
     "install_homer":  "yes",
     "install_jaeger":  "yes",
+    "install_cloudwatch":  "yes",
     "install_nodered":  "no",
     "influxdb_ip":  "127.0.0.1",
     "rtp_engine_version": "mr11.1.1.2",
@@ -91,6 +92,11 @@
     {
       "type": "shell",
       "script": "scripts/install_os_tuning.sh"
+    },
+    {
+      "type": "shell",
+      "execute_command": "chmod +x {{ .Path }}; sudo '{{ .Path }}' {{user `install_cloudwatch`}}",
+      "script": "scripts/install_cloudwatch.sh"
     },
     {
       "type": "shell",

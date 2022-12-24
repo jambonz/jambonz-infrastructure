@@ -74,6 +74,11 @@ whether or not to install influxdb and grafana.
 whether or not to install homer, postgresql and telegraf.
 
 ```
+"install_cloudwatch":  "yes"
+```
+whether or not to install cloudwatch logging for jambonz logs.
+
+```
 "influxdb_ip" : "127.0.0.1"
 ```
 ip address of remote influxdb server.  This should only be specified when building a "homer-only" AMI.
