@@ -3,7 +3,7 @@
     "region": "us-east-1",
     "ssh_username": "admin",
     "ami_description": "jambonz SBC SIP+RTP+Webserver+monitoring", 
-    "drachtio_version": "v0.8.18",
+    "drachtio_version": "v0.8.20",
     "jambonz_version": "v0.7.6",
     "install_influxdb":  "yes",
     "install_homer":  "yes",
