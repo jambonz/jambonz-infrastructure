@@ -261,8 +261,56 @@ Parameters:
       - 0
       - 1 
     Default: 1
+  CloudwatchLogRetention:
+    Description: "Number of days to retain cloudwatch logs"
+    Type: Number
+    Default: 3
+    AllowedValues:
+      - 1
+      - 3
+      - 5
+      - 7
+      - 14
+      - 30
+      - 60
+      - 90
+      - 120
+      - 150
 
 Resources:
+  IamCloudwatchRole:
+    Type: AWS::IAM::Role
+    Properties: 
+      Description: jambonz Cloudwatch IAM role
+      RoleName: !Sub '${Prefix}-jambonz-cloudwatch-role'
+      AssumeRolePolicyDocument:
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service: [ec2.amazonaws.com]
+          Action: ['sts:AssumeRole']
+      Path: /
+      Policies:
+        - PolicyName: root 
+          PolicyDocument: 
+            Version: "2012-10-17"
+            Statement: 
+              - Effect: Allow
+                Action: 
+                  - 'cloudwatch:PutMetricData'
+                  - 'ec2:DescribeVolumes'
+                  - 'ec2:DescribeTags'
+                  - 'logs:PutLogEvents'
+                  - 'logs:DescribeLogStreams'
+                  - 'logs:DescribeLogGroups'
+                  - 'logs:CreateLogStream'
+                  - 'logs:CreateLogGroup'
+                Resource: '*'
+              - Effect: Allow
+                Action:
+                  - 'ssm:GetParameter'
+                Resource: 'arn:aws:ssm:*:*:parameter/AmazonCloudWatch-*'
+
 ###########################################
 #
 #      VPC Resources
@@ -841,6 +889,7 @@ Resources:
       Path: /
       Roles:
         - !Ref SbcSipServerIamRole
+        - !Ref IamCloudwatchRole
 
   SbcSipConfig:
     Type: AWS::AutoScaling::LaunchConfiguration
@@ -1066,6 +1115,10 @@ Resources:
               sudo -u admin bash -c "pm2 save"
               sudo systemctl enable pm2-admin.service
 
+              echo "enabling cloudwatch"
+              sudo sed -i -e "s/retention_in_days\": 3/retention_in_days\": ${CloudwatchLogRetention}/g" /opt/aws/amazon-cloudwatch-agent/bin/config.json 
+              sudo /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a fetch-config -m ec2 -s -c file:/opt/aws/amazon-cloudwatch-agent/bin/config.json
+
               echo "user data script completed"
             - VPC_CIDR: !Ref VpcCIDR
               AWS_REGION: !Ref AWS::Region
@@ -1078,6 +1131,8 @@ Resources:
               MONITORING_SERVER_IP: !GetAtt MonitoringServerEC2.PrivateIp
               AWS_SNS_TOPIC_ARN: !Ref SbcSipServerSNSTopic
               JAMBONES_TIME_SERIES_HOST: !GetAtt MonitoringServerEC2.PrivateIp
+              CloudwatchLogRetention: !Ref CloudwatchLogRetention
+
   SbcSipServerPlacementGroup:
     Type: AWS::EC2::PlacementGroup
     Properties:
@@ -1165,6 +1220,7 @@ Resources:
       Path: /
       Roles:
         - !Ref FeatureServerIamRole
+        - !Ref IamCloudwatchRole
 
   FeatureServerConfig:
     Type: AWS::AutoScaling::LaunchConfiguration
@@ -1250,7 +1306,11 @@ Resources:
               # configure telegraph to send to the monitoring server
               sudo sed -i -e "s/influxdb:8086/${MONITORING_SERVER_IP}:8086/g"  /etc/telegraf/telegraf.conf
               sudo systemctl restart telegraf
-            
+
+              echo "enabling cloudwatch"
+              sudo sed -i -e "s/retention_in_days\": 3/retention_in_days\": ${CloudwatchLogRetention}/g" /opt/aws/amazon-cloudwatch-agent/bin/config.json 
+              sudo /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a fetch-config -m ec2 -s -c file:/opt/aws/amazon-cloudwatch-agent/bin/config.json
+
               echo "user data script completed"
             - VPC_CIDR: !Ref VpcCIDR
               JAMBONES_MYSQL_HOST: !GetAtt DatabaseCluster.Endpoint.Address
@@ -1265,6 +1325,7 @@ Resources:
               MONITORING_SERVER_IP: !GetAtt MonitoringServerEC2.PrivateIp
               JAMBONES_TIME_SERIES_HOST: !GetAtt MonitoringServerEC2.PrivateIp
               JWT_SECRET: !Ref EncryptionSecret
+              CloudwatchLogRetention: !Ref CloudwatchLogRetention
 
   FeatureServerPlacementGroup:
     Type: AWS::EC2::PlacementGroup
@@ -1341,7 +1402,7 @@ Resources:
         - arn:aws:iam::aws:policy/AmazonSNSFullAccess
         - arn:aws:iam::aws:policy/AutoScalingReadOnlyAccess
 
-  # --- Feature server EC2 Role Instance profile
+  # --- SBC RTP EC2 Role Instance profile
   SbcRTPServerInstanceProfile:
     Type: 'AWS::IAM::InstanceProfile'
     Properties:
@@ -1349,6 +1410,7 @@ Resources:
       Path: /
       Roles:
         - !Ref SbcRTPServerIamRole
+        - !Ref IamCloudwatchRole
 
   SbcRTPConfig:
     Type: AWS::AutoScaling::LaunchConfiguration
@@ -1417,6 +1479,10 @@ Resources:
               sudo sed -i -e "s/--delete-delay 0/--delete-delay 0 --homer=${MONITORING_SERVER_IP}:9060 --homer-protocol=udp --homer-id=11/g"  /etc/systemd/system/rtpengine.service
               sudo systemctl daemon-reload
               sudo sytemctl restart rtpengine
+
+              echo "enabling cloudwatch"
+              sudo sed -i -e "s/retention_in_days\": 3/retention_in_days\": ${CloudwatchLogRetention}/g" /opt/aws/amazon-cloudwatch-agent/bin/config.json 
+              sudo /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a fetch-config -m ec2 -s -c file:/opt/aws/amazon-cloudwatch-agent/bin/config.json
             - VPC_CIDR: !Ref VpcCIDR
               AWS_REGION: !Ref AWS::Region
               JAMBONES_MYSQL_HOST: !GetAtt DatabaseCluster.Endpoint.Address
@@ -1427,6 +1493,7 @@ Resources:
               JAMBONES_REDIS_HOST: !GetAtt ElastiCacheCluster.RedisEndpoint.Address
               AWS_SNS_TOPIC_ARN: !Ref SbcRTPServerSNSTopic
               MONITORING_SERVER_IP: !GetAtt MonitoringServerEC2.PrivateIp
+              CloudwatchLogRetention: !Ref CloudwatchLogRetention
 
   SbcRTPServerPlacementGroup:
     Type: AWS::EC2::PlacementGroup
@@ -1524,6 +1591,7 @@ Resources:
       Path: /
       Roles:
         - !Ref WebServerIamRole
+        - !Ref IamCloudwatchRole
 
   WebServerConfig:
     Type: AWS::AutoScaling::LaunchConfiguration
@@ -1706,6 +1774,10 @@ Resources:
               EOF
             
               sudo systemctl restart nginx
+
+              echo "enabling cloudwatch"
+              sudo sed -i -e "s/retention_in_days\": 3/retention_in_days\": ${CloudwatchLogRetention}/g" /opt/aws/amazon-cloudwatch-agent/bin/config.json 
+              sudo /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a fetch-config -m ec2 -s -c file:/opt/aws/amazon-cloudwatch-agent/bin/config.json
             
               echo "webserver user data script completed"
             - VPC_CIDR: !Ref VpcCIDR
@@ -1720,6 +1792,7 @@ Resources:
               JAMBONES_TIME_SERIES_HOST: !GetAtt MonitoringServerEC2.PrivateIp
               JWT_SECRET: !Ref EncryptionSecret
               URLPortal: !Ref URLPortal
+              CloudwatchLogRetention: !Ref CloudwatchLogRetention
 
   WebServerPlacementGroup:
     Type: AWS::EC2::PlacementGroup
