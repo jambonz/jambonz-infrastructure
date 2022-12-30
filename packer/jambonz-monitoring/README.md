@@ -1,6 +1,6 @@
 # packer-homer
 
-A [packer](https://www.packer.io/) template to build an AMI that runs [homer](https://github.com/sipcapture/homer) VoIP monitoring stack.  The base linux distro is Debian 10 (buster).  The packer script can build any of the following configurations:
+A [packer](https://www.packer.io/) template to build an AMI that runs [homer](https://github.com/sipcapture/homer) VoIP monitoring stack.  The base linux distro is Debian 11 (bullseye).  The packer script can build any of the following configurations:
 - an "all in one" AMI that includes homer, postgresql, telegraf, influxdb, and grafana.
 - a homer-only AMU that includes homer, postgresql, telegraf and sends statistics to a remote influxdb/grafana server
 - an influxdb/grafana AMI that includes influxdb and grafana, receiving data from a remote homer server via telegraf

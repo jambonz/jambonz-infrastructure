@@ -58,9 +58,9 @@
 	this will ensure you're able to use the entire DS3 without a problem.  Otherwise you'll
 	be 144 channels short of always filling that DS3 up which can translate into waste.
     -->
-    <param name="max-sessions" value="2000"/>
+    <param name="max-sessions" value="4000"/>
     <!--Most channels to create per second -->
-    <param name="sessions-per-second" value="100"/>
+    <param name="sessions-per-second" value="200"/>
     <!-- Default Global Log Level - value is one of debug,info,notice,warning,err,crit,alert -->
     <param name="loglevel" value="notice"/>
 
