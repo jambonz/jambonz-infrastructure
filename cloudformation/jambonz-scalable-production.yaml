@@ -4,17 +4,17 @@ AWSTemplateFormatVersion: "2010-09-09"
 Mappings:
   AWSRegion2AMI:
     us-east-1:
-      SbcSipAmi: ami-001ddbbf6b46aa1aa
-      SbcRtpAmi: ami-0c8bb13d19e389250
-      FsAmi: ami-08be1a488c5b95252
-      WebserverAmi: ami-022272c74e2f6a56b
-      MonitoringServerAmi: ami-0afe0d23b9f5d28c8
+      SbcSipAmi: ami-0d9e6a27e776aaa00
+      SbcRtpAmi: ami-0ae189b5c1b56b0c8
+      FsAmi: ami-016ebaf56df8a84b0
+      WebserverAmi: ami-037ea894bad466cc1
+      MonitoringServerAmi: ami-05ee9b09996e2c1a0
     eu-west-2:
-      SbcSipAmi: ami-0203afe0760214af9
-      SbcRtpAmi: ami-00441597c3d624a93
-      FsAmi: ami-06620f96c30adfd93
-      WebserverAmi: ami-0bedca20d91eccb4a
-      MonitoringServerAmi: ami-053445fe4b20ea9bb
+      SbcSipAmi: ami-0ae9968ecfef534df
+      SbcRtpAmi: ami-07940b2e454553039
+      FsAmi: ami-0cbfdbdaca620110b
+      WebserverAmi: ami-05a9d4ace683ad81b
+      MonitoringServerAmi: ami-0d4525c3bafefa46c
 
 Parameters:
   KeyName:
