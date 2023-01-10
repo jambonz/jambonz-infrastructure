@@ -1822,7 +1822,7 @@ Resources:
               sudo cat << EOF > /etc/nginx/sites-available/default 
               server {
                   listen 80;
-                  server_name _;
+                  server_name ${URLPortal};
                   location /api/ {
                       rewrite ^/api/(.*)$ /\$1 break;
                       proxy_pass http://localhost:3000;
@@ -1830,6 +1830,14 @@ Resources:
                   }
                   location / {
                       proxy_pass http://localhost:3001;
+                      proxy_set_header Host \$host;
+                  }
+              }
+              server {
+                  listen 80;
+                  server_name api.${URLPortal};
+                  location / {
+                      proxy_pass http://localhost:3000;
                       proxy_set_header Host \$host;
                   }
               }
