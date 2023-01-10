@@ -48,6 +48,7 @@ module.exports = {
     max_memory_restart: '1G',
     env: {
       NODE_ENV: 'production',
+      JWT_SECRET: 'JWT-SECRET-GOES_HERE',
       JAMBONES_MYSQL_HOST: '127.0.0.1',
       JAMBONES_MYSQL_USER: 'admin',
       JAMBONES_MYSQL_PASSWORD: 'JambonzR0ck$',
@@ -253,6 +254,7 @@ module.exports = {
     watch: false,
     env: {
       NODE_ENV: 'production',
+      JWT_SECRET: 'JWT-SECRET-GOES_HERE',
       JAMBONES_OTEL_ENABLED: 1,
       OTEL_EXPORTER_JAEGER_ENDPOINT: 'http://localhost:14268/api/traces',
       OTEL_EXPORTER_OTLP_METRICS_INSECURE: 1,

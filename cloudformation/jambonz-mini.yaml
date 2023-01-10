@@ -79,7 +79,6 @@ Parameters:
     Type: String
     Description: "(Optional) A DNS name that you will point to the jambonz webserver(s)"
     Default: ""
-
 Conditions:
   ShouldEnableCloudWatch: !Equals
     - true
@@ -95,9 +94,9 @@ Conditions:
 Mappings:
   AWSRegion2AMI:
     us-east-1:
-      Ami: ami-06285e61e785836ff
+      Ami: ami-0028cd0caa0098459
     eu-west-2:
-      Ami: ami-0f5f1714720adf7e4
+      Ami: ami-076c64115c239fe57
 Resources:
   IamCloudwatchRole:
     Type: AWS::IAM::Role
@@ -198,30 +197,30 @@ Resources:
               sudo sed -i -e "s/\(.*\)AWS_REGION_NAME\(.*\)/\1$AWS_REGION_NAME\2/g" /home/admin/apps/ecosystem.config.js 
               sudo sed -i -e "s/\(.*\)--JAMBONES_API_BASE_URL--\(.*\)/\1http:\/\/$PUBLIC_IPV4\/v1\2/g" /home/admin/apps/ecosystem.config.js 
               
+              # replace JWT_SECRET
+              uuid=$(uuidgen)
+              sudo sed -i -e "s/\(.*\)JWT-SECRET-GOES_HERE\(.*\)/\1$uuid\2/g" /home/admin/apps/ecosystem.config.js 
+
               # reset the database
               JAMBONES_ADMIN_INITIAL_PASSWORD=$INSTANCE_ID JAMBONES_MYSQL_USER=admin JAMBONES_MYSQL_PASSWORD=$NEW_DB_PASSWD JAMBONES_MYSQL_DATABASE=jambones JAMBONES_MYSQL_HOST=localhost /home/admin/apps/jambonz-api-server/db/reset_admin_password.js
               
               # configure webapp
               if [[ -z "${URLPortal}" ]]; then
                 # portals will be accessed by IP address of server
-                echo "REACT_APP_API_BASE_URL=http://$PUBLIC_IPV4/api/v1" > /home/admin/apps/jambonz-webapp/.env 
-                echo "REACT_APP_MOBILE_BREAKPOINT=767px" >> /home/admin/apps/jambonz-webapp/.env 
-                echo "REACT_APP_ENABLE_SUBSPACE=1" >> /home/admin/apps/jambonz-webapp/.env 
-                REACT_APP_API_BASE_URL=http://$PUBLIC_IPV4/api/v1 TAG="<script>window.JAMBONZ = { APP_API_BASE_URL: '$REACT_APP_API_BASE_URL'};</script>"
-                sed -i -e "\@</head>@i\ $TAG" /home/admin/apps/jambonz-webapp/build/index.html
+                echo "VITE_API_BASE_URL=http://$PUBLIC_IPV4/api/v1" > /home/admin/apps/jambonz-webapp/.env 
+                API_BASE_URL=http://$PUBLIC_IPV4/api/v1 TAG="<script>window.JAMBONZ = { API_BASE_URL: '$API_BASE_URL'};</script>"
+                sed -i -e "\@</head>@i\ $TAG" /home/admin/apps/jambonz-webapp/dist/index.html
               else
                 # portals will be accessed by DNS name
-                echo "REACT_APP_API_BASE_URL=http://${URLPortal}/api/v1" > /home/admin/apps/jambonz-webapp/.env 
-                echo "REACT_APP_MOBILE_BREAKPOINT=767px" >> /home/admin/apps/jambonz-webapp/.env 
-                echo "REACT_APP_ENABLE_SUBSPACE=1" >> /home/admin/apps/jambonz-webapp/.env 
-                REACT_APP_API_BASE_URL=http://${URLPortal}/api/v1 TAG="<script>window.JAMBONZ = { APP_API_BASE_URL: '$REACT_APP_API_BASE_URL'};</script>"
-                sed -i -e "\@</head>@i\ $TAG" /home/admin/apps/jambonz-webapp/build/index.html
+                echo "VITE_API_BASE_URL=http://${URLPortal}/api/v1" > /home/admin/apps/jambonz-webapp/.env 
+                API_BASE_URL=http://${URLPortal}/api/v1 TAG="<script>window.JAMBONZ = { API_BASE_URL: '$API_BASE_URL'};</script>"
+                sed -i -e "\@</head>@i\ $TAG" /home/admin/apps/jambonz-webapp/dist/index.html
 
                 # configure nginx for homer and grafana on the monitoring server
                 sudo cat << EOF > /etc/nginx/sites-available/default 
                 server {
                     listen 80;
-                    server_name _;
+                    server_name ${URLPortal};
                     location /api/ {
                         rewrite ^/api/(.*)$ /\$1 break;
                         proxy_pass http://localhost:3002;
@@ -231,6 +230,14 @@ Resources:
                         proxy_pass http://localhost:3001;
                         proxy_set_header Host \$host;
                     }
+                }
+                server {
+                  listen 80;
+                  server_name api.${URLPortal}; 
+                  location / {
+                    proxy_pass http://localhost:3002; 
+                    proxy_set_header Host \$host;
+                  }
                 }
                 server {
                   listen 80;

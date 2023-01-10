@@ -13,10 +13,7 @@ module.exports = {
     watch: false,
     env: {
       NODE_ENV: 'production',
-      GOOGLE_APPLICATION_CREDENTIALS: '/home/admin/credentials/$${GOOGLE_APPLICATION_CREDENTIALS}',
-      AWS_ACCESS_KEY_ID: '${AWS_ACCESS_KEY_ID}',
-      AWS_SECRET_ACCESS_KEY: '${AWS_SECRET_ACCESS_KEY}',
-      AWS_REGION: '${AWS_REGION}',
+      JWT_SECRET: 'JWT-SECRET-GOES_HERE',
       ENABLE_DATADOG_METRICS: 0,
       JAMBONES_NETWORK_CIDR: '172.31.32.0/24',
       JAMBONES_MYSQL_HOST: '${JAMBONES_MYSQL_HOST}',

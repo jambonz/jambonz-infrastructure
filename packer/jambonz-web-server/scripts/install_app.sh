@@ -5,7 +5,7 @@ cd /home/admin/apps
 cp /tmp/ecosystem.config.js .
 
 echo "building jambonz-api-server.."
-cd /home/admin/apps/jambonz-api-server && npm ci --unsafe-perm
+cd /home/admin/apps/jambonz-api-server && npm ci
 echo "building jambonz-webapp.."
 cd /home/admin/apps/jambonz-webapp && npm ci && npm run build
 echo "building public-apps.."
