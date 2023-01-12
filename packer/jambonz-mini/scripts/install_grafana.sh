@@ -1,7 +1,7 @@
 #!/bin/bash
 if [ "$1" = "yes" ]; then 
 
-curl -sL https://packages.grafana.com/gpg.key | sudo apt-key add -
+curl -sL https://packages.grafana.com/gpg.key | sudo apt-key --keyring /etc/apt/trusted.gpg.d/grafana-apt-key.gpg add
 echo "deb https://packages.grafana.com/oss/deb stable main" | sudo tee /etc/apt/sources.list.d/grafana.list
 sudo apt-get update 
 sudo apt-get install -y grafana
