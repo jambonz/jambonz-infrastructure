@@ -266,6 +266,14 @@ Parameters:
     Type: String
     Description: "DNS name you will point to the jambonz webserver(s)"
     Default: "yourdomain.com"
+  JaegerUsername:
+    Type: String
+    Description: "Basic Auth username for Jaeger"
+    Default: "admin"
+  JaegerPassword:
+    Type: String
+    Description: "Basic Auth password for Jaeger"
+    Default: "JambonzR0ck$"
   StatsSampleRate: 
     Type: Number
     Description: sampling rate for metrics, a number between 0 and 1 inclusive
@@ -1819,6 +1827,10 @@ Resources:
               sudo systemctl restart telegraf
             
               # configure nginx for homer and grafana on the monitoring server
+              
+              #Add BasicAuth password for Jaeger
+              sudo htpasswd -b -c /etc/nginx/.htpasswd ${JaegerUsername} ${JaegerPassword}
+              
               sudo cat << EOF > /etc/nginx/sites-available/default 
               server {
                   listen 80;
@@ -1875,6 +1887,8 @@ Resources:
                   proxy_set_header Connection 'upgrade';
                   proxy_set_header Host \$host;
                   proxy_cache_bypass \$http_upgrade;
+                  auth_basic "Secured Endpoint";
+                  auth_basic_user_file /etc/nginx/.htpasswd;
                 }
               }
               EOF
@@ -1898,6 +1912,8 @@ Resources:
               JAMBONES_TIME_SERIES_HOST: !GetAtt MonitoringServerEC2.PrivateIp
               JWT_SECRET: !Ref EncryptionSecret
               URLPortal: !Ref URLPortal
+              JaegerUsername: !Ref JaegerUsername
+              JaegerPassword: !Ref JaegerPassword
               CloudwatchLogRetention: !Ref CloudwatchLogRetention
               DbCachingTTS: !Ref DbCachingTTS
 
