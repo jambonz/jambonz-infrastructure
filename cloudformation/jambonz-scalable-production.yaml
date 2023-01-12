@@ -1009,7 +1009,6 @@ Resources:
                     JAMBONES_MYSQL_DATABASE: 'jambones',
                     JAMBONES_MYSQL_CONNECTION_LIMIT: 10,
                     JAMBONES_REDIS_HOST: '${JAMBONES_REDIS_HOST}',
-                    JAMBONES_REDIS_HOST: '${JAMBONES_REDIS_HOST}',
                     JAMBONES_REDIS_PORT: 6379,
                     JAMBONES_TIME_SERIES_HOST: '${JAMBONES_TIME_SERIES_HOST}',
                     ENABLE_METRICS: 1,
