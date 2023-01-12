@@ -620,9 +620,9 @@ Resources:
           Description: Allow access to prometheus scrape port from VPC
         - IpProtocol: udp
           FromPort: 22224
-          ToPort: 22225
+          ToPort: 22233
           CidrIp:  !Ref VpcCIDR
-          Description: Allow dtmf events from rtpengine-sidecard in the VPC
+          Description: Allow dtmf events from rtpengine-sidecar in the VPC
       SecurityGroupEgress:
         - IpProtocol: -1
           FromPort: 0
@@ -651,7 +651,7 @@ Resources:
           Description: Allow Freeswitch sip from VPC
         - IpProtocol: udp
           FromPort: 22222
-          ToPort: 22222
+          ToPort: 22223
           CidrIp:  !Ref VpcCIDR
           Description: Allow rtpengine ng protocol from VPC
         - IpProtocol: tcp
