@@ -79,6 +79,14 @@ Parameters:
     Type: String
     Description: "(Optional) A DNS name that you will point to the jambonz webserver(s)"
     Default: ""
+  JaegerUsername:
+      Type: String
+      Description: "Basic Auth username for Jaeger"
+      Default: "admin"
+  JaegerPassword:
+    Type: String
+    Description: "Basic Auth password for Jaeger"
+    Default: "JambonzR0ck$"
 Conditions:
   ShouldEnableCloudWatch: !Equals
     - true
@@ -90,13 +98,12 @@ Conditions:
     - !Equals 
       - !Ref URLPortal
       - ""
-
 Mappings:
   AWSRegion2AMI:
     us-east-1:
-      Ami: ami-0028cd0caa0098459
+      Ami: ami-0eaef8e96a50a9672
     eu-west-2:
-      Ami: ami-076c64115c239fe57
+      Ami: ami-0a74a2b91dc2f51cb
 Resources:
   IamCloudwatchRole:
     Type: AWS::IAM::Role
@@ -204,17 +211,24 @@ Resources:
               # reset the database
               JAMBONES_ADMIN_INITIAL_PASSWORD=$INSTANCE_ID JAMBONES_MYSQL_USER=admin JAMBONES_MYSQL_PASSWORD=$NEW_DB_PASSWD JAMBONES_MYSQL_DATABASE=jambones JAMBONES_MYSQL_HOST=localhost /home/admin/apps/jambonz-api-server/db/reset_admin_password.js
               
+              #Add BasicAuth password for Jaeger
+              sudo htpasswd -b -c /etc/nginx/.htpasswd ${JaegerUsername} ${JaegerPassword}
+
               # configure webapp
               if [[ -z "${URLPortal}" ]]; then
                 # portals will be accessed by IP address of server
-                echo "VITE_API_BASE_URL=http://$PUBLIC_IPV4/api/v1" > /home/admin/apps/jambonz-webapp/.env 
-                API_BASE_URL=http://$PUBLIC_IPV4/api/v1 TAG="<script>window.JAMBONZ = { API_BASE_URL: '$API_BASE_URL'};</script>"
-                sed -i -e "\@</head>@i\ $TAG" /home/admin/apps/jambonz-webapp/dist/index.html
+                echo "REACT_APP_API_BASE_URL=http://$PUBLIC_IPV4/api/v1" > /home/admin/apps/jambonz-webapp/.env 
+                echo "REACT_APP_MOBILE_BREAKPOINT=767px" >> /home/admin/apps/jambonz-webapp/.env 
+                echo "REACT_APP_ENABLE_SUBSPACE=1" >> /home/admin/apps/jambonz-webapp/.env 
+                REACT_APP_API_BASE_URL=http://$PUBLIC_IPV4/api/v1 TAG="<script>window.JAMBONZ = { APP_API_BASE_URL: '$REACT_APP_API_BASE_URL'};</script>"
+                sed -i -e "\@</head>@i\ $TAG" /home/admin/apps/jambonz-webapp/build/index.html
               else
                 # portals will be accessed by DNS name
-                echo "VITE_API_BASE_URL=http://${URLPortal}/api/v1" > /home/admin/apps/jambonz-webapp/.env 
-                API_BASE_URL=http://${URLPortal}/api/v1 TAG="<script>window.JAMBONZ = { API_BASE_URL: '$API_BASE_URL'};</script>"
-                sed -i -e "\@</head>@i\ $TAG" /home/admin/apps/jambonz-webapp/dist/index.html
+                echo "REACT_APP_API_BASE_URL=http://${URLPortal}/api/v1" > /home/admin/apps/jambonz-webapp/.env 
+                echo "REACT_APP_MOBILE_BREAKPOINT=767px" >> /home/admin/apps/jambonz-webapp/.env 
+                echo "REACT_APP_ENABLE_SUBSPACE=1" >> /home/admin/apps/jambonz-webapp/.env 
+                REACT_APP_API_BASE_URL=http://${URLPortal}/api/v1 TAG="<script>window.JAMBONZ = { APP_API_BASE_URL: '$REACT_APP_API_BASE_URL'};</script>"
+                sed -i -e "\@</head>@i\ $TAG" /home/admin/apps/jambonz-webapp/build/index.html
 
                 # configure nginx for homer and grafana on the monitoring server
                 sudo cat << EOF > /etc/nginx/sites-available/default 
@@ -273,6 +287,8 @@ Resources:
                     proxy_set_header Connection 'upgrade';
                     proxy_set_header Host \$host;
                     proxy_cache_bypass \$http_upgrade;
+                    auth_basic "Secured Endpoint";
+                    auth_basic_user_file /etc/nginx/.htpasswd;
                   }
                 }
               EOF
@@ -299,6 +315,8 @@ Resources:
             - URLPortal: !Ref URLPortal
               Cloudwatch: !Ref Cloudwatch
               CloudwatchLogRetention: !Ref CloudwatchLogRetention
+              JaegerUsername: !Ref JaegerUsername
+              JaegerPassword: !Ref JaegerPassword
 
   jambonzSecurityGroup:
     Type: 'AWS::EC2::SecurityGroup'
