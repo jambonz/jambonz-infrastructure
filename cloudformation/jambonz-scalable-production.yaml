@@ -1780,6 +1780,7 @@ Resources:
                     HOMER_BASE_URL: 'http://${MONITORING_SERVER_IP}:9080',
                     HOMER_USERNAME: 'admin',
                     HOMER_PASSWORD: 'sipcapture',
+                    JAEGER_BASE_URL: 'http://${MONITORING_SERVER_IP}:16686',
                     JWT_SECRET: '${JWT_SECRET}'
                     },
                 },
