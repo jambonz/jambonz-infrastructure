@@ -398,6 +398,11 @@ Resources:
           FromPort: 22
           ToPort: 22
           CidrIp: !Ref AllowedSshCidr
+      SecurityGroupEgress:
+        - IpProtocol: -1
+          FromPort: 0
+          ToPort: 0
+          CidrIp: 0.0.0.0/0
     DependsOn:
       - PublicRoute
   InternetGateway:
@@ -484,10 +489,4 @@ Outputs:
     Description: Login username for the jambonz portal
   Password:
     Value: !Ref jambonzInstance
-    Description: Initial password for jambonz portal.  You will be forced to change it once you log in for the first time.
-  JaegerUser:
-    Value: !Ref JaegerUsername
-    Description: Login username for the jambonz portal
-  JaegerPassword:
-    Value: !Ref JaegerPassword
     Description: Initial password for jambonz portal.  You will be forced to change it once you log in for the first time.
