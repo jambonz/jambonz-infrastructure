@@ -4,17 +4,17 @@ AWSTemplateFormatVersion: "2010-09-09"
 Mappings:
   AWSRegion2AMI:
     us-east-1:
-      SbcSipAmi: ami-0d9e6a27e776aaa00
-      SbcRtpAmi: ami-0ae189b5c1b56b0c8
-      FsAmi: ami-016ebaf56df8a84b0
-      WebserverAmi: ami-037ea894bad466cc1
-      MonitoringServerAmi: ami-05ee9b09996e2c1a0
-    eu-west-2:
-      SbcSipAmi: ami-0ae9968ecfef534df
-      SbcRtpAmi: ami-07940b2e454553039
-      FsAmi: ami-0cbfdbdaca620110b
-      WebserverAmi: ami-05a9d4ace683ad81b
-      MonitoringServerAmi: ami-0d4525c3bafefa46c
+      SbcSipAmi: ami-0b1129362b8ff76db
+      SbcRtpAmi: ami-08aa0cd1abd23684e
+      FsAmi: ami-012cde43def9ebfd3
+      WebserverAmi: ami-07c01a396d6359a74
+      MonitoringServerAmi: ami-0ec77ae7ad225eab0
+    eu-west-3:
+      SbcSipAmi: ami-0a597618da83f0f0a
+      SbcRtpAmi: ami-089faad36bf087a19
+      FsAmi: ami-09261164ad65cc50b
+      WebserverAmi: ami-097efdd8d82136079
+      MonitoringServerAmi: ami-02fedcc080183735c
 
 Parameters:
   KeyName:
@@ -1828,7 +1828,7 @@ Resources:
               # configure nginx for homer and grafana on the monitoring server
               
               #Add BasicAuth password for Jaeger
-              sudo htpasswd -b -c /etc/nginx/.htpasswd ${JaegerUsername} ${JaegerPassword}
+              sudo htpasswd -b -c /etc/nginx/.htpasswd ${JaegerUsername} "${JaegerPassword}"
               
               sudo cat << EOF > /etc/nginx/sites-available/default 
               server {

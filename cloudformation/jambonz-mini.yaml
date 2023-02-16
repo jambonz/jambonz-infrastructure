@@ -80,13 +80,14 @@ Parameters:
     Description: "(Optional) A DNS name that you will point to the jambonz webserver(s)"
     Default: ""
   JaegerUsername:
-    Type: String
-    Description: "Basic Auth username for Jaeger"
-    Default: "admin"
+      Type: String
+      Description: "Basic Auth username for Jaeger"
+      Default: "admin"
   JaegerPassword:
     Type: String
     Description: "Basic Auth password for Jaeger"
-    Default: "JambonzR0ck$"
+    NoEcho: true
+
 Conditions:
   ShouldEnableCloudWatch: !Equals
     - true
@@ -102,16 +103,16 @@ Conditions:
 Mappings:
   AWSRegion2AMI:
     us-east-1:
-      Ami: ami-0028cd0caa0098459
-    eu-west-2:
-      Ami: ami-076c64115c239fe57
+      Ami: ami-09d44d964981bb4eb
+    eu-west-3:
+      Ami: ami-0f908b027759bdf9c
+
 Resources:
   IamCloudwatchRole:
     Type: AWS::IAM::Role
     Condition: ShouldEnableCloudWatch
     Properties: 
       Description: jambonz mini IAM role
-      RoleName: !Sub 'jambonz-mini-iam-role'
       AssumeRolePolicyDocument:
         Statement:
         - Effect: Allow
@@ -211,6 +212,9 @@ Resources:
 
               # reset the database
               JAMBONES_ADMIN_INITIAL_PASSWORD=$INSTANCE_ID JAMBONES_MYSQL_USER=admin JAMBONES_MYSQL_PASSWORD=$NEW_DB_PASSWD JAMBONES_MYSQL_DATABASE=jambones JAMBONES_MYSQL_HOST=localhost /home/admin/apps/jambonz-api-server/db/reset_admin_password.js
+
+              #Add BasicAuth password for Jaeger
+              sudo htpasswd -b -c /etc/nginx/.htpasswd ${JaegerUsername} "${JaegerPassword}"
               
               # configure webapp
               if [[ -z "${URLPortal}" ]]; then
@@ -223,11 +227,6 @@ Resources:
                 echo "VITE_API_BASE_URL=http://${URLPortal}/api/v1" > /home/admin/apps/jambonz-webapp/.env 
                 API_BASE_URL=http://${URLPortal}/api/v1 TAG="<script>window.JAMBONZ = { API_BASE_URL: '$API_BASE_URL'};</script>"
                 sed -i -e "\@</head>@i\ $TAG" /home/admin/apps/jambonz-webapp/dist/index.html
-
-                # configure nginx for homer and grafana on the monitoring server
-              
-                #Add BasicAuth password for Jaeger
-                sudo htpasswd -b -c /etc/nginx/.htpasswd ${JaegerUsername} ${JaegerPassword}
               
                 sudo cat << EOF > /etc/nginx/sites-available/default 
                 server {
@@ -395,6 +394,11 @@ Resources:
           FromPort: 22
           ToPort: 22
           CidrIp: !Ref AllowedSshCidr
+      SecurityGroupEgress:
+        - IpProtocol: -1
+          FromPort: 0
+          ToPort: 0
+          CidrIp: 0.0.0.0/0
     DependsOn:
       - PublicRoute
   InternetGateway:

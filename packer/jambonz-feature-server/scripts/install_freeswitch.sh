@@ -6,7 +6,7 @@ GRPC_VERSION=c66d2cc
 GOOGLE_API_VERSION=e9da6f8b469c52b83f900e820be30762e9e05c57
 AWS_SDK_VERSION=1.8.129
 LWS_VERSION=v3.2.3
-MODULES_VERSION=v0.6.5
+MODULES_VERSION=v0.6.6
 
 echo "freeswitch version to install is ${FREESWITCH_VERSION}"
 echo "drachtio modules version to install is ${MODULES_VERSION}"
@@ -42,6 +42,7 @@ cd grpc && git checkout ${GRPC_VERSION} && cd ..
 
 cd freeswitch/libs
 git clone https://github.com/drachtio/nuance-asr-grpc-api.git -b main
+git clone https://github.com/drachtio/riva-asr-grpc-api.git -b main
 git clone https://github.com/freeswitch/spandsp.git -b master
 git clone https://github.com/freeswitch/sofia-sip.git -b master
 git clone https://github.com/dpirch/libfvad.git
@@ -58,6 +59,7 @@ sudo cp -r /usr/local/src/drachtio-freeswitch-modules/modules/mod_deepgram_trans
 sudo cp -r /usr/local/src/drachtio-freeswitch-modules/modules/mod_google_transcribe /usr/local/src/freeswitch/src/mod/applications/mod_google_transcribe
 sudo cp -r /usr/local/src/drachtio-freeswitch-modules/modules/mod_ibm_transcribe /usr/local/src/freeswitch/src/mod/applications/mod_ibm_transcribe
 sudo cp -r /usr/local/src/drachtio-freeswitch-modules/modules/mod_nuance_transcribe /usr/local/src/freeswitch/src/mod/applications/mod_nuance_transcribe
+sudo cp -r /usr/local/src/drachtio-freeswitch-modules/modules/mod_nvidia_transcribe /usr/local/src/freeswitch/src/mod/applications/mod_nvidia_transcribe
 sudo cp -r /usr/local/src/drachtio-freeswitch-modules/modules/mod_google_tts /usr/local/src/freeswitch/src/mod/applications/mod_google_tts
 sudo cp -r /usr/local/src/drachtio-freeswitch-modules/modules/mod_dialogflow /usr/local/src/freeswitch/src/mod/applications/mod_dialogflow
  
@@ -128,6 +130,11 @@ LANGUAGE=cpp make -j 4
 # build nuance protobufs
 echo "building protobuf stubs for Nuance asr"
 cd /usr/local/src/freeswitch/libs/nuance-asr-grpc-api
+LANGUAGE=cpp make 
+
+# build nvidia protobufs
+echo "building protobuf stubs for nvidia riva asr"
+cd /usr/local/src/freeswitch/libs/riva-asr-grpc-api
 LANGUAGE=cpp make 
 
 # build freeswitch

@@ -420,8 +420,16 @@ libs/nuance-asr-grpc-api/stubs/nuance/asr/v1/recognizer.grpc.pb.cc
 
 libfreeswitch_libnuanceapis_la_CPPFLAGS = -I/usr/local/include -I$(NUANCE_GENS_PATH) -std=c++17  -pthread
 
-CORE_LIBS+=libfreeswitch_libgoogleapis.la libfreeswitch_libnuanceapis.la
-noinst_LTLIBRARIES += libfreeswitch_libgoogleapis.la libfreeswitch_libnuanceapis.la
+NVIDIA_GENS_PATH = libs/riva-asr-grpc-api/stubs/
+
+nodist_libfreeswitch_libnvidiaapis_la_SOURCES = \
+libs/riva-asr-grpc-api/stubs/riva/proto/riva_asr.pb.cc \
+libs/riva-asr-grpc-api/stubs/riva/proto/riva_audio.pb.cc 
+
+libfreeswitch_libnvidiaapis_la_CPPFLAGS = -I/usr/local/include -I$(NVIDIA_GENS_PATH) -std=c++17  -pthread
+
+CORE_LIBS+=libfreeswitch_libgoogleapis.la libfreeswitch_libnuanceapis.la libfreeswitch_libnvidiaapis.la
+noinst_LTLIBRARIES += libfreeswitch_libgoogleapis.la libfreeswitch_libnuanceapis.la libfreeswitch_libnvidiaapis.la
 
 endif
 
