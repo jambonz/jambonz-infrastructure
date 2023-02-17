@@ -25,14 +25,21 @@ sudo cp -r lib/ /usr/local/lib/MicrosoftSpeechSDK
 if [ "$ARCH" == "arm64" ]; then
   echo installing Microsoft arm64 libs...
   sudo cp /usr/local/lib/MicrosoftSpeechSDK/arm64/libMicrosoft.*.so /usr/local/lib/
+  echo done
 fi 
 if [ "$ARCH" == "amd64" ]; then
   echo installing Microsoft x64 libs...
   sudo cp /usr/local/lib/MicrosoftSpeechSDK/x64/libMicrosoft.*.so /usr/local/lib/
+  echo done
 fi
-rm -Rf /tmp/SpeechSDK-Linux-1.24.2
 
+echo remove SpeechSDK-Linux-1.24.2
+sudo rm -Rf /tmp/SpeechSDK-Linux-1.24.2.tgz /tmp/SpeechSDK-Linux-1.24.2
+echo done
+
+echo config git
 git config --global pull.rebase true
+echo done
 cd /usr/local/src
 git clone https://github.com/signalwire/freeswitch.git -b ${FREESWITCH_VERSION}
 git clone https://github.com/warmcat/libwebsockets.git -b ${LWS_VERSION}

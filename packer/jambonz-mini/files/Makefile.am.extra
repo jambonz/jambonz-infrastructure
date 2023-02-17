@@ -424,7 +424,9 @@ NVIDIA_GENS_PATH = libs/riva-asr-grpc-api/stubs/
 
 nodist_libfreeswitch_libnvidiaapis_la_SOURCES = \
 libs/riva-asr-grpc-api/stubs/riva/proto/riva_asr.pb.cc \
-libs/riva-asr-grpc-api/stubs/riva/proto/riva_audio.pb.cc 
+libs/riva-asr-grpc-api/stubs/riva/proto/riva_audio.pb.cc \
+libs/riva-asr-grpc-api/stubs/riva/proto/riva_asr.grpc.pb.cc \
+libs/riva-asr-grpc-api/stubs/riva/proto/riva_audio.grpc.pb.cc 
 
 libfreeswitch_libnvidiaapis_la_CPPFLAGS = -I/usr/local/include -I$(NVIDIA_GENS_PATH) -std=c++17  -pthread
 
