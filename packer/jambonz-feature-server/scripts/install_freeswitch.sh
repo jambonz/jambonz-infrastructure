@@ -33,6 +33,7 @@ if [ "$ARCH" == "amd64" ]; then
   echo done
 fi
 
+cd /usr/local/src
 echo remove SpeechSDK-Linux-1.24.2
 sudo rm -Rf /tmp/SpeechSDK-Linux-1.24.2.tgz /tmp/SpeechSDK-Linux-1.24.2
 echo done
@@ -40,7 +41,6 @@ echo done
 echo config git
 git config --global pull.rebase true
 echo done
-cd /usr/local/src
 git clone https://github.com/signalwire/freeswitch.git -b ${FREESWITCH_VERSION}
 git clone https://github.com/warmcat/libwebsockets.git -b ${LWS_VERSION}
 git clone https://github.com/drachtio/drachtio-freeswitch-modules.git -b ${MODULES_VERSION}

@@ -19,7 +19,9 @@
     "influxdb_ip":  "127.0.0.1",
     "rtp_engine_version": "mr11.2.1.2",
     "rtp_engine_min_port": "40000",
-    "rtp_engine_max_port": "60000"
+    "rtp_engine_max_port": "60000",
+    "mediaserver_name" : "jambonz",
+    "preferred_codec_list" : "PCMU,PCMA,OPUS,G722"
   },
   "builders": [{
     "type": "amazon-ebs",
@@ -100,6 +102,11 @@
     },
     {
       "type": "shell",
+      "environment_vars": [
+        "ARCH=amd64",
+        "MEDIA_SERVER_NAME={{user `mediaserver_name`}}",
+        "PREFERRED_CODEC_LIST={{user `preferred_codec_list`}}"
+      ],
       "script": "scripts/install_freeswitch.sh"
     },
     {
