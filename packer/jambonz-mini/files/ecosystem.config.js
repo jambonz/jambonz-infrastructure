@@ -255,6 +255,7 @@ module.exports = {
     env: {
       NODE_ENV: 'production',
       JWT_SECRET: 'JWT-SECRET-GOES_HERE',
+      JAMBONES_GATHER_EARLY_HINTS_MATCH: 1,
       JAMBONES_OTEL_ENABLED: 1,
       OTEL_EXPORTER_JAEGER_ENDPOINT: 'http://localhost:14268/api/traces',
       OTEL_EXPORTER_OTLP_METRICS_INSECURE: 1,
