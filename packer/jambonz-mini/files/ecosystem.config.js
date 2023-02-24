@@ -30,7 +30,7 @@ module.exports = {
       JAMBONES_MYSQL_CONNECTION_LIMIT: 10,
       JAMBONES_REDIS_HOST: '127.0.0.1',
       JAMBONES_REDIS_PORT: 6379,
-      JAMBONES_LOGLEVEL: 'debug'
+      JAMBONES_LOGLEVEL: 'info'
     }
   },
   {
@@ -190,7 +190,7 @@ module.exports = {
     env: {
       NODE_ENV: 'production',
       JAMBONES_NETWORK_CIDR: 'PRIVATE_IP/32',
-      JAMBONES_LOGLEVEL: 'debug',
+      JAMBONES_LOGLEVEL: 'info',
       DRACHTIO_HOST: '127.0.0.1',
       DRACHTIO_PORT: 9022,
       DRACHTIO_SECRET: 'cymru',
@@ -271,6 +271,7 @@ module.exports = {
       AWS_REGION: 'AWS_REGION_NAME',
       JAMBONES_NETWORK_CIDR: 'PRIVATE_IP/32',
       JAMBONES_API_BASE_URL: '--JAMBONES_API_BASE_URL--',
+      JAMBONES_GATHER_EARLY_HINTS_MATCH: 1,
       JAMBONES_MYSQL_HOST: '127.0.0.1',
       JAMBONES_MYSQL_USER: 'admin',
       JAMBONES_MYSQL_PASSWORD: 'JambonzR0ck$',
@@ -278,7 +279,7 @@ module.exports = {
       JAMBONES_MYSQL_CONNECTION_LIMIT: 10,
       JAMBONES_REDIS_HOST: '127.0.0.1',
       JAMBONES_REDIS_PORT: 6379,
-      JAMBONES_LOGLEVEL: 'debug',
+      JAMBONES_LOGLEVEL: 'info',
       JAMBONES_TIME_SERIES_HOST: '127.0.0.1',
       HTTP_PORT: 3000,
       DRACHTIO_HOST: '127.0.0.1',

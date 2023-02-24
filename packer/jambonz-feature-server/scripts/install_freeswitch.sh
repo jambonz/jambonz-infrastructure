@@ -50,6 +50,7 @@ cd grpc && git checkout ${GRPC_VERSION} && cd ..
 cd freeswitch/libs
 git clone https://github.com/drachtio/nuance-asr-grpc-api.git -b main
 git clone https://github.com/drachtio/riva-asr-grpc-api.git -b main
+git clone https://github.com/drachtio/soniox-asr-grpc-api.git -b main
 git clone https://github.com/freeswitch/spandsp.git -b master
 git clone https://github.com/freeswitch/sofia-sip.git -b master
 git clone https://github.com/dpirch/libfvad.git
@@ -144,6 +145,11 @@ echo "building protobuf stubs for nvidia riva asr"
 cd /usr/local/src/freeswitch/libs/riva-asr-grpc-api
 LANGUAGE=cpp make 
 
+# build soniox protobufs
+echo "building protobuf stubs for sonioxasr"
+cd /usr/local/src/freeswitch/libs/soniox-asr-grpc-api
+LANGUAGE=cpp make 
+
 # build freeswitch
 echo "building freeswitch"
 cd /usr/local/src/freeswitch
@@ -170,3 +176,8 @@ sudo systemctl enable freeswitch
 sudo cp /tmp/freeswitch_log_rotation /etc/cron.daily/freeswitch_log_rotation
 sudo chown root:root /etc/cron.daily/freeswitch_log_rotation
 sudo chmod a+x /etc/cron.daily/freeswitch_log_rotation
+
+echo "downloading soniox root verification certificate"
+cd /usr/local/freeswitch/certs
+wget https://raw.githubusercontent.com/grpc/grpc/master/etc/roots.pem
+
