@@ -1731,12 +1731,9 @@ Resources:
               fi
               # jambonz webapp
               echo "configuring webapp.."
-              echo "REACT_APP_API_BASE_URL=http://${URLPortal}/api/v1" > /home/admin/apps/jambonz-webapp/.env
-              echo "REACT_APP_MOBILE_BREAKPOINT=767px" >> /home/admin/apps/jambonz-webapp/.env
-              echo "REACT_APP_ENABLE_SUBSPACE=1" >> /home/admin/apps/jambonz-webapp/.env
-              REACT_APP_API_BASE_URL=http://${URLPortal}/api/v1
-              TAG="<script>window.JAMBONZ = { APP_API_BASE_URL: '$REACT_APP_API_BASE_URL'};</script>"
-              sed -i -e "\@</head>@i\ $TAG" /home/admin/apps/jambonz-webapp/build/index.html
+              echo "VITE_API_BASE_URL=http://${URLPortal}/api/v1" > /home/admin/apps/jambonz-webapp/.env 
+              API_BASE_URL=http://${URLPortal}/api/v1 TAG="<script>window.JAMBONZ = { API_BASE_URL: '$API_BASE_URL'};</script>"
+              sed -i -e "\@</head>@i\ $TAG" /home/admin/apps/jambonz-webapp/dist/index.html
         
               echo "writing /home/admin/apps/ecosystem.config.js.."
               cat << EOF > /home/admin/apps/ecosystem.config.js
