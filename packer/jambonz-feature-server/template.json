@@ -82,6 +82,15 @@
     },
     {
       "type": "shell",
+      "environment_vars": [
+        "ARCH={{user `ami_base_image_arch`}}",
+        "MEDIA_SERVER_NAME={{user `mediaserver_name`}}",
+        "PREFERRED_CODEC_LIST={{user `preferred_codec_list`}}"
+      ],
+      "script": "scripts/install_freeswitch.sh"
+    },
+    {
+      "type": "shell",
       "script": "scripts/install_nodejs.sh"
     },
     {
@@ -97,15 +106,6 @@
       "type": "shell",
       "execute_command": "chmod +x {{ .Path }}; sudo '{{ .Path }}' {{user `install_telegraf`}}",
       "script": "scripts/install_telegraf.sh"
-    },
-    {
-      "type": "shell",
-      "environment_vars": [
-        "ARCH={{user `ami_base_image_arch`}}",
-        "MEDIA_SERVER_NAME={{user `mediaserver_name`}}",
-        "PREFERRED_CODEC_LIST={{user `preferred_codec_list`}}"
-      ],
-      "script": "scripts/install_freeswitch.sh"
     },
     {
       "type": "shell",
