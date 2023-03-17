@@ -1896,8 +1896,10 @@ AC_CONFIG_FILES([Makefile
     src/mod/applications/mod_google_tts/Makefile
     src/mod/applications/mod_google_transcribe/Makefile
     src/mod/applications/mod_ibm_transcribe/Makefile
+    src/mod/applications/mod_jambonz_transcribe/Makefile
     src/mod/applications/mod_nuance_transcribe/Makefile
     src/mod/applications/mod_nvidia_transcribe/Makefile
+    src/mod/applications/mod_soniox_transcribe/Makefile
     src/mod/applications/mod_dialogflow/Makefile
 		src/mod/applications/mod_abstraction/Makefile
 		src/mod/applications/mod_avmd/Makefile

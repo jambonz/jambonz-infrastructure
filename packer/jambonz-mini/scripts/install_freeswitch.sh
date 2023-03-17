@@ -6,7 +6,7 @@ GRPC_VERSION=c66d2cc
 GOOGLE_API_VERSION=e9da6f8b469c52b83f900e820be30762e9e05c57
 AWS_SDK_VERSION=1.8.129
 LWS_VERSION=v3.2.3
-MODULES_VERSION=v0.6.7
+MODULES_VERSION=v0.6.9
 
 echo "freeswitch version to install is ${FREESWITCH_VERSION}"
 echo "drachtio modules version to install is ${MODULES_VERSION}"
@@ -33,6 +33,7 @@ if [ "$ARCH" == "amd64" ]; then
   echo done
 fi
 
+cd /usr/local/src
 echo remove SpeechSDK-Linux-1.24.2
 sudo rm -Rf /tmp/SpeechSDK-Linux-1.24.2.tgz /tmp/SpeechSDK-Linux-1.24.2
 echo done
@@ -40,7 +41,6 @@ echo done
 echo config git
 git config --global pull.rebase true
 echo done
-cd /usr/local/src
 git clone https://github.com/signalwire/freeswitch.git -b ${FREESWITCH_VERSION}
 git clone https://github.com/warmcat/libwebsockets.git -b ${LWS_VERSION}
 git clone https://github.com/drachtio/drachtio-freeswitch-modules.git -b ${MODULES_VERSION}
@@ -50,6 +50,7 @@ cd grpc && git checkout ${GRPC_VERSION} && cd ..
 cd freeswitch/libs
 git clone https://github.com/drachtio/nuance-asr-grpc-api.git -b main
 git clone https://github.com/drachtio/riva-asr-grpc-api.git -b main
+git clone https://github.com/drachtio/soniox-asr-grpc-api.git -b main
 git clone https://github.com/freeswitch/spandsp.git -b master
 git clone https://github.com/freeswitch/sofia-sip.git -b master
 git clone https://github.com/dpirch/libfvad.git
@@ -68,6 +69,7 @@ sudo cp -r /usr/local/src/drachtio-freeswitch-modules/modules/mod_ibm_transcribe
 sudo cp -r /usr/local/src/drachtio-freeswitch-modules/modules/mod_nuance_transcribe /usr/local/src/freeswitch/src/mod/applications/mod_nuance_transcribe
 sudo cp -r /usr/local/src/drachtio-freeswitch-modules/modules/mod_nvidia_transcribe /usr/local/src/freeswitch/src/mod/applications/mod_nvidia_transcribe
 sudo cp -r /usr/local/src/drachtio-freeswitch-modules/modules/mod_soniox_transcribe /usr/local/src/freeswitch/src/mod/applications/mod_soniox_transcribe
+sudo cp -r /usr/local/src/drachtio-freeswitch-modules/modules/mod_jambonz_transcribe /usr/local/src/freeswitch/src/mod/applications/mod_jambonz_transcribe
 sudo cp -r /usr/local/src/drachtio-freeswitch-modules/modules/mod_google_tts /usr/local/src/freeswitch/src/mod/applications/mod_google_tts
 sudo cp -r /usr/local/src/drachtio-freeswitch-modules/modules/mod_dialogflow /usr/local/src/freeswitch/src/mod/applications/mod_dialogflow
  
@@ -148,6 +150,11 @@ echo "building protobuf stubs for nvidia riva asr"
 cd /usr/local/src/freeswitch/libs/riva-asr-grpc-api
 LANGUAGE=cpp make 
 
+# build soniox protobufs
+echo "building protobuf stubs for sonioxasr"
+cd /usr/local/src/freeswitch/libs/soniox-asr-grpc-api
+LANGUAGE=cpp make 
+
 # build freeswitch
 echo "building freeswitch"
 cd /usr/local/src/freeswitch
@@ -174,3 +181,8 @@ sudo systemctl enable freeswitch
 sudo cp /tmp/freeswitch_log_rotation /etc/cron.daily/freeswitch_log_rotation
 sudo chown root:root /etc/cron.daily/freeswitch_log_rotation
 sudo chmod a+x /etc/cron.daily/freeswitch_log_rotation
+
+echo "downloading soniox root verification certificate"
+cd /usr/local/freeswitch/certs
+wget https://raw.githubusercontent.com/grpc/grpc/master/etc/roots.pem
+
