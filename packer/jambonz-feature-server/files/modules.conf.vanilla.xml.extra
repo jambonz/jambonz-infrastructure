@@ -10,6 +10,7 @@
     <load module="mod_nuance_transcribe"/>
     <load module="mod_nvidia_transcribe"/>
     <load module="mod_soniox_transcribe"/>
+    <load module="mod_jambonz_transcribe"/>
     <load module="mod_dialogflow"/>
 
     <!-- Loggers (I'd load these first) -->
