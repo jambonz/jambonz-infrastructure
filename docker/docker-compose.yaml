@@ -64,6 +64,7 @@ services:
       - "3000:3000"
     environment:
       NODE_ENV: production
+      JWT_SECRET: '5a3e38b5-3188-4936-89c9-fb0df3138b5c'
       JAMBONES_MYSQL_HOST: 172.10.0.2
       JAMBONES_MYSQL_USER: jambones 
       JAMBONES_MYSQL_PASSWORD: jambones 
@@ -75,6 +76,7 @@ services:
       JAMBONES_CLUSTER_ID: jb 
       ENABLE_METRICS: 0
       HTTP_PORT: 3000
+      JAMBONES_TIME_SERIES_HOST: 172.10.0.61
     depends_on:
       - mysql
       - redis
@@ -83,14 +85,14 @@ services:
         ipv4_address: 172.10.0.30
     
   webapp:
-    build: ./webapp
+    build: ./jambonz-webapp
     networks:
       jambonz:
         ipv4_address: 172.10.0.31
     ports:
       - "3001:3001"
     environment:
-      REACT_APP_API_BASE_URL: http://${HOST_IP}:3000/v1
+      API_BASE_URL: http://${HOST_IP}:3000/v1
     depends_on:
       - api-server
 
@@ -110,6 +112,7 @@ services:
       JAMBONES_REDIS_PORT: 6379
       JAMBONES_LOGLEVEL: info
       ENABLE_METRICS: 0
+      JAMBONES_TIME_SERIES_HOST: 172.10.0.61
     depends_on:
       - mysql
       - redis
@@ -155,6 +158,8 @@ services:
       JAMBONES_CLUSTER_ID: jb 
       JAMBONES_LOGLEVEL: info
       ENABLE_METRICS: 0
+      JAMBONES_NETWORK_CIDR: 172.10.0.0/16
+      JAMBONES_TIME_SERIES_HOST: 172.10.0.61
     depends_on:
       - mysql
       - redis
@@ -180,6 +185,8 @@ services:
       JAMBONES_CLUSTER_ID: jb 
       JAMBONES_LOGLEVEL: info
       ENABLE_METRICS: 0
+      JAMBONES_NETWORK_CIDR: 172.10.0.0/16
+      JAMBONES_TIME_SERIES_HOST: 172.10.0.61
     depends_on:
       - mysql
       - redis
@@ -196,7 +203,7 @@ services:
         ipv4_address: 172.10.0.50
 
   freeswitch:
-    image: drachtio/drachtio-freeswitch-mrf:v1.10.1-full
+    image: drachtio/drachtio-freeswitch-mrf:0.4.27
     restart: always
     command: freeswitch --rtp-range-start 20000 --rtp-range-end 20100
     ports:
@@ -235,6 +242,7 @@ services:
       JAMBONES_SBCS: 172.10.0.10
       JAMBONES_FEATURE_SERVERS: 172.10.0.50:9022:cymru
       JAMBONES_FREESWITCH: 172.10.0.51:8021:ClueCon
+      JAMBONES_TIME_SERIES_HOST: 172.10.0.61
     depends_on:
       - mysql
       - redis
@@ -247,5 +255,12 @@ services:
       jambonz:
         ipv4_address: 172.10.0.60
 
+  influxdb:
+    image: influxdb:1.8
+    ports:
+      - "8086:8086"
+    networks:
+      jambonz:
+        ipv4_address: 172.10.0.61
 
 
