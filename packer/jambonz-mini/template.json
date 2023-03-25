@@ -5,7 +5,7 @@
     "ami_description": "jambonz all-in-one AMI", 
     "instance_type": "t2.xlarge",
     "drachtio_version": "v0.8.21",
-    "jambonz_version": "v0.8.2-rc3",
+    "jambonz_version": "v0.8.2-rc11",
     "jambonz_user": "admin",
     "jambonz_password": "JambonzR0ck$",
     "install_telegraf": "yes",
@@ -17,7 +17,7 @@
     "install_cloudwatch":  "yes",
     "install_nodered":  "no",
     "influxdb_ip":  "127.0.0.1",
-    "rtp_engine_version": "mr11.2.1.2",
+    "rtp_engine_version": "mr11.2.1.5",
     "rtp_engine_min_port": "40000",
     "rtp_engine_max_port": "60000",
     "mediaserver_name" : "jambonz",
@@ -153,11 +153,6 @@
     },
     {
       "type": "shell",
-      "execute_command": "chmod +x {{ .Path }}; sudo '{{ .Path }}' {{user `install_homer`}} {{user `homer_user`}} {{user `homer_password`}}",
-      "script": "scripts/install_homer.sh"
-    },
-    {
-      "type": "shell",
       "execute_command": "chmod +x {{ .Path }}; sudo '{{ .Path }}' {{user `install_influxdb`}}",
       "script": "scripts/install_grafana.sh"
     },
@@ -179,6 +174,11 @@
       "type": "shell",
       "execute_command": "chmod +x {{ .Path }}; sudo '{{ .Path }}' {{user `jambonz_version`}} {{user `jambonz_user`}} {{user `jambonz_password`}}",
       "script": "scripts/install_app.sh"
+    },
+    {
+      "type": "shell",
+      "execute_command": "chmod +x {{ .Path }}; sudo '{{ .Path }}' {{user `install_homer`}} {{user `homer_user`}} {{user `homer_password`}}",
+      "script": "scripts/install_homer.sh"
     },
     {
       "type": "shell",

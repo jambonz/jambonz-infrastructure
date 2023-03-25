@@ -7,6 +7,7 @@ DB_PASS=$3
 curl -s https://packagecloud.io/install/repositories/qxip/sipcapture/script.deb.sh | sudo bash
 sudo apt-get install -y homer-app heplify-server
 
+sudo cp /usr/local/homer/etc/webapp_config.json.example /usr/local/homer/etc/webapp_config.json
 sudo sed -i -e "s/homer_user/$DB_USER/g" /usr/local/homer/etc/webapp_config.json
 sudo sed -i -e "s/homer_password/$DB_PASS/g" /usr/local/homer/etc/webapp_config.json
 sudo sed -i -e "s/localhost/127.0.0.1/g" /usr/local/homer/etc/webapp_config.json
