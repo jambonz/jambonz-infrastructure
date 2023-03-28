@@ -7,7 +7,7 @@
         <contacts>
         </contacts>
 
-        <udp-mtu>4096</udp-mtu>
+        <udp-mtu>8192</udp-mtu>
 
     </sip>
 

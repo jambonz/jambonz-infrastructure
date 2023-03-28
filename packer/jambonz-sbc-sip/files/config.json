@@ -1,5 +1,6 @@
 {
 	"APIKEY":"API-KEY-HERE",
-	"LKID":"0",
-	"VERSION":"0.3"
+	"LKID":"100",
+	"VERSION":"0.7",
+  "FLUSH":"200"
 }

@@ -6,7 +6,7 @@ GRPC_VERSION=c66d2cc
 GOOGLE_API_VERSION=e9da6f8b469c52b83f900e820be30762e9e05c57
 AWS_SDK_VERSION=1.8.129
 LWS_VERSION=v3.2.3
-MODULES_VERSION=v0.6.9
+MODULES_VERSION=v0.6.11
 
 echo "freeswitch version to install is ${FREESWITCH_VERSION}"
 echo "drachtio modules version to install is ${MODULES_VERSION}"
