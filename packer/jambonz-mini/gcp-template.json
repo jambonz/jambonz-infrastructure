@@ -1,0 +1,170 @@
+{
+  "variables": {
+    "region": "us-east-1",
+    "ssh_username": "admin",
+    "ami_description": "jambonz all-in-one AMI", 
+    "instance_type": "c2-standard-4",
+    "drachtio_version": "v0.8.21",
+    "jambonz_version": "v0.8.2",
+    "jambonz_user": "admin",
+    "jambonz_password": "JambonzR0ck$",
+    "install_telegraf": "yes",
+    "homer_user": "homer_user",
+    "homer_password": "XcapJTqy11LnsYRtxXGPTYQkAnI",
+    "install_influxdb":  "yes",
+    "install_homer":  "yes",
+    "install_jaeger":  "yes",
+    "install_cloudwatch":  "yes",
+    "install_nodered":  "no",
+    "influxdb_ip":  "127.0.0.1",
+    "rtp_engine_version": "mr11.2.1.5",
+    "rtp_engine_min_port": "40000",
+    "rtp_engine_max_port": "60000",
+    "mediaserver_name" : "jambonz",
+    "preferred_codec_list" : "PCMU,PCMA,OPUS,G722",
+    "project_id": "drachtio-cpaas",
+    "image_family": "debian-11-bullseye-v20230306",
+    "image_zone": "us-east1-b"
+  },
+  "builders": [
+    {
+      "type": "googlecompute",
+      "project_id": "{{user `project_id`}}",
+      "source_image": "{{user `image_family`}}",
+      "ssh_username": "{{user `ssh_username`}}",
+      "zone": "{{user `image_zone`}}",
+      "machine_type": "{{user `instance_type`}}",
+      "disk_size": "60"
+    }
+  ],
+  "provisioners": [
+    {
+      "type": "shell",
+      "inline": [
+        "sudo apt-get update",
+        "sudo apt-get remove --auto-remove nftables",
+        "sudo apt-get purge nftables",
+        "sudo apt-get -y install python lsof gcc g++ make cmake build-essential git autoconf automake default-mysql-client redis-tools \\",
+        "curl argon2 telnet libtool libtool-bin libssl-dev libcurl4-openssl-dev libz-dev systemd-coredump liblz4-tool \\",
+        "libxtables-dev libip6tc-dev libip4tc-dev  libiptc-dev linux-headers-$(uname -r) libavformat-dev liblua5.1-0-dev libavfilter-dev libavcodec-dev libswresample-dev \\",
+        "libevent-dev libpcap-dev libxmlrpc-core-c3-dev markdown libjson-glib-dev lsb-release \\",
+        "libhiredis-dev gperf libspandsp-dev default-libmysqlclient-dev htop dnsutils gdb \\",
+        "gnupg2 wget pkg-config ca-certificates libjpeg-dev libsqlite3-dev libpcre3-dev libldns-dev \\",
+        "libspeex-dev libspeexdsp-dev libedit-dev libtiff-dev yasm libswscale-dev haveged jq fail2ban \\",
+        "libopus-dev libsndfile-dev libshout3-dev libmpg123-dev libmp3lame-dev libopusfile-dev libgoogle-perftools-dev",
+        "sudo chmod a+w /usr/local/src",
+        "mkdir ~/apps",
+        "cd ~/apps",
+        "git config --global advice.detachedHead false",
+        "git clone https://github.com/jambonz/sbc-call-router.git -b {{user `jambonz_version`}}",
+        "git clone https://github.com/jambonz/fsw-clear-old-calls.git -b {{user `jambonz_version`}}",
+        "git clone https://github.com/jambonz/sbc-outbound.git -b {{user `jambonz_version`}}",
+        "git clone https://github.com/jambonz/sbc-inbound.git -b {{user `jambonz_version`}}",
+        "git clone https://github.com/jambonz/sbc-sip-sidecar.git -b {{user `jambonz_version`}}",
+        "git clone https://github.com/jambonz/jambonz-feature-server.git -b {{user `jambonz_version`}}",
+        "git clone https://github.com/jambonz/jambonz-api-server.git -b {{user `jambonz_version`}}",
+        "git clone https://github.com/jambonz/jambonz-webapp.git -b {{user `jambonz_version`}}",
+        "git clone https://github.com/jambonz/jambonz-smpp-esme.git -b {{user `jambonz_version`}}",
+        "git clone https://github.com/jambonz/sbc-rtpengine-sidecar.git -b {{user `jambonz_version`}}"
+      ]
+    },
+    {
+      "type": "file",
+      "source": "files/",
+      "destination": "/tmp"
+    },
+    {
+      "type": "shell",
+      "script": "scripts/install_os_tuning.sh"
+    },
+    {
+      "type": "shell",
+      "execute_command": "chmod +x {{ .Path }}; sudo '{{ .Path }}' {{user `drachtio_version`}} GCP",
+      "script": "scripts/install_drachtio.sh"
+    },
+    {
+      "type": "shell",
+      "environment_vars": [
+        "ARCH=amd64",
+        "MEDIA_SERVER_NAME={{user `mediaserver_name`}}",
+        "PREFERRED_CODEC_LIST={{user `preferred_codec_list`}}"
+      ],
+      "script": "scripts/install_freeswitch.sh"
+    },
+    {
+      "type": "shell",
+      "execute_command": "chmod +x {{ .Path }}; sudo '{{ .Path }}' {{user `rtp_engine_version`}}",
+      "script": "scripts/install_rtpengine.sh"
+    },
+    {
+      "type": "shell",
+      "script": "scripts/install_nodejs.sh"
+    },
+    {
+      "type": "shell",
+      "execute_command": "chmod +x {{ .Path }}; sudo '{{ .Path }}' {{user `install_influxdb`}}",
+      "script": "scripts/install_influxdb.sh"
+    },
+    {
+      "type": "shell",
+      "execute_command": "chmod +x {{ .Path }}; sudo '{{ .Path }}' {{build `ID`}} {{user `apiban_username`}} {{user `apiban_password`}}",
+      "script": "scripts/install_apiban.sh"
+    },
+    {
+      "type": "shell",
+      "script": "scripts/install_nginx.sh"
+    },
+    {
+      "type": "shell",
+      "script": "scripts/install_redis.sh"
+    },
+    {
+      "type": "shell",
+      "execute_command": "chmod +x {{ .Path }}; sudo '{{ .Path }}' {{user `install_homer`}} {{user `homer_user`}} {{user `homer_password`}}",
+      "script": "scripts/install_postgresql.sh"
+    },
+    {
+      "type": "shell",
+      "execute_command": "chmod +x {{ .Path }}; sudo '{{ .Path }}' {{user `install_homer`}} {{user `influxdb_ip`}}",
+      "script": "scripts/install_telegraf.sh"
+    },
+    {
+      "type": "shell",
+      "execute_command": "chmod +x {{ .Path }}; sudo '{{ .Path }}' {{user `install_influxdb`}}",
+      "script": "scripts/install_grafana.sh"
+    },
+    {
+      "type": "shell",
+      "script": "scripts/install_fail2ban.sh"
+    },
+    {
+      "type": "shell",
+      "execute_command": "chmod +x {{ .Path }}; sudo '{{ .Path }}' {{user `install_jaeger`}}",
+      "script": "scripts/install_jaeger.sh"
+    },
+    {
+      "type": "shell",
+      "execute_command": "chmod +x {{ .Path }}; sudo '{{ .Path }}'  {{user `jambonz_user`}} {{user `jambonz_password`}}",
+      "script": "scripts/install_mysql.sh"
+    },
+    {
+      "type": "shell",
+      "execute_command": "chmod +x {{ .Path }}; sudo '{{ .Path }}' {{user `jambonz_version`}} {{user `jambonz_user`}} {{user `jambonz_password`}}",
+      "script": "scripts/install_app.sh"
+    },
+    {
+      "type": "shell",
+      "execute_command": "chmod +x {{ .Path }}; sudo '{{ .Path }}' {{user `install_homer`}} {{user `homer_user`}} {{user `homer_password`}}",
+      "script": "scripts/install_homer.sh"
+    },
+    {
+      "type": "shell",
+      "inline": [
+        "echo iptables-persistent iptables-persistent/autosave_v4 boolean true | sudo debconf-set-selections",
+        "echo iptables-persistent iptables-persistent/autosave_v6 boolean true | sudo debconf-set-selections",
+        "sudo apt-get -y install iptables-persistent",
+        "sudo rm -Rf /tmp/*"
+      ]
+    }
+  ]
+}

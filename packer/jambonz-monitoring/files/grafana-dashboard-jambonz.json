@@ -76,7 +76,7 @@
 						"type": "fill"
 					}
 				],
-				"measurement": "rtp_media_calls_count",
+				"measurement": "sbc_media_calls_count",
 				"orderByTime": "ASC",
 				"policy": "default",
 				"queryType": "randomWalk",
@@ -389,7 +389,7 @@
 						"type": "fill"
 					}
 				],
-				"measurement": "rtp_media_calls_count",
+				"measurement": "sbc_media_calls_count",
 				"orderByTime": "ASC",
 				"policy": "default",
 				"queryType": "randomWalk",
@@ -605,7 +605,7 @@
 						"type": "fill"
 					}
 				],
-				"measurement": "rtp_media_calls_count",
+				"measurement": "sbc_media_calls_count",
 				"orderByTime": "ASC",
 				"policy": "default",
 				"queryType": "randomWalk",
