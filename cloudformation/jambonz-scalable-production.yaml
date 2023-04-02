@@ -4,17 +4,11 @@ AWSTemplateFormatVersion: "2010-09-09"
 Mappings:
   AWSRegion2AMI:
     us-east-1:
-      SbcSipAmi: ami-0b1129362b8ff76db
-      SbcRtpAmi: ami-08aa0cd1abd23684e
-      FsAmi: ami-012cde43def9ebfd3
-      WebserverAmi: ami-07c01a396d6359a74
-      MonitoringServerAmi: ami-0ec77ae7ad225eab0
-    eu-west-3:
-      SbcSipAmi: ami-0a597618da83f0f0a
-      SbcRtpAmi: ami-089faad36bf087a19
-      FsAmi: ami-09261164ad65cc50b
-      WebserverAmi: ami-097efdd8d82136079
-      MonitoringServerAmi: ami-02fedcc080183735c
+      SbcSipAmi: ami-01bd8823d7269c0c8
+      SbcRtpAmi: ami-0954b7e5aaf4ee966
+      FsAmi: ami-0afdc9cef2c7e3e24
+      WebserverAmi: ami-0b0b877726e51a31c
+      MonitoringServerAmi: ami-0b9fe2fe66ff1ad62
 
 Parameters:
   KeyName:
@@ -1155,6 +1149,11 @@ Resources:
               sudo sed -i -e "s/retention_in_days\": 3/retention_in_days\": ${CloudwatchLogRetention}/g" /opt/aws/amazon-cloudwatch-agent/bin/config.json 
               sudo /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a fetch-config -m ec2 -s -c file:/opt/aws/amazon-cloudwatch-agent/bin/config.json
 
+              # get an apiban key
+              APIBANKEY=$(curl -X POST -u jambonz:1a074994242182a9e0b67eae93978826 -d "{\"client\": \"$INSTANCE_ID\"}" -s https://apiban.org/sponsor/newkey | jq -r '.ApiKey')
+              sudo sed -i -e "s/API-KEY-HERE/$APIBANKEY/g" /usr/local/bin/apiban/config.json
+              sudo /usr/local/bin/apiban/apiban-iptables-client FULL
+
               echo "user data script completed"
             - VPC_CIDR: !Ref VpcCIDR
               AWS_REGION: !Ref AWS::Region
@@ -1350,6 +1349,7 @@ Resources:
                     JAMBONES_CLUSTER_ID: '${JAMBONES_CLUSTER_ID}',
                     JAMBONES_FEATURE_SERVERS: '127.0.0.1:9022:cymru',
                     JAMBONES_FREESWITCH: '127.0.0.1:8021:JambonzR0ck$',
+                    AUTHENTICATION_KEY: '${JWT_SECRET}',
                     JWT_SECRET: '${JWT_SECRET}'
                   }
                 }]
@@ -1777,6 +1777,7 @@ Resources:
                     HOMER_BASE_URL: 'http://${MONITORING_SERVER_IP}:9080',
                     HOMER_USERNAME: 'admin',
                     HOMER_PASSWORD: 'sipcapture',
+                    AUTHENTICATION_KEY: '${JWT_SECRET}',
                     JWT_SECRET: '${JWT_SECRET}'
                     },
                 },
