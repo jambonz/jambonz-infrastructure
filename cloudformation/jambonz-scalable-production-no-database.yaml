@@ -215,9 +215,6 @@ Parameters:
   MySQLUsername:
     Description: 'the database username'
     Type: String
-  MySQLPassword:
-    Description: 'The database admin account password'
-    Type: String
   EncryptionSecret:
     Type: String
     Description: "secret to use for encrypting jwt and other data"
