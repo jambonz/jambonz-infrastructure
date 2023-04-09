@@ -1,7 +1,7 @@
 #!/bin/bash
 VERSION=$1
 
-echo "rtpengine version to install is ${VERSION}"
+echo "rtpengine version to install is ${VERSION}, cloud provider is $2"
 
 cd /usr/local/src
 git clone https://github.com/BelledonneCommunications/bcg729.git
@@ -33,9 +33,16 @@ EOF
 echo 'add 42' > /proc/rtpengine/control
 iptables -I INPUT -p udp --dport 40000:60000 -j RTPENGINE --id 42
 
+if [ "$2" = "gcp" ]; then 
+  echo "installing rtpengine for gcp"
+  sudo mv /tmp/rtpengine.gcp.service /etc/systemd/system/rtpengine.service
+else
+  echo "installing rtpengine for aws"
+  sudo mv /tmp/rtpengine.service /etc/systemd/system/rtpengine.service
+fi 
+
 cp /usr/local/src/rtpengine/daemon/rtpengine /usr/local/bin
 cp /usr/local/src/rtpengine/recording-daemon/rtpengine-recording /usr/local/bin/
-sudo mv /tmp/rtpengine.service /etc/systemd/system
 sudo mv /tmp/rtpengine-recording.service /etc/systemd/system
 sudo mv /tmp/rtpengine-recording.ini /etc/rtpengine-recording.ini
 sudo chmod 644 /etc/systemd/system/rtpengine.service

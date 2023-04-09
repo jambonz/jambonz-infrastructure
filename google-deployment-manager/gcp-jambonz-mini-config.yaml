@@ -1,0 +1,6 @@
+imports:
+- path: gcp-jambonz-mini.jinja
+
+resources:
+- name: jambonz-mini
+  type: gcp-jambonz-mini.jinja

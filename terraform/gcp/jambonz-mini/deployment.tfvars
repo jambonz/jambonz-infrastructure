@@ -1,0 +1,8 @@
+image = "packer-1680730500"
+region = "us-central1"
+zone = "us-central1-b"
+project = "drachtio-cpaas"
+dns_name = "jambonz.me"
+instance_type = "e2-medium"
+jaeger_username = "admin"
+jaeger_password = "JambonzR0ck$"

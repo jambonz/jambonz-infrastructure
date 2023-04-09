@@ -1,8 +1,9 @@
 {
   "variables": {
+    "cloud_provider": "gcp",
     "region": "us-east-1",
     "ssh_username": "admin",
-    "ami_description": "jambonz all-in-one AMI", 
+    "ami_description": "jambonz-mini (all-in-one server)", 
     "instance_type": "c2-standard-4",
     "drachtio_version": "v0.8.21",
     "jambonz_version": "v0.8.2",
@@ -23,18 +24,21 @@
     "mediaserver_name" : "jambonz",
     "preferred_codec_list" : "PCMU,PCMA,OPUS,G722",
     "project_id": "drachtio-cpaas",
-    "image_family": "debian-11-bullseye-v20230306",
-    "image_zone": "us-east1-b"
+    "source_image_family": "debian-11",
+    "source_image_project_id": "debian-cloud",
+    "image_zone": "us-central1-c"
   },
   "builders": [
     {
       "type": "googlecompute",
       "project_id": "{{user `project_id`}}",
-      "source_image": "{{user `image_family`}}",
+      "source_image_family": "{{user `source_image_family`}}",
+      "source_image_project_id": "{{user `source_image_project_id`}}",
       "ssh_username": "{{user `ssh_username`}}",
       "zone": "{{user `image_zone`}}",
       "machine_type": "{{user `instance_type`}}",
-      "disk_size": "60"
+      "image_description": "{{user `ami_description`}}",
+      "disk_size": "80"
     }
   ],
   "provisioners": [
@@ -79,7 +83,12 @@
     },
     {
       "type": "shell",
-      "execute_command": "chmod +x {{ .Path }}; sudo '{{ .Path }}' {{user `drachtio_version`}} GCP",
+      "execute_command": "chmod +x {{ .Path }}; sudo '{{ .Path }}' {{user `rtp_engine_version`}} {{user `cloud_provider`}}",
+      "script": "scripts/install_rtpengine.sh"
+    },
+    {
+      "type": "shell",
+      "execute_command": "chmod +x {{ .Path }}; sudo '{{ .Path }}' {{user `drachtio_version`}} {{user `cloud_provider`}}",
       "script": "scripts/install_drachtio.sh"
     },
     {
@@ -90,11 +99,6 @@
         "PREFERRED_CODEC_LIST={{user `preferred_codec_list`}}"
       ],
       "script": "scripts/install_freeswitch.sh"
-    },
-    {
-      "type": "shell",
-      "execute_command": "chmod +x {{ .Path }}; sudo '{{ .Path }}' {{user `rtp_engine_version`}}",
-      "script": "scripts/install_rtpengine.sh"
     },
     {
       "type": "shell",
