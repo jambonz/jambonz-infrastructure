@@ -249,6 +249,7 @@ sbc_address_sid CHAR(36) NOT NULL UNIQUE ,
 ipv4 VARCHAR(255) NOT NULL,
 port INTEGER NOT NULL DEFAULT 5060,
 service_provider_sid CHAR(36),
+last_updated DATETIME,
 PRIMARY KEY (sbc_address_sid)
 );
 

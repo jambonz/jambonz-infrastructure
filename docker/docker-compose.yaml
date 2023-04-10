@@ -96,8 +96,8 @@ services:
     depends_on:
       - api-server
 
-  registrar:
-    image: jambonz/sbc-registrar:latest
+  sbc-sip-sidecar:
+    image: jambonz/sbc-sip-sidecar:latest
     restart: always
     environment:
       NODE_ENV: production
@@ -238,6 +238,7 @@ services:
       AWS_REGION: ${AWS_REGION}
       ENABLE_METRICS: 0
       JAMBONES_NETWORK_CIDR: 172.10.0.0/16
+      ENCRYPTION_SECRET: 5a3e38b5-3188-4936-89c9-fb0df3138b5c
       HTTP_PORT: 3000
       JAMBONES_SBCS: 172.10.0.10
       JAMBONES_FEATURE_SERVERS: 172.10.0.50:9022:cymru
