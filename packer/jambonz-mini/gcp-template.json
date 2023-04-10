@@ -1,7 +1,10 @@
 {
   "variables": {
     "cloud_provider": "gcp",
-    "region": "us-east-1",
+    "project_id": "drachtio-cpaas",
+    "source_image_family": "debian-11",
+    "source_image_project_id": "debian-cloud",
+    "image_zone": "us-central1-c",
     "ssh_username": "admin",
     "ami_description": "jambonz-mini (all-in-one server)", 
     "instance_type": "c2-standard-4",
@@ -22,11 +25,7 @@
     "rtp_engine_min_port": "40000",
     "rtp_engine_max_port": "60000",
     "mediaserver_name" : "jambonz",
-    "preferred_codec_list" : "PCMU,PCMA,OPUS,G722",
-    "project_id": "drachtio-cpaas",
-    "source_image_family": "debian-11",
-    "source_image_project_id": "debian-cloud",
-    "image_zone": "us-central1-c"
+    "preferred_codec_list" : "PCMU,PCMA,OPUS,G722"
   },
   "builders": [
     {

@@ -79,7 +79,7 @@ uuid=$(uuidgen)
 sudo sed -i -e "s/\(.*\)JWT-SECRET-GOES_HERE\(.*\)/\1$uuid\2/g" /home/admin/apps/ecosystem.config.js 
 
 #Add BasicAuth password for Jaeger
-sudo htpasswd -b -c /etc/nginx/.htpasswd $JAEGER_USERNAME "$JAEGER_PASSWORD"
+sudo htpasswd -b -c /etc/nginx/.htpasswd admin "JambonzR0ck$"
 
 # configure webapp
 if [[ -z $DNS_NAME ]]; then
