@@ -68,7 +68,8 @@ module.exports = {
       HTTP_PORT:  3002,
       HOMER_BASE_URL: 'http://127.0.0.1:9080',
       HOMER_USERNAME: 'admin',
-      HOMER_PASSWORD: 'sipcapture'      
+      HOMER_PASSWORD: 'sipcapture',
+      JAEGER_BASE_URL: 'http://127.0.0.1:16686'
     }
   },
   {
