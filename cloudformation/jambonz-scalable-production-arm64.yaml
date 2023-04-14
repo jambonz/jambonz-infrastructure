@@ -975,7 +975,11 @@ Resources:
                     STATS_PORT: 8125,
                     STATS_PROTOCOL: 'tcp',
                     STATS_SAMPLE_RATE: ${JAMBONES_SAMPLE_RATE},
-                    STATS_TELEGRAF: 1
+                    STATS_TELEGRAF: 1,
+                    JAMBONES_OTEL_ENABLED: ${OTEL_TRACING},
+                    OTEL_EXPORTER_JAEGER_ENDPOINT: 'http://${MONITORING_SERVER_IP}:14268/api/traces',
+                    OTEL_EXPORTER_OTLP_METRICS_INSECURE: 1,
+                    OTEL_EXPORTER_JAEGER_GRPC_INSECURE: 1,
                   }
                 },
                 {
@@ -1019,6 +1023,10 @@ Resources:
                     STATS_PROTOCOL: 'tcp',
                     STATS_TELEGRAF: 1,
                     STATS_SAMPLE_RATE: ${JAMBONES_SAMPLE_RATE},
+                    JAMBONES_OTEL_ENABLED: ${OTEL_TRACING},
+                    OTEL_EXPORTER_JAEGER_ENDPOINT: 'http://${MONITORING_SERVER_IP}:14268/api/traces',
+                    OTEL_EXPORTER_OTLP_METRICS_INSECURE: 1,
+                    OTEL_EXPORTER_JAEGER_GRPC_INSECURE: 1,
                     MS_TEAMS_SIP_PROXY_IPS: '52.114.148.0, 52.114.132.46, 52.114.75.24, 52.114.76.76, 52.114.7.24, 52.114.14.70'
                   }
                 }
@@ -1052,6 +1060,7 @@ Resources:
               JAMBONES_REDIS_HOST: !GetAtt ElastiCacheCluster.RedisEndpoint.Address
               JAMBONES_CLUSTER_ID: !Ref Prefix
               JAMBONES_SAMPLE_RATE: !Ref StatsSampleRate
+              OTEL_TRACING: !Ref EnableTracing
               MONITORING_SERVER_IP: !GetAtt MonitoringServerEC2.PrivateIp
               AWS_SNS_TOPIC_ARN: !Ref SbcSipServerSNSTopic
               JAMBONES_TIME_SERIES_HOST: !GetAtt MonitoringServerEC2.PrivateIp
@@ -1700,7 +1709,8 @@ Resources:
               JAMBONES_REDIS_HOST: !GetAtt ElastiCacheCluster.RedisEndpoint.Address
               JAMBONES_CLUSTER_ID: !Ref Prefix
               JAMBONES_SAMPLE_RATE: !Ref StatsSampleRate
-              MONITORING_SERVER_IP:  !GetAtt MonitoringServerEC2.PrivateIp
+              OTEL_TRACING: !Ref EnableTracing
+              MONITORING_SERVER_IP: !GetAtt MonitoringServerEC2.PrivateIp
               AWS_REGION: !Ref AWS::Region
               JAMBONES_TIME_SERIES_HOST: !GetAtt MonitoringServerEC2.PrivateIp
               JWT_SECRET: !Ref EncryptionSecret
