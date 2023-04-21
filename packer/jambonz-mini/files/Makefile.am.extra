@@ -402,6 +402,7 @@ libs/googleapis/gens/google/cloud/dialogflow/v2beta1/webhook.pb.cc
 
 libfreeswitch_libgoogleapis_la_CPPFLAGS = -I/usr/local/include -I$(GOOGLEAPIS_GENS_PATH) -std=c++17  -pthread
 
+# nuance asr 
 NUANCE_GENS_PATH = libs/nuance-asr-grpc-api/stubs/
 
 nodist_libfreeswitch_libnuanceapis_la_SOURCES = \
@@ -420,6 +421,7 @@ libs/nuance-asr-grpc-api/stubs/nuance/asr/v1/recognizer.grpc.pb.cc
 
 libfreeswitch_libnuanceapis_la_CPPFLAGS = -I/usr/local/include -I$(NUANCE_GENS_PATH) -std=c++17  -pthread
 
+#nvidia asr
 NVIDIA_GENS_PATH = libs/riva-asr-grpc-api/stubs/
 
 nodist_libfreeswitch_libnvidiaapis_la_SOURCES = \
@@ -430,8 +432,17 @@ libs/riva-asr-grpc-api/stubs/riva/proto/riva_audio.grpc.pb.cc
 
 libfreeswitch_libnvidiaapis_la_CPPFLAGS = -I/usr/local/include -I$(NVIDIA_GENS_PATH) -std=c++17  -pthread
 
-CORE_LIBS+=libfreeswitch_libgoogleapis.la libfreeswitch_libnuanceapis.la libfreeswitch_libnvidiaapis.la
-noinst_LTLIBRARIES += libfreeswitch_libgoogleapis.la libfreeswitch_libnuanceapis.la libfreeswitch_libnvidiaapis.la
+#soniox asr
+SONIOX_GENS_PATH = libs/soniox-asr-grpc-api/stubs/
+
+nodist_libfreeswitch_libsonioxapis_la_SOURCES = \
+libs/soniox-asr-grpc-api/stubs/soniox/speech_service.pb.cc \
+libs/soniox-asr-grpc-api/stubs/soniox/speech_service.grpc.pb.cc
+
+libfreeswitch_libsonioxapis_la_CPPFLAGS = -I/usr/local/include -I$(SONIOX_GENS_PATH) -std=c++17  -pthread
+
+CORE_LIBS+=libfreeswitch_libgoogleapis.la libfreeswitch_libnuanceapis.la libfreeswitch_libnvidiaapis.la libfreeswitch_libsonioxapis.la
+noinst_LTLIBRARIES += libfreeswitch_libgoogleapis.la libfreeswitch_libnuanceapis.la libfreeswitch_libnvidiaapis.la libfreeswitch_libsonioxapis.la
 
 endif
 

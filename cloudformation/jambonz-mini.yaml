@@ -103,7 +103,7 @@ Conditions:
 Mappings:
   AWSRegion2AMI:
     us-east-1:
-      Ami: ami-0eedbdac5ab1b336f
+      Ami: ami-0ec9460dc739838ff
 
 Resources:
   IamCloudwatchRole:

@@ -1,12 +1,17 @@
---- src/mod/applications/mod_avmd/mod_avmd.c	2022-07-21 09:22:01.000000000 +0200
-+++ src/mod/applications/mod_avmd/mod_avmd.c.new	2022-07-21 09:21:55.000000000 +0200
-@@ -1479,12 +1479,17 @@
- 			direction = "READ_REPLACE";
+--- mod_avmd.c	2022-02-10 11:19:05
++++ mod_avmd.c.new	2023-04-19 13:28:03
+@@ -1476,15 +1476,20 @@
      }
-     if ((SWITCH_CALL_DIRECTION_INBOUND == switch_channel_direction(channel)) && (avmd_session->settings.inbound_channnel == 1)) {
+     if ((SWITCH_CALL_DIRECTION_OUTBOUND == switch_channel_direction(channel)) && (avmd_session->settings.outbound_channnel == 1)) {
+             flags |= SMBF_READ_REPLACE;
+-			direction = "READ_REPLACE";
++            direction = "READ_REPLACE";
+     }
+-    if ((SWITCH_CALL_DIRECTION_INBOUND == switch_channel_direction(channel)) && (avmd_session->settings.inbound_channnel == 1)) {
++    if ((SWITCH_CALL_DIRECTION_INBOUND == switch_channel_direction(channel)) /* && (avmd_session->settings.inbound_channnel == 1) */) {
 +            /* DCH: for drachtio-fsmrf */
 +            flags |= SMBF_READ_REPLACE;
-+			direction = "READ_REPLACE";
++            direction = "READ_REPLACE";
 +/*
              flags |= SMBF_WRITE_REPLACE;
  			if (!strcmp(direction, "READ_REPLACE")) {
@@ -18,24 +23,3 @@
      }
  
      if (flags == 0) {
-@@ -1849,6 +1854,20 @@
- 
-     avmd_session = (avmd_session_t *) switch_core_session_alloc(fs_session, sizeof(avmd_session_t)); /* Allocate memory attached to this FreeSWITCH session for use in the callback routine and to store state information */
-     status = init_avmd_session_data(avmd_session, fs_session, NULL);
-+
-+    /* DCH: for drachtio-fsmrf */
-+    avmd_session->settings.inbound_channnel = 1;
-+    avmd_session->settings.debug = 0;
-+    avmd_session->settings.report_status = 1;
-+    avmd_session->settings.mode = 2;
-+    avmd_session->settings.detectors_n = 36;
-+    avmd_session->settings.detectors_lagged_n = 1;
-+    avmd_session->settings.require_continuous_streak = 1;
-+    avmd_session->settings.sample_n_continuous_streak = 3;
-+    avmd_session->settings.require_continuous_streak_amp = 1;
-+    avmd_session->settings.simplified_estimation = 1;
-+    /* */
-+
-     if (status != SWITCH_STATUS_SUCCESS) {
-         stream->write_function(stream, "-ERR, failed to initialize avmd session\n for FreeSWITCH session [%s]\n", uuid);
-         switch (status) {
