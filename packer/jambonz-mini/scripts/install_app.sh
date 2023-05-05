@@ -41,3 +41,6 @@ sudo -u admin bash -c "pm2 set pm2-logrotate:compress true"
 sudo chown -R admin:admin  /home/admin/apps
 
 sudo rm /home/admin/apps/jambonz-webapp/.env
+
+sudo snap install core
+sudo snap install --classic certbot
