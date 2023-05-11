@@ -4,10 +4,11 @@
     "ssh_username": "admin",
     "ami_description": "jambonz webserver", 
     "instance_type": "t3.xlarge",
-    "jambonz_version": "v0.8.2",
+    "jambonz_version": "v0.8.3-rc4",
     "ami_base_image_arch": "amd64",
     "ami_base_image_owner": "136693071363",
     "install_datadog": "no",
+    "install_cloudwatch":  "yes",
     "install_telegraf": "yes"
   },
   "builders": [{
@@ -52,7 +53,7 @@
         "sudo apt-get -y install python gcc g++ make cmake build-essential git autoconf automake default-mysql-client redis-tools \\",
         "curl telnet libtool libtool-bin libssl-dev libcurl4-openssl-dev libz-dev systemd-coredump liblz4-tool \\",
         "libxtables-dev libip6tc-dev libip4tc-dev  libiptc-dev libavformat-dev lsb-release fail2ban \\",
-        "nginx python3-certbot-nginx default-libmysqlclient-dev htop dnsutils gdb \\",
+        "nginx python3-certbot-nginx default-libmysqlclient-dev htop dnsutils gdb snapd \\",
         "gnupg2 wget pkg-config ca-certificates libjpeg-dev libsqlite3-dev libpcre3-dev libldns-dev libgoogle-perftools-dev",
         "sudo chmod a+w /usr/local/src",
         "ssh-keyscan github.com >> ~/.ssh/known_hosts",
@@ -73,6 +74,11 @@
     {
       "type": "shell",
       "script": "scripts/install_os_tuning.sh"
+    },
+    {
+      "type": "shell",
+      "execute_command": "chmod +x {{ .Path }}; sudo '{{ .Path }}' {{user `install_cloudwatch`}}",
+      "script": "scripts/install_cloudwatch.sh"
     },
     {
       "type": "shell",

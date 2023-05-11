@@ -20,3 +20,7 @@ sudo -u admin bash -c "pm2 set pm2-logrotate:retain 5"
 sudo -u admin bash -c "pm2 set pm2-logrotate:compress true"
 
 sudo chown -R admin:admin  /home/admin/apps
+
+sudo snap install core
+sudo snap install --classic certbot
+sudo ln -s /snap/bin/certbot /usr/bin/certbot

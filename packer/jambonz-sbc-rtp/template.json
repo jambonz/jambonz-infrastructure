@@ -4,7 +4,7 @@
     "ssh_username": "admin",
     "ami_description": "jambonz SBC RTP server", 
     "drachtio_version": "v0.8.21",
-    "jambonz_version": "v0.8.2",
+    "jambonz_version": "v0.8.3-rc4",
     "ami_base_image_arch": "amd64",
     "ami_base_image_owner": "136693071363",
     "instance_type": "t3.xlarge",
@@ -13,6 +13,7 @@
     "rtp_engine_max_port": "60000",
     "install_datadog": "no",
     "datadog_key" : "",
+    "install_cloudwatch":  "yes",
     "install_telegraf": "yes"
   },
   "builders": [{
@@ -79,6 +80,11 @@
     {
       "type": "shell",
       "script": "scripts/install_os_tuning.sh"
+    },
+    {
+      "type": "shell",
+      "execute_command": "chmod +x {{ .Path }}; sudo '{{ .Path }}' {{user `install_cloudwatch`}}",
+      "script": "scripts/install_cloudwatch.sh"
     },
     {
       "type": "shell",

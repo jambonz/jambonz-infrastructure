@@ -23,3 +23,6 @@ sudo chown -R admin:admin  /home/admin/apps
 
 sudo cp /tmp/auto-assign-elastic-ip.sh /usr/local/bin
 sudo chmod +x /usr/local/bin/auto-assign-elastic-ip.sh
+
+sudo snap install core
+sudo snap install --classic certbot

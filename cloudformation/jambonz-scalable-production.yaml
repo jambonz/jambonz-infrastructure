@@ -283,6 +283,11 @@ Parameters:
       - 0
       - 1 
     Default: 1
+  Cloudwatch:
+    Description: Send jambonz logs to cloudwatch
+    Type: String
+    Default: true
+    AllowedValues: [true, false]
   CloudwatchLogRetention:
     Description: "Number of days to retain cloudwatch logs"
     Type: Number
@@ -1145,9 +1150,15 @@ Resources:
               sudo -u admin bash -c "pm2 save"
               sudo systemctl enable pm2-admin.service
 
-              echo "enabling cloudwatch"
-              sudo sed -i -e "s/retention_in_days\": 3/retention_in_days\": ${CloudwatchLogRetention}/g" /opt/aws/amazon-cloudwatch-agent/bin/config.json 
-              sudo /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a fetch-config -m ec2 -s -c file:/opt/aws/amazon-cloudwatch-agent/bin/config.json
+              # enable cloudwatch
+              if [[ "${Cloudwatch}" == "true" ]]; then
+                echo "Enabling Cloudwatch for jambonz logs"
+                sudo sed -i -e "s/retention_in_days\": 3/retention_in_days\": ${CloudwatchLogRetention}/g" /opt/aws/amazon-cloudwatch-agent/bin/config.json 
+                sudo /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a fetch-config -m ec2 -s -c file:/opt/aws/amazon-cloudwatch-agent/bin/config.json
+              else
+                echo "Cloudwatch is not enabled for jambonz logs"
+                sudo sed -i -e "s/combine_logs: true/combine_logs: false/g" /home/admin/apps/ecosystem.config.js 
+              fi
 
               # get an apiban key
               APIBANKEY=$(curl -X POST -u jambonz:1a074994242182a9e0b67eae93978826 -d "{\"client\": \"$INSTANCE_ID\"}" -s https://apiban.org/sponsor/newkey | jq -r '.ApiKey')
@@ -1367,9 +1378,15 @@ Resources:
               sudo sed -i -e "s/influxdb:8086/${MONITORING_SERVER_IP}:8086/g"  /etc/telegraf/telegraf.conf
               sudo systemctl restart telegraf
 
-              echo "enabling cloudwatch"
-              sudo sed -i -e "s/retention_in_days\": 3/retention_in_days\": ${CloudwatchLogRetention}/g" /opt/aws/amazon-cloudwatch-agent/bin/config.json 
-              sudo /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a fetch-config -m ec2 -s -c file:/opt/aws/amazon-cloudwatch-agent/bin/config.json
+              # enable cloudwatch
+              if [[ "${Cloudwatch}" == "true" ]]; then
+                echo "Enabling Cloudwatch for jambonz logs"
+                sudo sed -i -e "s/retention_in_days\": 3/retention_in_days\": ${CloudwatchLogRetention}/g" /opt/aws/amazon-cloudwatch-agent/bin/config.json 
+                sudo /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a fetch-config -m ec2 -s -c file:/opt/aws/amazon-cloudwatch-agent/bin/config.json
+              else
+                echo "Cloudwatch is not enabled for jambonz logs"
+                sudo sed -i -e "s/combine_logs: true/combine_logs: false/g" /home/admin/apps/ecosystem.config.js 
+              fi
 
               echo "user data script completed"
             - VPC_CIDR: !Ref VpcCIDR
@@ -1561,9 +1578,15 @@ Resources:
               sudo systemctl daemon-reload
               sudo sytemctl restart rtpengine
 
-              echo "enabling cloudwatch"
-              sudo sed -i -e "s/retention_in_days\": 3/retention_in_days\": ${CloudwatchLogRetention}/g" /opt/aws/amazon-cloudwatch-agent/bin/config.json 
-              sudo /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a fetch-config -m ec2 -s -c file:/opt/aws/amazon-cloudwatch-agent/bin/config.json
+              # enable cloudwatch
+              if [[ "${Cloudwatch}" == "true" ]]; then
+                echo "Enabling Cloudwatch for jambonz logs"
+                sudo sed -i -e "s/retention_in_days\": 3/retention_in_days\": ${CloudwatchLogRetention}/g" /opt/aws/amazon-cloudwatch-agent/bin/config.json 
+                sudo /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a fetch-config -m ec2 -s -c file:/opt/aws/amazon-cloudwatch-agent/bin/config.json
+              else
+                echo "Cloudwatch is not enabled for jambonz logs"
+                sudo sed -i -e "s/combine_logs: true/combine_logs: false/g" /home/admin/apps/ecosystem.config.js 
+              fi
             - VPC_CIDR: !Ref VpcCIDR
               AWS_REGION: !Ref AWS::Region
               JAMBONES_MYSQL_HOST: !GetAtt DatabaseCluster.Endpoint.Address
@@ -1892,9 +1915,15 @@ Resources:
             
               sudo systemctl restart nginx
 
-              echo "enabling cloudwatch"
-              sudo sed -i -e "s/retention_in_days\": 3/retention_in_days\": ${CloudwatchLogRetention}/g" /opt/aws/amazon-cloudwatch-agent/bin/config.json 
-              sudo /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a fetch-config -m ec2 -s -c file:/opt/aws/amazon-cloudwatch-agent/bin/config.json
+              # enable cloudwatch
+              if [[ "${Cloudwatch}" == "true" ]]; then
+                echo "Enabling Cloudwatch for jambonz logs"
+                sudo sed -i -e "s/retention_in_days\": 3/retention_in_days\": ${CloudwatchLogRetention}/g" /opt/aws/amazon-cloudwatch-agent/bin/config.json 
+                sudo /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a fetch-config -m ec2 -s -c file:/opt/aws/amazon-cloudwatch-agent/bin/config.json
+              else
+                echo "Cloudwatch is not enabled for jambonz logs"
+                sudo sed -i -e "s/combine_logs: true/combine_logs: false/g" /home/admin/apps/ecosystem.config.js 
+              fi
             
               echo "webserver user data script completed"
             - VPC_CIDR: !Ref VpcCIDR

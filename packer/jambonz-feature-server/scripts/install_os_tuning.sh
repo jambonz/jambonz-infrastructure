@@ -13,3 +13,5 @@ vm.swappiness=0
 vm.dirty_expire_centisecs=200
 vm.dirty_writeback_centisecs=100
 EOT'
+
+sudo cp /tmp/20auto-upgrades /etc/apt/apt.conf.d/20auto-upgrades
