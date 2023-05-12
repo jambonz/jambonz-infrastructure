@@ -1589,6 +1589,9 @@ Resources:
                 mysql -h ${JAMBONES_MYSQL_HOST} -u admin -D jambones -p${JAMBONES_MYSQL_PASSWORD} < /home/admin/apps/jambonz-api-server/db/jambones-sql.sql
                 mysql -h ${JAMBONES_MYSQL_HOST} -u admin -D jambones -p${JAMBONES_MYSQL_PASSWORD} < /home/admin/apps/jambonz-api-server/db/seed-production-database-open-source.sql
                 JAMBONES_MYSQL_HOST=${JAMBONES_MYSQL_HOST} JAMBONES_MYSQL_USER=admin JAMBONES_MYSQL_PASSWORD=${JAMBONES_MYSQL_PASSWORD} JAMBONES_MYSQL_DATABASE=jambones /home/admin/apps/jambonz-api-server/db/reset_admin_password.js
+
+                # add row to system information table 
+                mysql -h localhost -u admin -D jambones -p$NEW_DB_PASSWD -e $'insert into system_information (domain_name, sip_domain_name, monitoring_domain_name) values ('\'''"${URLPortal}"''\'', '\''sip.'"${URLPortal}"''\'', '\''grafana.'"${URLPortal}"''\'')'
               fi
               # jambonz webapp
               echo "building webapp.."
@@ -1637,6 +1640,7 @@ Resources:
                     STATS_TELEGRAF: 1,
                     STATS_SAMPLE_RATE: ${JAMBONES_SAMPLE_RATE},
                     HTTP_PORT:  3000,
+                    JAEGER_BASE_URL: 'http://${MONITORING_SERVER_IP}::16686',
                     HOMER_BASE_URL: 'http://${MONITORING_SERVER_IP}:9080',
                     HOMER_USERNAME: 'admin',
                     HOMER_PASSWORD: 'sipcapture',

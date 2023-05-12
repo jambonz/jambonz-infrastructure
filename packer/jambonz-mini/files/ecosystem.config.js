@@ -66,6 +66,7 @@ module.exports = {
       STATS_PROTOCOL: 'tcp',
       STATS_TELEGRAF: 1,
       HTTP_PORT:  3002,
+      JAEGER_BASE_URL: 'http://127.0.0.1:16686',
       HOMER_BASE_URL: 'http://127.0.0.1:9080',
       HOMER_USERNAME: 'admin',
       HOMER_PASSWORD: 'sipcapture'      

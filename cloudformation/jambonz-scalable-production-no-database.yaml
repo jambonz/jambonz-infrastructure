@@ -1483,6 +1483,10 @@ Resources:
                     STATS_PORT: 8125,
                     STATS_PROTOCOL: 'tcp',
                     STATS_TELEGRAF: 1,
+                    JAEGER_BASE_URL: 'http://${MONITORING_SERVER_IP}::16686',
+                    HOMER_BASE_URL: 'http://${MONITORING_SERVER_IP}:9080',
+                    HOMER_USERNAME: 'admin',
+                    HOMER_PASSWORD: 'sipcapture',
                     HTTP_PORT:  3000,
                     JWT_SECRET: '${JWT_SECRET}'
                     },
