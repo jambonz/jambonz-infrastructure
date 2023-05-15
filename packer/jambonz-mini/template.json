@@ -102,15 +102,6 @@
     },
     {
       "type": "shell",
-      "environment_vars": [
-        "ARCH=amd64",
-        "MEDIA_SERVER_NAME={{user `mediaserver_name`}}",
-        "PREFERRED_CODEC_LIST={{user `preferred_codec_list`}}"
-      ],
-      "script": "scripts/install_freeswitch.sh"
-    },
-    {
-      "type": "shell",
       "execute_command": "chmod +x {{ .Path }}; sudo '{{ .Path }}' {{user `rtp_engine_version`}}",
       "script": "scripts/install_rtpengine.sh"
     },
@@ -122,6 +113,15 @@
     {
       "type": "shell",
       "script": "scripts/install_nodejs.sh"
+    },
+    {
+      "type": "shell",
+      "environment_vars": [
+        "ARCH=amd64",
+        "MEDIA_SERVER_NAME={{user `mediaserver_name`}}",
+        "PREFERRED_CODEC_LIST={{user `preferred_codec_list`}}"
+      ],
+      "script": "scripts/install_freeswitch.sh"
     },
     {
       "type": "shell",
