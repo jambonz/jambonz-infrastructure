@@ -44,3 +44,4 @@ sudo rm /home/admin/apps/jambonz-webapp/.env
 
 sudo snap install core
 sudo snap install --classic certbot
+sudo ln -s /snap/bin/certbot /usr/bin/certbot

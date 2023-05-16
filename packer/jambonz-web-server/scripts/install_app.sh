@@ -26,3 +26,4 @@ sudo chmod +x /usr/local/bin/auto-assign-elastic-ip.sh
 
 sudo snap install core
 sudo snap install --classic certbot
+sudo ln -s /snap/bin/certbot /usr/bin/certbot
