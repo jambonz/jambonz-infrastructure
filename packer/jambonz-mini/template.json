@@ -3,7 +3,7 @@
     "region": "us-east-1",
     "ssh_username": "admin",
     "ami_description": "jambonz all-in-one AMI", 
-    "instance_type": "t2.xlarge",
+    "instance_type": "c6in.xlarge",
     "drachtio_version": "v0.8.22",
     "jambonz_version": "v0.8.3",
     "jambonz_user": "admin",
