@@ -1,0 +1,8 @@
+[nginx-badbots]
+
+enabled  = true
+port     = http,https
+filter   = nginx-badbots
+logpath  = /var/log/nginx/access.log
+maxretry = 1
+bantime = 86400
