@@ -1,0 +1,109 @@
+#cloud-config
+hostname: ${hostname}
+ssh_authorized_keys:
+  - ${ssh_key}
+write_files:
+  - content: |
+      #!/bin/bash -xe
+
+      # get instance metadata
+      PRIVATE_IPV4="$(/bin/ip -4 addr show eth0 | grep -oP '(?<=inet )\d+(\.\d+){3}' | head -n 1)"
+      PUBLIC_IPV4="$(/usr/bin/curl -s http://ipecho.net/plain)" 
+      
+      # change the database password to a random id
+      NEW_DB_PASSWD="$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1)" 
+      echo "alter user 'admin'@'%' identified by '$NEW_DB_PASSWD'" | mysql -h localhost -u admin -D jambones -pJambonzR0ck$ 
+      sudo sed -i -e "s/\(.*\)JAMBONES_MYSQL_PASSWORD.*/\1JAMBONES_MYSQL_PASSWORD: '$NEW_DB_PASSWD',/g" /home/admin/apps/ecosystem.config.js 
+      
+      # replace ip addresses in the ecosystem.config.js file
+      sudo sed -i -e "s/\(.*\)PRIVATE_IP\(.*\)/\1$PRIVATE_IPV4\2/g" /home/admin/apps/ecosystem.config.js 
+      sudo sed -i -e "s/\(.*\)AWS_REGION_NAME\(.*\)/\1$AWS_REGION_NAME\2/g" /home/admin/apps/ecosystem.config.js 
+      sudo sed -i -e "s/\(.*\)--JAMBONES_API_BASE_URL--\(.*\)/\1http:\/\/$PUBLIC_IPV4\/v1\2/g" /home/admin/apps/ecosystem.config.js 
+      
+      # replace JWT_SECRET
+      uuid=$(uuidgen)
+      sudo sed -i -e "s/\(.*\)JWT-SECRET-GOES_HERE\(.*\)/\1$uuid\2/g" /home/admin/apps/ecosystem.config.js 
+
+      # reset the database
+      JAMBONES_ADMIN_INITIAL_PASSWORD=$INSTANCE_ID JAMBONES_MYSQL_USER=admin JAMBONES_MYSQL_PASSWORD=$NEW_DB_PASSWD JAMBONES_MYSQL_DATABASE=jambones JAMBONES_MYSQL_HOST=localhost /home/admin/apps/jambonz-api-server/db/reset_admin_password.js
+
+      if [[ -z "${url_portal}" ]]; then
+        # portals will be accessed by IP address of server
+        echo "VITE_API_BASE_URL=http://$PUBLIC_IPV4/api/v1" > /home/admin/apps/jambonz-webapp/.env 
+        API_BASE_URL=http://$PUBLIC_IPV4/api/v1 TAG="<script>window.JAMBONZ = { API_BASE_URL: '$API_BASE_URL'};</script>"
+        sed -i -e "\@</head>@i\ $TAG" /home/admin/apps/jambonz-webapp/dist/index.html
+      else
+        # portals will be accessed by DNS name
+        echo "VITE_API_BASE_URL=http://${url_portal}/api/v1" > /home/admin/apps/jambonz-webapp/.env 
+        API_BASE_URL=http://${url_portal}/api/v1 TAG="<script>window.JAMBONZ = { API_BASE_URL: '$API_BASE_URL'};</script>"
+        sed -i -e "\@</head>@i\ $TAG" /home/admin/apps/jambonz-webapp/dist/index.html
+        # add row to system information table 
+        mysql -h localhost -u admin -D jambones -p$NEW_DB_PASSWD -e $'insert into system_information (domain_name, sip_domain_name, monitoring_domain_name) values ('\'''"${url_portal}"''\'', '\''sip.'"${url_portal}"''\'', '\''grafana.'"${url_portal}"''\'')'
+      
+        sudo cat << EOF > /etc/nginx/sites-available/default 
+        server {
+            listen 80;
+            server_name ${url_portal};
+            location /api/ {
+                rewrite ^/api/(.*)$ /\$1 break;
+                proxy_pass http://localhost:3002;
+                proxy_set_header Host \$host;
+            }
+            location / {
+                proxy_pass http://localhost:3001;
+                proxy_set_header Host \$host;
+            }
+        }
+        server {
+          listen 80;
+          server_name api.${url_portal}; 
+          location / {
+            proxy_pass http://localhost:3002; 
+            proxy_set_header Host \$host;
+          }
+        }
+        server {
+          listen 80;
+          server_name grafana.${url_portal}; 
+          location / {
+            proxy_pass http://localhost:3010; 
+            proxy_http_version 1.1;
+            proxy_set_header Upgrade \$http_upgrade;
+            proxy_set_header Connection 'upgrade';
+            proxy_set_header Host \$host;
+            proxy_cache_bypass \$http_upgrade;
+          }
+        }
+        server {
+          listen 80;
+          server_name homer.${url_portal}; 
+          location / {
+            proxy_pass http://localhost:9080; 
+            proxy_http_version 1.1;
+            proxy_set_header Upgrade \$http_upgrade;
+            proxy_set_header Connection 'upgrade';
+            proxy_set_header Host \$host;
+            proxy_cache_bypass \$http_upgrade;
+          }
+        }
+      EOF
+      
+        sudo systemctl restart nginx
+      fi
+
+      # restart heplify-server
+      sudo systemctl restart heplify-server
+
+      sudo -u admin bash -c "pm2 restart /home/admin/apps/ecosystem.config.js" 
+      sudo -u admin bash -c "pm2 save"
+      sudo env PATH=$PATH:/usr/bin /usr/lib/node_modules/pm2/bin/pm2 startup systemd -u admin --hp /home/admin
+
+      # get an apiban key
+      APIBANKEY=$(curl -X POST -u jambonz:1a074994242182a9e0b67eae93978826 -d "{\"client\": \"$NEW_DB_PASSWD\"}" -s https://apiban.org/sponsor/newkey | jq -r '.ApiKey')
+      sudo sed -i -e "s/API-KEY-HERE/$APIBANKEY/g" /usr/local/bin/apiban/config.json
+      sudo /usr/local/bin/apiban/apiban-iptables-client FULL
+
+    path: /var/tmp/script.sh
+    permissions: '0755'
+runcmd:
+  - /var/tmp/script.sh
