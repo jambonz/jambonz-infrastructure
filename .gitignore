@@ -9,3 +9,5 @@ tmpAudio/
 
 .idea
 *.iml
+
+variables.json
