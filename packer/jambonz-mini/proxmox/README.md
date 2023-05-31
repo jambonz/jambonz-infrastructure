@@ -1,102 +1,33 @@
-# packer-jambonz-mini
+# packer build of jambonz-mini VM template for Proxmox
 
-A [packer](https://www.packer.io/) template to build an AMI containing everything needed to run jambonz on a single EC2 instance.  The base linux distro is Debian 11 (bullseye).
+A [packer](https://www.packer.io/) template to build an proxmox VM template containing everything needed to run jambonz on a single VM instance.  The base linux distro is Debian 11 (bullseye).
+
+Once the VM template has been created using this template, the associated terraform template should be used to deploy the final jambonz-mini server.
+
+## Prerequisites
+In order to run this packer script you must first create a VM template on your Packer node that has a basic Debian 11 install meeting the following requirements:
+- an 'admin' user has been created that has sudo privileges
+- the 'admin' user should have your public ssh key installed to allow passwordless access
+- the VM template should have 4 CPU cores
 
 ## Installing 
 
+Assuming that you have created a variables.json file to hold your variable values, you would simply do this:
 ```
-$  packer build -color=false template.json
+$  packer build -color=false -var-file=variables.json template.json template.json
 ```
 
 ### variables
-There are many variables that can be specified on the `packer build` command line; however defaults (which are shown below) are appropriate for building an "all in one" jambonz server, so you generally should not need to specify values.
+There are many variables that can be specified either on the `packer build` command line, or in a separate variables.json file.
 
+- `proxmox_url`: the url of the proxmox GUI api server (e.g.https://<your-ip>:8006/api2/json)
+- `proxmox_user`: user to log into proxmox GUI (e.g. root@pam)
+- `proxmox_password`: password for proxmox GUI user
+- `proxmox_node`: name of the promox node
+- `proxmox_source_vm_private_key_file`: path to private ssh key on local machine, used to ssh to source vm without a password
+- `proxmox_clone_vm`: name of the VM template to clone and build from
+- `proxmox_vm_id`: vm id to assign to the VM build server
+- `proxmox_bridge`: name of the proxmox bridge to attach the VM build server to
+- `proxmox_ip`: IP address to assign to the VM build server
+- `proxmox_gateway`: gateway for the VM build server
 ```
-"region": "us-east-1"
-```
-The region to create the AMI in
-
-```
-"ami_description": "EC2 AMI jambonz mini"
-```
-AMI description.
-
-```
-"instance_type": "t2.medium"
-```
-EC2 Instance type to use when building the AMI.
-
-```
-"install_drachtio": "true"
-```
-whether to install drachtio
-
-```
-"install_nodejs": "false",
-```
-whether to install Node.js
-
-```
-"install_rtpengine": "true",
-```
-whether to install rtpengine
-
-```
-"install_freeswitch": "true",
-```
-whether to install freeswitch
-
-```
-"install_drachtio_fail2ban": "true",
-```
-whether to install fail2ban with drachtio filter
-
-```
-"install_redis": "true",
-```
-whether to install redis
-
-```
-"drachtio_version": "v0.8.3"
-```
-drachtio tag or branch to build
-
-```
-"nodejs_version": "v10.16.2",
-```
-Node.js version to install
-
-```
-"freeswitch_bind_cloud_ip": "true"
-```
-If freeswitch is enabled, and cloud_provider is not none then this variable dictates whether freeswitch should bind its sip and rtp ports to the cloud public address (versus the local ipv4 address).
-
-```
-"mod_audio_fork_subprotocol": "audio.jambonz.org"
-```
-websocket subprotocol name used by freeswitch module mod_audio_fork
-
-```
-"mod_audio_fork_service_threads": "3",
-```
-number of libwebsocket service threads used by freeswitch module mod_audio_fork
-
-``
-"mod_audio_fork_buffer_secs": "2",
-```
-max number of seconds of audio to buffer by freeswitch module mod_audio_fork
-
-```
-"freeswitch_build_with_grpc:: "true"
-```
-whether to build support for google speech and text-to-speech services
-
-```
-"remove_source": "true"
-```
-whether to remove source build directories, or leave them on the instance
-
-```
-"cloud_provider": "aws"
-```
-Cloud provider the AMI will be built on.

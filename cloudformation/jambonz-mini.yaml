@@ -95,7 +95,7 @@ Conditions:
 Mappings:
   AWSRegion2AMI:
     us-east-1:
-      Ami: ami-07ae487129ffcf70c
+      Ami: ami-00d771ac0ee2a4774
 
 Resources:
   IamCloudwatchRole:
@@ -181,7 +181,7 @@ Resources:
               INSTANCE_ID="$(curl -s http://169.254.169.254/latest/meta-data/instance-id)" 
               AWS_REGION_NAME="$(curl -s http://169.254.169.254/latest/meta-data/placement/region)" 
               
-              # change the database password to the instance id
+              # change the database password to a random id
               NEW_DB_PASSWD="$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1)" 
               echo "alter user 'admin'@'%' identified by '$NEW_DB_PASSWD'" | mysql -h localhost -u admin -D jambones -pJambonzR0ck$ 
               sudo sed -i -e "s/\(.*\)JAMBONES_MYSQL_PASSWORD.*/\1JAMBONES_MYSQL_PASSWORD: '$NEW_DB_PASSWD',/g" /home/admin/apps/ecosystem.config.js 

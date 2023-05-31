@@ -1,19 +1,20 @@
 {
   "variables": {
-    "region": "us-east-1",
-    "ssh_username": "admin",
-    "vm_description": "jambonz all-in-one AMI", 
-    "proxmox_url": "https://<your-proxmox-url>/api2/json",
-    "proxmox_user": "your-proxmox-user",
-    "proxmox_password": "your-proxmox-password",
-    "proxmox_node": "your-node",
+    "proxmox_url": "{{user `proxmox_url`}}",
+    "proxmox_user": "{{user `proxmox_user`}}",
+    "proxmox_password": "{{user `proxmox_password`}}",
+    "proxmox_node": "{{user `proxmox_node`}}",
+    "proxmox_clone_vm": "{{user `proxmox_clone_vm`}}",
+    "proxmox_vm_id": "{{user `proxmox_vm_id`}}",
     "proxmox_source_vm_ssh_username": "admin",
-    "proxmox_clone_vm": "your-vm-template-name",
-    "proxmox_vm_id": "your-vm-id",
+    "proxmox_source_vm_private_key_file": "~/.ssh/id_rsa",
     "proxmox_memory": "8192",
     "proxmox_cores": "4",
+    "proxmox_bridge": "{{user `proxmox_bridge`}}",
+    "proxmox_ip": "{{user `proxmox_ip`}}",
+    "proxmox_gateway": "{{user `proxmox_gateway`}}",
     "drachtio_version": "v0.8.22",
-    "jambonz_version": "v0.8.3",
+    "jambonz_version": "v0.8.3-2",
     "jambonz_user": "admin",
     "jambonz_password": "JambonzR0ck$",
     "install_telegraf": "yes",
@@ -22,14 +23,13 @@
     "install_influxdb":  "yes",
     "install_homer":  "yes",
     "install_jaeger":  "yes",
-    "install_cloudwatch":  "yes",
     "install_nodered":  "no",
     "influxdb_ip":  "127.0.0.1",
     "rtp_engine_version": "mr11.2.1.5",
     "rtp_engine_min_port": "40000",
     "rtp_engine_max_port": "60000",
-    "mediaserver_name" : "jambonz",
-    "preferred_codec_list" : "PCMU,PCMA,OPUS,G722"
+    "mediaserver_name": "jambonz",
+    "preferred_codec_list": "PCMU,PCMA,OPUS,G722"
   },
   "builders": [{
     "type": "proxmox-clone",
@@ -43,18 +43,19 @@
     "cores": "{{user `proxmox_cores`}}",
     "insecure_skip_tls_verify": true,
     "ssh_username": "{{user `proxmox_source_vm_ssh_username`}}",
-    "ssh_private_key_file": "~/.ssh/id_rsa",
+    "ssh_private_key_file": "{{user `proxmox_source_vm_private_key_file`}}",
     "template_name": "jambonz-mini-{{user `jambonz_version`}}-template",
     "nameserver": "8.8.8.8",
+    "cloud_init": true,
     "network_adapters": [
       {
-        "bridge": "vmbr30"
+        "bridge": "{{user `proxmox_bridge`}}"
       }
     ],
     "ipconfig": [
       {
-        "ip": "10.200.100.20/24",
-        "gateway": "10.200.100.1"
+        "ip": "{{user `proxmox_ip`}}",
+        "gateway": "{{user `proxmox_gateway`}}"
       }
     ]
   }],

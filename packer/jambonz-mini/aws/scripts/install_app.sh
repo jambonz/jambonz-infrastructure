@@ -20,7 +20,7 @@ echo "building sbc-inbound.."
 cd /home/admin/apps/sbc-inbound  && npm ci --unsafe-perm 
 echo "building sbc-outbound.."
 cd /home/admin/apps/sbc-outbound && npm ci --unsafe-perm 
-echo "building sbc-registrar.."
+echo "building sbc-call-router.."
 cd /home/admin/apps/sbc-call-router  && npm ci --unsafe-perm 
 echo "building jambonz-smpp-esme.."
 cd /home/admin/apps/jambonz-smpp-esme && npm ci --unsafe-perm

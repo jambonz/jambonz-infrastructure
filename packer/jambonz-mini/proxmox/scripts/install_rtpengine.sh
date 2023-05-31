@@ -1,11 +1,6 @@
 #!/bin/bash
 VERSION=$1
 
-if [ ! -f /usr/local/bin/set_local_ip.sh ]; then
-    sudo cp /tmp/set_local_ip.sh /usr/local/bin
-    sudo chmod +x /usr/local/bin/set_local_ip.sh
-fi
-
 echo "rtpengine version to install is ${VERSION}, cloud provider is $2"
 
 cd /usr/local/src

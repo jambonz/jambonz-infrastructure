@@ -7,12 +7,12 @@ After=syslog.target network.target local-fs.target
 ; service
 Type=forking
 Environment="LD_LIBRARY_PATH=/usr/local/lib/"
-ExecStartPre=/usr/local/bin/set_local_ip.sh
+ExecStartPre=/bin/sh -c 'systemctl set-environment LOCAL_IP=$$(/bin/ip -4 addr show eth0 | grep -oP "(?<=inet )\d+(\.\d+){3}" | head -n 1)'
 ExecStartPre=/bin/sh -c "systemctl set-environment PUBLIC_IP=`/usr/bin/curl -s http://ipecho.net/plain`"
 ExecStartPre=echo 'del 42' > /proc/rtpengine/control
 ExecStart=/usr/local/bin/rtpengine \
 --interface private/${LOCAL_IP} \
---interface public/${LOCAL_IP}!${PUBLIC_IP} \
+--interface public/${PUBLIC_IP} \
 --listen-ng=22222 \
 --listen-http=8080 \
 --listen-udp=12222 \
