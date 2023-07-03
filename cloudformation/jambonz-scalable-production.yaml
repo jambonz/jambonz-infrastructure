@@ -8,7 +8,13 @@ Mappings:
       SbcRtpAmi: ami-0954b7e5aaf4ee966
       FsAmi: ami-0afdc9cef2c7e3e24
       WebserverAmi: ami-0b0b877726e51a31c
-      MonitoringServerAmi: ami-0b9fe2fe66ff1ad62
+      MonitoringServerAmi: ami-0aaa644b8462b7a6b
+    eu-central-1:
+      SbcSipAmi: ami-0eb4a42513512f83c
+      SbcRtpAmi: ami-0193b4d53092ab162
+      FsAmi: ami-096cfff649d965aef
+      WebserverAmi: ami-0ad690b17d163c794
+      MonitoringServerAmi: ami-010baeedfe1041c1b
 
 Parameters:
   KeyName:
@@ -268,13 +274,6 @@ Parameters:
     Type: Number
     Description: Number of seconds to cache results from DB queries (0=no caching)
     Default: 0
-  EnableTracing: 
-    Type: Number
-    Description: enable opentelemetry application tracing?
-    AllowedValues:
-      - 0
-      - 1 
-    Default: 1
   Cloudwatch:
     Description: Send jambonz logs to cloudwatch
     Type: String
@@ -705,30 +704,15 @@ Resources:
           CidrIp: !Ref VpcCIDR
           Description: Allow access to homer HEP
         - IpProtocol: tcp
-          FromPort: 1880
-          ToPort: 1880
-          CidrIp: !Ref AllowedHttpCidr
-          Description: Allow access to Node-RED
-        - IpProtocol: tcp
           FromPort: 16686
           ToPort: 16686
           CidrIp: !Ref VpcCIDR
-          Description: Allow access to Jaeger
-        - IpProtocol: udp
-          FromPort: 6831
-          ToPort: 6831
-          CidrIp:  !Ref VpcCIDR
-          Description: Jaeger collector - compact
-        - IpProtocol: udp
-          FromPort: 6832
-          ToPort: 6832
-          CidrIp:  !Ref VpcCIDR
-          Description: Jaeger collector (udp)
+          Description: jaeger-query
         - IpProtocol: tcp
           FromPort: 14268
-          ToPort: 14268
+          ToPort: 14269
           CidrIp:  !Ref VpcCIDR
-          Description: Jaeger collector (http)
+          Description: jaeger-collector (jaeger-thrift, health check)
       SecurityGroupEgress:
         - IpProtocol: -1
           FromPort: 0
@@ -757,9 +741,9 @@ Resources:
     Type: AWS::RDS::DBCluster
     Properties:
       DBClusterIdentifier: !Sub '${Prefix}-aurora-mysql-cluster'
-      Engine: aurora
-      EngineVersion: '5.6.10a'
-      EngineMode: 'serverless'
+      Engine: aurora-mysql
+      EngineMode: serverless
+      EngineVersion: '5.7'
       MasterUsername: !Ref MySQLUsername
       MasterUserPassword: !Ref MySQLPassword
       DatabaseName: 'jambones'
@@ -823,18 +807,19 @@ Resources:
       KeyName: !Ref KeyName
       Monitoring: true
       UserData:
-        Fn::Base64: 
-          Fn::Sub:
-            - |
-              #!/bin/bash -xe
-              # restart heplify-server
-              sudo systemctl restart heplify-server
-            - EnableTracing: !Ref EnableTracing
+        Fn::Base64: |
+          #!/bin/bash -xe
+          # restart heplify-server
+          sudo systemctl restart heplify-server.service
+          sudo systemctl restart cassandra.service        
+          sleep 15
+          sudo systemctl restart jaeger-collector.service
+          sudo systemctl restart jaeger-query.service
       Tags:
         -
           Key: Name
           Value: !Sub '${Prefix}-monitoring-server'
-          
+                    
 
 ###########################################
 #      New SBC SIP instances
@@ -959,7 +944,6 @@ Resources:
                   watch: false,
                   max_memory_restart: '1G',
                   env: {
-                    NODE_ENV: 'production',
                     JAMBONES_LOGLEVEL: 'info',
                     JAMBONES_CLUSTER_ID: '${JAMBONES_CLUSTER_ID}',
                     AVOID_UDH: true,
@@ -987,9 +971,10 @@ Resources:
                   watch: false,
                   max_memory_restart: '1G',
                   env: {
-                    NODE_ENV: 'production',
-                    JAMBONES_CLUSTER_ID: '${JAMBONES_CLUSTER_ID}',
                     JAMBONES_LOGLEVEL: 'info',
+                    JWT_SECRET: '${JWT_SECRET}',
+                    JAMBONES_CLUSTER_ID: '${JAMBONES_CLUSTER_ID}',
+                    RTPENGINE_PING_INTERVAL: 30000,
                     DRACHTIO_HOST: '127.0.0.1',
                     DRACHTIO_PORT: 9022,
                     DRACHTIO_SECRET: 'cymru',
@@ -1024,7 +1009,7 @@ Resources:
                   watch: false,
                   max_memory_restart: '1G',
                   env: {
-                    NODE_ENV: 'production',
+                    JAMBONES_LOGLEVEL: 'info',
                     HTTP_PORT:  4000,
                     JAMBONES_INBOUND_ROUTE: '127.0.0.1:4002',
                     JAMBONES_OUTBOUND_ROUTE: '127.0.0.1:4003',
@@ -1051,9 +1036,10 @@ Resources:
                   watch: false,
                   max_memory_restart: '1G',
                   env: {
-                    NODE_ENV: 'production',
                     JAMBONES_LOGLEVEL: 'info',
+                    JWT_SECRET: '${JWT_SECRET}',
                     JAMBONES_NETWORK_CIDR: '${VPC_CIDR}',
+                    JAMBONES_RTPENGINE_UDP_PORT: 6000,
                     MIN_CALL_LIMIT: 9999,
                     RTPENGINE_PING_INTERVAL: 30000,
                     DRACHTIO_HOST: '127.0.0.1',
@@ -1069,6 +1055,9 @@ Resources:
                     JAMBONES_REDIS_PORT: 6379,
                     JAMBONES_CLUSTER_ID: '${JAMBONES_CLUSTER_ID}',
                     JAMBONES_TIME_SERIES_HOST: '${JAMBONES_TIME_SERIES_HOST}',
+                    JAMBONES_TRACK_ACCOUNT_CALLS: 0,
+                    JAMBONES_TRACK_SP_CALLS: 0,
+                    JAMBONES_TRACK_APP_CALLS: 0,
                     ENABLE_METRICS: 1,
                     STATS_HOST: '127.0.0.1',
                     STATS_PORT: 8125,
@@ -1090,10 +1079,11 @@ Resources:
                   watch: false,
                   max_memory_restart: '1G',
                   env: {
-                    NODE_ENV: 'production',
-                    JAMBONES_NETWORK_CIDR: '${VPC_CIDR}',
                     JAMBONES_LOGLEVEL: 'info',
+                    JWT_SECRET: '${JWT_SECRET}',
                     AWS_REGION: '${AWS_REGION}',
+                    JAMBONES_NETWORK_CIDR: '${VPC_CIDR}',
+                    JAMBONES_RTPENGINE_UDP_PORT: 7000,
                     DRACHTIO_HOST: '127.0.0.1',
                     DRACHTIO_PORT: 9022,
                     DRACHTIO_SECRET: 'cymru',
@@ -1113,6 +1103,9 @@ Resources:
                     JAMBONES_CLUSTER_ID: '${JAMBONES_CLUSTER_ID}',
                     JAMBONES_TIME_SERIES_HOST: '${JAMBONES_TIME_SERIES_HOST}',
                     ENABLE_METRICS: 1,
+                    JAMBONES_TRACK_ACCOUNT_CALLS: 0,
+                    JAMBONES_TRACK_SP_CALLS: 0,
+                    JAMBONES_TRACK_APP_CALLS: 0,
                     STATS_HOST: '127.0.0.1',
                     STATS_PORT: 8125,
                     STATS_PROTOCOL: 'tcp',
@@ -1169,6 +1162,9 @@ Resources:
               MONITORING_SERVER_IP: !GetAtt MonitoringServerEC2.PrivateIp
               AWS_SNS_TOPIC_ARN: !Ref SbcSipServerSNSTopic
               JAMBONES_TIME_SERIES_HOST: !GetAtt MonitoringServerEC2.PrivateIp
+              JWT_SECRET: !Ref EncryptionSecret
+              AWS_REGION: !Ref AWS::Region
+              Cloudwatch: !Ref Cloudwatch
               CloudwatchLogRetention: !Ref CloudwatchLogRetention
               DbCachingTTS: !Ref DbCachingTTS
 
@@ -1318,14 +1314,17 @@ Resources:
                   watch: false,
                   max_memory_restart: '1G',
                   env: {
-                    NODE_ENV: 'production',
+                    JAMBONES_LOGLEVEL: 'info',
+                    JWT_SECRET: '${JWT_SECRET}',
+                    AWS_REGION: '${AWS_REGION}',
+                    JAMBONES_API_BASE_URL: 'http://${URLPortal}/v1',
                     ENABLE_METRICS: 1,
                     STATS_HOST: '127.0.0.1',
                     STATS_PORT: 8125,
                     STATS_PROTOCOL: 'tcp',
                     STATS_TELEGRAF: 1,
                     STATS_SAMPLE_RATE: ${JAMBONES_SAMPLE_RATE},
-                    JAMBONES_OTEL_ENABLED: ${OTEL_TRACING},
+                    JAMBONES_OTEL_ENABLED: 1,
                     OTEL_EXPORTER_JAEGER_ENDPOINT: 'http://${MONITORING_SERVER_IP}:14268/api/traces',
                     OTEL_EXPORTER_OTLP_METRICS_INSECURE: 1,
                     OTEL_EXPORTER_JAEGER_GRPC_INSECURE: 1,
@@ -1353,7 +1352,9 @@ Resources:
                     JAMBONES_FEATURE_SERVERS: '127.0.0.1:9022:cymru',
                     JAMBONES_FREESWITCH: '127.0.0.1:8021:JambonzR0ck$',
                     AUTHENTICATION_KEY: '${JWT_SECRET}',
-                    JWT_SECRET: '${JWT_SECRET}'
+                    JAMBONZ_RECORD_WS_USERNAME: 'jambonz',
+                    JAMBONZ_RECORD_WS_PASSWORD: '${JWT_SECRET}',
+                    JAMBONZ_RECORD_WS_BASE_URL: 'ws://${WebServerPrivateIP}:3000/api/v1'
                   }
                 }]
               };
@@ -1389,13 +1390,15 @@ Resources:
               AWS_SNS_TOPIC_ARN: !Ref FeatureServerSNSTopic
               AWS_REGION: !Ref AWS::Region
               JAMBONES_SAMPLE_RATE: !Ref StatsSampleRate
-              OTEL_TRACING: !Ref EnableTracing
               JAMBONES_CLUSTER_ID: !Ref Prefix
               MONITORING_SERVER_IP: !GetAtt MonitoringServerEC2.PrivateIp
+              URLPortal: !Ref URLPortal
               JAMBONES_TIME_SERIES_HOST: !GetAtt MonitoringServerEC2.PrivateIp
               JWT_SECRET: !Ref EncryptionSecret
+              Cloudwatch: !Ref Cloudwatch
               CloudwatchLogRetention: !Ref CloudwatchLogRetention
               DbCachingTTS: !Ref DbCachingTTS
+              WebServerPrivateIP: !GetAtt WebServerEC2.PrivateIp
 
   FeatureServerPlacementGroup:
     Type: AWS::EC2::PlacementGroup
@@ -1535,7 +1538,6 @@ Resources:
                   watch: false,
                   max_memory_restart: '1G',
                   env: {
-                    NODE_ENV: 'production',
                     LOGLEVEL: 'info',
                     RTPENGINE_DTMF_LOG_PORT: 22223,
                     AWS_SNS_TOPIC_ARM: '${AWS_SNS_TOPIC_ARN}',
@@ -1651,7 +1653,7 @@ Resources:
 #      WebServer Instance
 #
 ###########################################
-  WebServerEIP1:
+  WebServerEIP:
     Type: AWS::EC2::EIP
     Properties:
       Domain: vpc
@@ -1709,30 +1711,31 @@ Resources:
       Roles:
         - !Ref WebServerIamRole
 
-  WebServerConfig:
-    Type: AWS::AutoScaling::LaunchConfiguration
+  WebServerEC2:
+    Type: 'AWS::EC2::Instance'
     Properties:
+      SubnetId: !Ref PublicSubnet1
+      IamInstanceProfile: !Ref WebServerInstanceProfile
       ImageId: !FindInMap [ "AWSRegion2AMI", !Ref AWS::Region,  "WebserverAmi"]
-      SecurityGroups:
+      InstanceType: !Ref InstanceTypeWebserver
+      SecurityGroupIds:
         - Ref: SshSecurityGroup
         - Ref: WebserverSecurityGroup
-      IamInstanceProfile: !Ref WebServerInstanceProfile
-      InstanceType: !Ref InstanceTypeWebserver
       KeyName: !Ref KeyName
-      AssociatePublicIpAddress: true
+      Monitoring: true
       UserData:
         Fn::Base64: 
           Fn::Sub:
             - |
               #!/bin/bash
-              PRE_PUBLIC_IP=`curl -s http://169.254.169.254/latest/meta-data/public-ipv4`
-              echo "before retrieving EIP for web server, public IP is $PRE_PUBLIC_IP"
+              #PRE_PUBLIC_IP=`curl -s http://169.254.169.254/latest/meta-data/public-ipv4`
+              #echo "before retrieving EIP for web server, public IP is $PRE_PUBLIC_IP"
 
-              /usr/local/bin/auto-assign-elastic-ip.sh
-              sleep 15
+              #/usr/local/bin/auto-assign-elastic-ip.sh
+              #sleep 15
 
-              PUBLIC_IP=`curl -s http://169.254.169.254/latest/meta-data/public-ipv4`
-              echo "after retrieving EIP for web server, public IP is $PUBLIC_IP"
+              #PUBLIC_IP=`curl -s http://169.254.169.254/latest/meta-data/public-ipv4`
+              #echo "after retrieving EIP for web server, public IP is $PUBLIC_IP"
             
               echo "running jambonz webserver user data script"
             
@@ -1772,7 +1775,10 @@ Resources:
                   watch: false,
                   max_memory_restart: '1G',
                   env: {
-                    NODE_ENV: 'production',
+                    JAMBONES_LOGLEVEL: 'info',
+                    JWT_SECRET: '${JWT_SECRET}',
+                    AWS_REGION: '${AWS_REGION}',
+                    AUTHENTICATION_KEY: '${JWT_SECRET}',
                     JAMBONES_MYSQL_REFRESH_TTL: ${DbCachingTTS},
                     JAMBONES_MYSQL_HOST: '${JAMBONES_MYSQL_HOST}',
                     JAMBONES_MYSQL_USER: '${JAMBONES_MYSQL_USER}',
@@ -1781,9 +1787,7 @@ Resources:
                     JAMBONES_MYSQL_CONNECTION_LIMIT: 10,
                     JAMBONES_REDIS_HOST: '${JAMBONES_REDIS_HOST}',
                     JAMBONES_REDIS_PORT: 6379,
-                    JAMBONES_LOGLEVEL: 'info',
                     JAMBONE_API_VERSION: 'v1',
-                    AWS_REGION: '${AWS_REGION}',
                     JAMBONES_CLUSTER_ID: '${JAMBONES_CLUSTER_ID}',
                     JAMBONES_TIME_SERIES_HOST: '${JAMBONES_TIME_SERIES_HOST}',
                     ENABLE_METRICS: 1,
@@ -1793,12 +1797,12 @@ Resources:
                     STATS_TELEGRAF: 1,
                     STATS_SAMPLE_RATE: ${JAMBONES_SAMPLE_RATE},
                     HTTP_PORT:  3000,
-                    JAEGER_BASE_URL: 'http://${MONITORING_SERVER_IP}::16686',
+                    JAEGER_BASE_URL: 'http://${MONITORING_SERVER_IP}:16686',
                     HOMER_BASE_URL: 'http://${MONITORING_SERVER_IP}:9080',
                     HOMER_USERNAME: 'admin',
                     HOMER_PASSWORD: 'sipcapture',
-                    AUTHENTICATION_KEY: '${JWT_SECRET}',
-                    JWT_SECRET: '${JWT_SECRET}'
+                    JAMBONZ_RECORD_WS_USERNAME: 'jambonz',
+                    JAMBONZ_RECORD_WS_PASSWORD: '${JWT_SECRET}'
                     },
                 },
                 {
@@ -1821,7 +1825,6 @@ Resources:
                   watch: false,
                   max_memory_restart: '1G',
                   env: {
-                    NODE_ENV: 'production',
                     LOGLEVEL: 'info',
                     NRC_TIME_SERVICE_DID: '+16137451576'
                   }
@@ -1889,20 +1892,6 @@ Resources:
                   proxy_cache_bypass \$http_upgrade;
                 }
               }
-              server {
-                listen 80;
-                server_name jaeger.${URLPortal}; 
-                location / {
-                  proxy_pass http://${MONITORING_SERVER_IP}:16686; 
-                  proxy_http_version 1.1;
-                  proxy_set_header Upgrade \$http_upgrade;
-                  proxy_set_header Connection 'upgrade';
-                  proxy_set_header Host \$host;
-                  proxy_cache_bypass \$http_upgrade;
-                  auth_basic "Secured Endpoint";
-                  auth_basic_user_file /etc/nginx/.htpasswd;
-                }
-              }
               EOF
             
               sudo systemctl restart nginx
@@ -1917,6 +1906,10 @@ Resources:
                 sudo sed -i -e "s/combine_logs: true/combine_logs: false/g" /home/admin/apps/ecosystem.config.js 
               fi
             
+              # restart jaeger 
+              sudo systemctl restart jaeger-collector.service
+              sudo systemctl restart jaeger-query.service
+
               echo "webserver user data script completed"
             - VPC_CIDR: !Ref VpcCIDR
               JAMBONES_MYSQL_HOST: !GetAtt DatabaseCluster.Endpoint.Address
@@ -1930,36 +1923,19 @@ Resources:
               JAMBONES_TIME_SERIES_HOST: !GetAtt MonitoringServerEC2.PrivateIp
               JWT_SECRET: !Ref EncryptionSecret
               URLPortal: !Ref URLPortal
+              Cloudwatch: !Ref Cloudwatch
               CloudwatchLogRetention: !Ref CloudwatchLogRetention
               DbCachingTTS: !Ref DbCachingTTS
-
-  WebServerPlacementGroup:
-    Type: AWS::EC2::PlacementGroup
-    Properties:
-      Strategy: spread
-    
-  WebServerAutoScalingGroup:
-    Type: AWS::AutoScaling::AutoScalingGroup
-    Properties:
-      AutoScalingGroupName: !Sub '${Prefix}-webserver-autoscaling-group'
-      LaunchConfigurationName: !Ref WebServerConfig
-      MinSize: 1
-      MaxSize: 1
-      DesiredCapacity: 1
-      TerminationPolicies:
-      - OldestInstance
-      VPCZoneIdentifier: 
-        - !Ref PublicSubnet1
-        - !Ref PublicSubnet2
       Tags:
         - 
           Key: Name
           Value: !Sub '${Prefix}-webserver'
-          PropagateAtLaunch: 'true'
-        - 
-          Key: Environment
-          Value: !Sub '${Prefix}-webserver'
-          PropagateAtLaunch: 'true'
+
+  WebServerEIPAssociation:
+    Type: AWS::EC2::EIPAssociation
+    Properties:
+      AllocationId: !GetAtt WebServerEIP.AllocationId
+      InstanceId: !Ref WebServerEC2
 
 Outputs: 
   WebPortalURL:

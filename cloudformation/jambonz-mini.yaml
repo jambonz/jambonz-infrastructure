@@ -95,7 +95,9 @@ Conditions:
 Mappings:
   AWSRegion2AMI:
     us-east-1:
-      Ami: ami-00d771ac0ee2a4774
+      Ami: ami-045c73965222f6e15
+    eu-west-2:
+      Ami: ami-01b49ce6a07a8b520
 
 Resources:
   IamCloudwatchRole:
@@ -279,6 +281,10 @@ Resources:
               sudo -u admin bash -c "pm2 save"
               sudo env PATH=$PATH:/usr/bin /usr/lib/node_modules/pm2/bin/pm2 startup systemd -u admin --hp /home/admin
 
+              # restart jaeger 
+              sudo systemctl restart jaeger-collector.service
+              sudo systemctl restart jaeger-query.service
+              
               # get an apiban key
               APIBANKEY=$(curl -X POST -u jambonz:1a074994242182a9e0b67eae93978826 -d "{\"client\": \"$INSTANCE_ID\"}" -s https://apiban.org/sponsor/newkey | jq -r '.ApiKey')
               sudo sed -i -e "s/API-KEY-HERE/$APIBANKEY/g" /usr/local/bin/apiban/config.json
@@ -333,11 +339,6 @@ Resources:
           IpProtocol: tcp
           FromPort: 9080
           ToPort: 9080
-          CidrIp: !Ref AllowedHttpCidr
-        - Description: jaeger
-          IpProtocol: tcp
-          FromPort: 16686
-          ToPort: 16686
           CidrIp: !Ref AllowedHttpCidr
         - Description: grafana
           IpProtocol: tcp

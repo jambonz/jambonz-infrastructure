@@ -1,0 +1,12 @@
+[Unit]
+Description=Jaeger Agent
+After=network.target
+
+[Service]
+ExecStart=/usr/local/bin/jaeger-agent --reporter.grpc.host-port=localhost:14250
+User=nobody
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
+

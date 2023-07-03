@@ -1,0 +1,118 @@
+{
+  "variables": {
+    "region": "us-east-1",
+    "ssh_username": "admin",
+    "ami_description": "jambonz monitoring server", 
+    "instance_type": "t2.xlarge",
+    "jambonz_version": "v0.8.4",
+    "homer_user": "homer_user",
+    "homer_password": "XcapJTqy11LnsYRtxXGPTYQkAnI",
+    "install_influxdb":  "yes",
+    "install_homer":  "yes",
+    "install_jaeger":  "yes",
+    "install_nodered":  "no",
+    "install_cloudwatch":  "yes",
+    "influxdb_ip":  "127.0.0.1",
+    "tag_name": "jambonz-monitoring-server"
+  },
+  "builders": [{
+    "type": "amazon-ebs",
+    "region": "{{user `region`}}",
+    "source_ami_filter": {
+      "filters": {
+        "virtualization-type": "hvm",
+        "name": "debian-11-amd64-*",
+        "root-device-type": "ebs"
+      },
+      "owners": ["136693071363"],
+      "most_recent": true
+    },
+    "instance_type": "{{user `instance_type`}}",
+    "ssh_username": "{{user `ssh_username`}}",
+    "ami_name": "jambonz-monitoring-server-{{user `jambonz_version`}}-amd64-{{isotime |clean_resource_name }}",
+    "ami_description": "{{user `ami_description`}}",
+    "launch_block_device_mappings": [
+      {
+        "device_name": "/dev/xvda",
+        "volume_size": 100,
+        "volume_type": "gp2",
+        "delete_on_termination": true
+      }
+    ],
+    "tags": {
+      "Name": "{{user `tag_name`}}"
+    },
+    "run_tags": {
+      "Name": "jambonz-monitoring-server-build"
+    }
+  }],
+  "provisioners": [
+    {
+      "type": "shell",
+      "inline": [
+        "while [ ! -f /var/lib/cloud/instance/boot-finished ]; do echo 'Waiting for cloud-init...'; sleep 1; done",
+        "sudo apt-get update",
+        "sudo apt-get remove --auto-remove nftables",
+        "sudo apt-get purge nftables",
+        "sudo apt-get -y install software-properties-common make cmake gcc g++ dirmngr sudo python3-dev \\",
+        "curl wget sed git",
+        "sudo find / -name authorized_keys | sudo xargs -0 -r rm -Rf"
+      ]
+    },
+    {
+      "type": "file",
+      "source": "files/",
+      "destination": "/tmp"
+    },
+    {
+      "type": "shell",
+      "script": "scripts/install_os_tuning.sh"
+    },
+    {
+      "type": "shell",
+      "execute_command": "chmod +x {{ .Path }}; sudo '{{ .Path }}' {{user `install_cloudwatch`}}",
+      "script": "scripts/install_cloudwatch.sh"
+    },
+    {
+      "type": "shell",
+      "execute_command": "chmod +x {{ .Path }}; sudo '{{ .Path }}' {{user `install_homer`}} {{user `homer_user`}} {{user `homer_password`}}",
+      "script": "scripts/install_postgresql.sh"
+    },
+    {
+      "type": "shell",
+      "execute_command": "chmod +x {{ .Path }}; sudo '{{ .Path }}' {{user `install_homer`}} {{user `influxdb_ip`}}",
+      "script": "scripts/install_telegraf.sh"
+    },
+    {
+      "type": "shell",
+      "execute_command": "chmod +x {{ .Path }}; sudo '{{ .Path }}' {{user `install_homer`}} {{user `homer_user`}} {{user `homer_password`}}",
+      "script": "scripts/install_homer.sh"
+    },
+    {
+      "type": "shell",
+      "execute_command": "chmod +x {{ .Path }}; sudo '{{ .Path }}' {{user `install_influxdb`}}",
+      "script": "scripts/install_influxdb.sh"
+    },
+    {
+      "type": "shell",
+      "execute_command": "chmod +x {{ .Path }}; sudo '{{ .Path }}' {{user `install_influxdb`}}",
+      "script": "scripts/install_grafana.sh"
+    },
+    {
+      "type": "shell",
+      "execute_command": "chmod +x {{ .Path }}; sudo '{{ .Path }}' {{user `install_jaeger`}}",
+      "script": "scripts/install_jaeger.sh"
+    },
+    {
+      "type": "shell",
+      "inline": [
+        "echo iptables-persistent iptables-persistent/autosave_v4 boolean true | sudo debconf-set-selections",
+        "echo iptables-persistent iptables-persistent/autosave_v6 boolean true | sudo debconf-set-selections",
+        "sudo apt-get -y install iptables-persistent",
+        "sudo rm -Rf /tmp/*",
+        "sudo rm /root/.ssh/authorized_keys",
+        "sudo rm /home/admin/.ssh/authorized_keys"
+      ]
+    }
+  ]
+}

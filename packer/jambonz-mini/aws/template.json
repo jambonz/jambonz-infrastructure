@@ -5,7 +5,7 @@
     "ami_description": "jambonz all-in-one AMI", 
     "instance_type": "c6in.xlarge",
     "drachtio_version": "v0.8.22",
-    "jambonz_version": "v0.8.3-3",
+    "jambonz_version": "v0.8.4",
     "jambonz_user": "admin",
     "jambonz_password": "JambonzR0ck$",
     "install_telegraf": "yes",
@@ -17,7 +17,7 @@
     "install_cloudwatch":  "yes",
     "install_nodered":  "no",
     "influxdb_ip":  "127.0.0.1",
-    "rtp_engine_version": "mr11.2.1.5",
+    "rtp_engine_version": "mr11.3.1.8",
     "rtp_engine_min_port": "40000",
     "rtp_engine_max_port": "60000",
     "mediaserver_name" : "jambonz",
@@ -42,7 +42,7 @@
     "launch_block_device_mappings": [
       {
         "device_name": "/dev/xvda",
-        "volume_size": 60,
+        "volume_size": 100,
         "volume_type": "gp2",
         "delete_on_termination": true
       }
@@ -94,6 +94,11 @@
     {
       "type": "shell",
       "script": "scripts/install_os_tuning.sh"
+    },
+    {
+      "type": "shell",
+      "execute_command": "chmod +x {{ .Path }}; sudo '{{ .Path }}' {{user `install_jaeger`}}",
+      "script": "scripts/install_jaeger.sh"
     },
     {
       "type": "shell",
@@ -159,11 +164,6 @@
     {
       "type": "shell",
       "script": "scripts/install_fail2ban.sh"
-    },
-    {
-      "type": "shell",
-      "execute_command": "chmod +x {{ .Path }}; sudo '{{ .Path }}' {{user `install_jaeger`}}",
-      "script": "scripts/install_jaeger.sh"
     },
     {
       "type": "shell",

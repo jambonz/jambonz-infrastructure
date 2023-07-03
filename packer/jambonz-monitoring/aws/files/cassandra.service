@@ -1,0 +1,16 @@
+[Unit]
+Description=Cassandra
+After=network.target
+
+[Service]
+User=admin
+Group=admin
+ExecStart=/usr/local/cassandra/bin/cassandra -f
+ExecStop=/usr/local/cassandra/bin/nodetool drain
+Type=simple
+Restart=always
+RestartSec=5
+LimitNOFILE=32000
+
+[Install]
+WantedBy=multi-user.target
