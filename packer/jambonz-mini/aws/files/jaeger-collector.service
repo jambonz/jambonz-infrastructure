@@ -6,8 +6,8 @@ After=network.target
 Environment="SPAN_STORAGE_TYPE=cassandra"
 Environment="CASSANDRA_SERVERS=127.0.0.1"
 Environment="CASSANDRA_KEYSPACE=jaeger_v1_dc1"
-ExecStart=/usr/local/bin/jaeger-collector --cassandra.keyspace=jaeger_v1_dc1 --cassandra.servers=127.0.0.1 --cassandra.username=jaeger --cassandra.password=foobar --collector.num-workers=50 --collector.queue-size=2000 --collector.http-server.host-port=127.0.0.1:14268
-User=nobody
+ExecStart=/usr/local/bin/jaeger-collector --cassandra.keyspace=jaeger_v1_dc1 --cassandra.servers=127.0.0.1 --cassandra.username=jaeger --cassandra.password=JambonzR0ck$ --collector.num-workers=50 --collector.queue-size=2000 --collector.http-server.host-port=127.0.0.1:14268
+User=admin
 Restart=on-failure
 
 [Install]
