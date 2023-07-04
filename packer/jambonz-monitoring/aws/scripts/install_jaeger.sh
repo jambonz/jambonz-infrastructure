@@ -46,7 +46,7 @@ echo "create jambonz user in cassandra"
 export CQLSH_HOST='127.0.0.1'
 export CQLSH_PORT=9042
 export USER_TO_CREATE='jaeger'
-export PASSWORD='foobar'
+export PASSWORD='JambonzR0ck$'
 cqlsh -u cassandra -p cassandra -e "CREATE ROLE IF NOT EXISTS $USER_TO_CREATE WITH PASSWORD = '$PASSWORD' AND LOGIN = true AND SUPERUSER = false;"
 
 echo "create keyspace and schema for jaeger in cassandra"
