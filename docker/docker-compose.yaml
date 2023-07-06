@@ -160,6 +160,7 @@ services:
       ENABLE_METRICS: 0
       JAMBONES_NETWORK_CIDR: 172.10.0.0/16
       JAMBONES_TIME_SERIES_HOST: 172.10.0.61
+      ENCRYPTION_SECRET: 'supersecret'
     depends_on:
       - mysql
       - redis
@@ -243,6 +244,7 @@ services:
       JAMBONES_FEATURE_SERVERS: 172.10.0.50:9022:cymru
       JAMBONES_FREESWITCH: 172.10.0.51:8021:ClueCon
       JAMBONES_TIME_SERIES_HOST: 172.10.0.61
+      ENCRYPTION_SECRET: 'supersecret'
     depends_on:
       - mysql
       - redis
