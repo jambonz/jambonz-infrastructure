@@ -8,8 +8,7 @@ Type=forking
 ExecStartPre=/bin/sh -c 'systemctl set-environment LOCAL_IP=$$(/bin/ip -4 addr show eth0 | grep -oP "(?<=inet )\d+(\.\d+){3}" | head -n 1)'
 ExecStartPre=/bin/sh -c "systemctl set-environment PUBLIC_IP=`/usr/bin/curl -s http://ipecho.net/plain`"
 ExecStart=/usr/local/bin/drachtio --daemon \
---contact sip:${PUBLIC_IP};transport=udp,tcp \
---contact sip:${LOCAL_IP};transport=udp,tcp \
+--contact sip:${LOCAL_IP};transport=udp,tcp --external-ip ${PUBLIC_IP}\
 --address 0.0.0.0 --port 9022 --homer 127.0.0.1:9060 --homer-id 10
 TimeoutSec=15s
 Restart=always
