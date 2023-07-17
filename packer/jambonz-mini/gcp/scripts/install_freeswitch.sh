@@ -52,6 +52,7 @@ git clone https://github.com/drachtio/nuance-asr-grpc-api.git -b main
 git clone https://github.com/drachtio/riva-asr-grpc-api.git -b main
 git clone https://github.com/drachtio/soniox-asr-grpc-api.git -b main
 git clone https://github.com/freeswitch/spandsp.git -b master
+cd spandsp && git checkout 728b60abdd1a71e254b8e831e9156521d788b2b9 && cd ..
 git clone https://github.com/freeswitch/sofia-sip.git -b master
 git clone https://github.com/dpirch/libfvad.git
 git clone https://github.com/aws/aws-sdk-cpp.git -b ${AWS_SDK_VERSION}
