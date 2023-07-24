@@ -1315,6 +1315,7 @@ Resources:
                   max_memory_restart: '1G',
                   env: {
                     JAMBONES_LOGLEVEL: 'info',
+                    JAMBONES_TTS_TRIM_SILENCE: 1,
                     JWT_SECRET: '${JWT_SECRET}',
                     AWS_REGION: '${AWS_REGION}',
                     JAMBONES_API_BASE_URL: 'http://${URLPortal}/v1',

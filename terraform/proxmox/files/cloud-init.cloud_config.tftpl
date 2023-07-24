@@ -98,6 +98,10 @@ write_files:
       sudo -u admin bash -c "pm2 save"
       sudo env PATH=$PATH:/usr/bin /usr/lib/node_modules/pm2/bin/pm2 startup systemd -u admin --hp /home/admin
 
+      # restart jaeger 
+      sudo systemctl restart jaeger-collector.service
+      sudo systemctl restart jaeger-query.service
+
       # get an apiban key
       APIBANKEY=$(curl -X POST -u jambonz:1a074994242182a9e0b67eae93978826 -d "{\"client\": \"$NEW_DB_PASSWD\"}" -s https://apiban.org/sponsor/newkey | jq -r '.ApiKey')
       sudo sed -i -e "s/API-KEY-HERE/$APIBANKEY/g" /usr/local/bin/apiban/config.json

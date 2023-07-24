@@ -14,6 +14,7 @@ module.exports = {
     env: {
       NODE_ENV: 'production',
       JWT_SECRET: 'JWT-SECRET-GOES_HERE',
+      JAMBONES_TTS_TRIM_SILENCE: 1,
       JAMBONES_GATHER_EARLY_HINTS_MATCH: 1,
       ENABLE_DATADOG_METRICS: 0,
       JAMBONES_NETWORK_CIDR: '172.31.32.0/24',

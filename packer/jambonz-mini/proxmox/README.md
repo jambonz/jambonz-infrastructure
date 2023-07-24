@@ -14,7 +14,7 @@ In order to run this packer script you must first create a VM template on your P
 
 Assuming that you have created a variables.json file to hold your variable values, you would simply do this:
 ```
-$  packer build -color=false -var-file=variables.json template.json template.json
+$  packer build -color=false -var-file=variables.json template.json
 ```
 
 ### variables

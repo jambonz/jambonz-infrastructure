@@ -1212,6 +1212,7 @@ Resources:
                   max_memory_restart: '1G',
                   env: {
                     NODE_ENV: 'production',
+                    JAMBONES_TTS_TRIM_SILENCE: 1,
                     JAMBONES_MYSQL_REFRESH_TTL: ${JAMBONES_MYSQL_REFRESH_TTL},
                     ENABLE_METRICS: 1,
                     STATS_HOST: '127.0.0.1',

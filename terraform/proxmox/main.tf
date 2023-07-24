@@ -110,7 +110,7 @@ resource "null_resource" "cloud_init_config_files" {
   connection {
     type     = "ssh"
     user     = var.pve_user
-    private_key = file(var.ssh_private_key_path)
+    password = var.pm_password
     host     = var.pve_host
   }
 
@@ -120,13 +120,13 @@ resource "null_resource" "cloud_init_config_files" {
   }
 }
 
-resource "proxmox_vm_qemu" "jambonz-mini-v083-1" {
+resource "proxmox_vm_qemu" "jambonz-mini-v084-2" {
   depends_on = [
     null_resource.cloud_init_config_files,
   ]
 
   count             = var.vm_count
-  name              = "jambonz-mini-v083-1"
+  name              = "jambonz-mini-v084-2"
   target_node       = var.pm_target_node
   clone             = var.pm_source_template  
   full_clone        = true
@@ -139,12 +139,12 @@ resource "proxmox_vm_qemu" "jambonz-mini-v083-1" {
 
   network {
     model           = "virtio"
-    bridge          = "vmbr30"
+    bridge          = "vmbr0"
   }
 
   network {
     model           = "virtio"
-    bridge          = "vmbr0"
+    bridge          = "vmbr1"
   }
 
   disk {
@@ -158,8 +158,8 @@ resource "proxmox_vm_qemu" "jambonz-mini-v083-1" {
   ssh_private_key   = file(var.ssh_private_key_path)
 
   # Cloud Init settings
-  ipconfig0         = var.ifpconfig_private
-  ipconfig1         = var.ifpconfig_public
+  ipconfig0         = var.ifpconfig_public
+  ipconfig1         = var.ifpconfig_private
   sshkeys           = file(var.ssh_pub_key_path)
   nameserver        = var.nameserver
 

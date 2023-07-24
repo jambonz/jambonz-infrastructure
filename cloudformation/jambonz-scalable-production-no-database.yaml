@@ -1075,6 +1075,7 @@ Resources:
                   max_memory_restart: '1G',
                   env: {
                     NODE_ENV: 'production',
+                    JAMBONES_TTS_TRIM_SILENCE: 1,
                     ENABLE_METRICS: 1,
                     STATS_HOST: '127.0.0.1',
                     STATS_PORT: 8125,

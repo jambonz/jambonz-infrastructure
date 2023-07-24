@@ -7,9 +7,6 @@ sudo sed -i s/#DefaultLimitNOFILE=/DefaultLimitNOFILE=65535/g /etc/systemd/syste
 sudo sed -i s/#DefaultLimitNOFILE=/DefaultLimitNOFILE=65535/g /etc/systemd/user.conf
 
 sudo bash -c 'cat >> /etc/sysctl.conf << EOT
-net.ipv6.conf.all.disable_ipv6 = 1
-net.ipv6.conf.default.disable_ipv6 = 1
-net.ipv6.conf.lo.disable_ipv6 = 1
 net.core.rmem_max=26214400
 net.core.rmem_default=26214400
 vm.swappiness=0

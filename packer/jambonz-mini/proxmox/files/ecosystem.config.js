@@ -20,7 +20,7 @@ module.exports = {
     watch: false,
     max_memory_restart: '2G',
     env: {
-      NODE_ENV: 'production',
+      JAMBONES_LOGLEVEL: 'info',
       HTTP_PORT: 3020,
       AVOID_UDH: true,
       JAMBONES_MYSQL_HOST: '127.0.0.1',
@@ -29,8 +29,7 @@ module.exports = {
       JAMBONES_MYSQL_DATABASE: 'jambones',
       JAMBONES_MYSQL_CONNECTION_LIMIT: 10,
       JAMBONES_REDIS_HOST: '127.0.0.1',
-      JAMBONES_REDIS_PORT: 6379,
-      JAMBONES_LOGLEVEL: 'info'
+      JAMBONES_REDIS_PORT: 6379
     }
   },
   {
@@ -41,13 +40,13 @@ module.exports = {
     err_file: '/home/admin/.pm2/logs/jambonz-api-server.log',
     combine_logs: true,
     instance_var: 'INSTANCE_ID',
-    exec_mode: 'fork',
-    instances: 1,
+    exec_mode: 'cluster',
+    instances: 0,
     autorestart: true,
     watch: false,
     max_memory_restart: '1G',
     env: {
-      NODE_ENV: 'production',
+      JAMBONES_LOGLEVEL: 'info',
       AUTHENTICATION_KEY: 'JWT-SECRET-GOES_HERE',
       JWT_SECRET: 'JWT-SECRET-GOES_HERE',
       JAMBONES_MYSQL_HOST: '127.0.0.1',
@@ -57,7 +56,6 @@ module.exports = {
       JAMBONES_MYSQL_CONNECTION_LIMIT: 10,
       JAMBONES_REDIS_HOST: '127.0.0.1',
       JAMBONES_REDIS_PORT: 6379,
-      JAMBONES_LOGLEVEL: 'info',
       JAMBONE_API_VERSION: 'v1',
       JAMBONES_TIME_SERIES_HOST: '127.0.0.1',
       ENABLE_METRICS: 1,
@@ -67,6 +65,8 @@ module.exports = {
       STATS_TELEGRAF: 1,
       HTTP_PORT:  3002,
       JAEGER_BASE_URL: 'http://127.0.0.1:16686',
+      JAMBONZ_RECORD_WS_USERNAME: 'jambonz',
+      JAMBONZ_RECORD_WS_PASSWORD: 'JWT-SECRET-GOES_HERE',
       HOMER_BASE_URL: 'http://127.0.0.1:9080',
       HOMER_USERNAME: 'admin',
       HOMER_PASSWORD: 'sipcapture'      
@@ -86,7 +86,7 @@ module.exports = {
     watch: false,
     max_memory_restart: '1G',
     env: {
-      NODE_ENV: 'production',
+      JAMBONES_LOGLEVEL: 'info',
       HTTP_PORT:  4000,
       JAMBONES_INBOUND_ROUTE: '127.0.0.1:4002',
       JAMBONES_OUTBOUND_ROUTE: '127.0.0.1:4003',
@@ -113,8 +113,8 @@ module.exports = {
     watch: false,
     max_memory_restart: '1G',
     env: {
-      NODE_ENV: 'production',
       JAMBONES_LOGLEVEL: 'info',
+      JWT_SECRET: 'JWT-SECRET-GOES_HERE',
       RTPENGINE_PING_INTERVAL: 30000,
       DRACHTIO_HOST: '127.0.0.1',
       DRACHTIO_PORT: 9022,
@@ -148,8 +148,8 @@ module.exports = {
     autorestart: true,
     watch: false,
     env: {
-      NODE_ENV: 'production',
       JAMBONES_LOGLEVEL: 'info',
+      JWT_SECRET: 'JWT-SECRET-GOES_HERE',
       JAMBONES_NETWORK_CIDR: 'PRIVATE_IP/32',
       MIN_CALL_LIMIT: 9999,
       RTPENGINE_PING_INTERVAL: 30000,
@@ -190,9 +190,9 @@ module.exports = {
     autorestart: true,
     watch: false,
     env: {
-      NODE_ENV: 'production',
-      JAMBONES_NETWORK_CIDR: 'PRIVATE_IP/32',
       JAMBONES_LOGLEVEL: 'info',
+      JWT_SECRET: 'JWT-SECRET-GOES_HERE',
+      JAMBONES_NETWORK_CIDR: 'PRIVATE_IP/32',
       DRACHTIO_HOST: '127.0.0.1',
       DRACHTIO_PORT: 9022,
       DRACHTIO_SECRET: 'cymru',
@@ -231,7 +231,6 @@ module.exports = {
     watch: false,
     max_memory_restart: '1G',
     env: {
-      NODE_ENV: 'production',
       LOGLEVEL: 'info',
       DTMF_ONLY: true,
       RTPENGINE_DTMF_LOG_PORT: 22223,
@@ -255,10 +254,10 @@ module.exports = {
     autorestart: true,
     watch: false,
     env: {
-      NODE_ENV: 'production',
-      AUTHENTICATION_KEY: 'JWT-SECRET-GOES_HERE',
+      JAMBONES_LOGLEVEL: 'info',
       JWT_SECRET: 'JWT-SECRET-GOES_HERE',
-      JAMBONES_GATHER_EARLY_HINTS_MATCH: 1,
+      AUTHENTICATION_KEY: 'JWT-SECRET-GOES_HERE',
+      JAMBONES_TTS_TRIM_SILENCE: 1,
       JAMBONES_OTEL_ENABLED: 1,
       OTEL_EXPORTER_JAEGER_ENDPOINT: 'http://localhost:14268/api/traces',
       OTEL_EXPORTER_OTLP_METRICS_INSECURE: 1,
@@ -275,6 +274,7 @@ module.exports = {
       JAMBONES_NETWORK_CIDR: 'PRIVATE_IP/32',
       JAMBONES_API_BASE_URL: '--JAMBONES_API_BASE_URL--',
       JAMBONES_GATHER_EARLY_HINTS_MATCH: 1,
+      JAMBONES_GATHER_CLEAR_GLOBAL_HINTS_ON_EMPTY_HINTS: 1,
       JAMBONES_MYSQL_HOST: '127.0.0.1',
       JAMBONES_MYSQL_USER: 'admin',
       JAMBONES_MYSQL_PASSWORD: 'JambonzR0ck$',
@@ -282,7 +282,6 @@ module.exports = {
       JAMBONES_MYSQL_CONNECTION_LIMIT: 10,
       JAMBONES_REDIS_HOST: '127.0.0.1',
       JAMBONES_REDIS_PORT: 6379,
-      JAMBONES_LOGLEVEL: 'info',
       JAMBONES_TIME_SERIES_HOST: '127.0.0.1',
       HTTP_PORT: 3000,
       DRACHTIO_HOST: '127.0.0.1',
@@ -290,6 +289,9 @@ module.exports = {
       DRACHTIO_SECRET: 'cymru',
       JAMBONES_SBCS: 'PRIVATE_IP',
       JAMBONES_FREESWITCH: '127.0.0.1:8021:JambonzR0ck$',
+      JAMBONZ_RECORD_WS_USERNAME: 'jambonz',
+      JAMBONZ_RECORD_WS_PASSWORD: 'JWT-SECRET-GOES_HERE',
+      JAMBONZ_RECORD_WS_BASE_URL: 'ws://127.0.0.1:3002/api/v1',
       SMPP_URL: 'http://PRIVATE_IP:3020'
     }
   }

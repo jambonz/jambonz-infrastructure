@@ -10,9 +10,15 @@ cd drachtio-server
 git submodule update --init --recursive
 ./autogen.sh && mkdir -p build && cd $_ && ../configure --enable-tcmalloc=yes CPPFLAGS='-DNDEBUG -g -O2' && make -j 4 && sudo make install
 
-echo "installing drachtio"
-sudo mv /tmp/drachtio.service /etc/systemd/system
-sudo mv /tmp/drachtio-5070.service /etc/systemd/system
+if [ "$2" = "gcp" ]; then 
+  echo "installing drachtio for gcp"
+  sudo mv /tmp/drachtio.gcp.service /etc/systemd/system/drachtio.service
+  sudo mv /tmp/drachtio-5070.gcp.service /etc/systemd/system/drachtio-5070.service
+else
+  echo "installing drachtio for aws"
+  sudo mv /tmp/drachtio.service /etc/systemd/system
+  sudo mv /tmp/drachtio-5070.service /etc/systemd/system
+fi 
 
 sudo mv /tmp/drachtio.conf.xml /etc
 sudo chmod 644 /etc/drachtio.conf.xml

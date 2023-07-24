@@ -37,7 +37,7 @@ if [ "$2" = "gcp" ]; then
   echo "installing rtpengine for gcp"
   sudo mv /tmp/rtpengine.gcp.service /etc/systemd/system/rtpengine.service
 else
-  echo "installing rtpengine"
+  echo "installing rtpengine for aws"
   sudo mv /tmp/rtpengine.service /etc/systemd/system/rtpengine.service
 fi 
 

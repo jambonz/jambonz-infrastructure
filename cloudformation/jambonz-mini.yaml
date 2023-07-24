@@ -95,9 +95,9 @@ Conditions:
 Mappings:
   AWSRegion2AMI:
     us-east-1:
-      Ami: ami-0aee73467294db8aa
+      Ami: ami-039461e559b855aae
     eu-west-2:
-      Ami: ami-065dc7be444b2ad3a
+      Ami: ami-01bdddec97e77cb73
 
 Resources:
   IamCloudwatchRole:
@@ -285,7 +285,7 @@ Resources:
               sudo systemctl restart jaeger-collector.service
               sudo systemctl restart jaeger-query.service
               
-              # get an apiban key
+              # get an apiban key and install it
               APIBANKEY=$(curl -X POST -u jambonz:1a074994242182a9e0b67eae93978826 -d "{\"client\": \"$INSTANCE_ID\"}" -s https://apiban.org/sponsor/newkey | jq -r '.ApiKey')
               sudo sed -i -e "s/API-KEY-HERE/$APIBANKEY/g" /usr/local/bin/apiban/config.json
               sudo /usr/local/bin/apiban/apiban-iptables-client FULL

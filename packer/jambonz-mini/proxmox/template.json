@@ -10,11 +10,13 @@
     "proxmox_source_vm_private_key_file": "~/.ssh/id_rsa",
     "proxmox_memory": "8192",
     "proxmox_cores": "4",
-    "proxmox_bridge": "{{user `proxmox_bridge`}}",
-    "proxmox_ip": "{{user `proxmox_ip`}}",
+    "proxmox_bridge_public": "{{user `proxmox_bridge_public`}}",
+    "proxmox_bridge_private": "{{user `proxmox_bridge_private`}}",
+    "proxmox_ip_public": "{{user `proxmox_ip_public`}}",
+    "proxmox_ip_private": "{{user `proxmox_ip_private`}}",
     "proxmox_gateway": "{{user `proxmox_gateway`}}",
     "drachtio_version": "v0.8.22",
-    "jambonz_version": "v0.8.3-2",
+    "jambonz_version": "v0.8.4-3",
     "jambonz_user": "admin",
     "jambonz_password": "JambonzR0ck$",
     "install_telegraf": "yes",
@@ -25,7 +27,7 @@
     "install_jaeger":  "yes",
     "install_nodered":  "no",
     "influxdb_ip":  "127.0.0.1",
-    "rtp_engine_version": "mr11.2.1.5",
+    "rtp_engine_version": "mr11.4.1.3",
     "rtp_engine_min_port": "40000",
     "rtp_engine_max_port": "60000",
     "mediaserver_name": "jambonz",
@@ -46,16 +48,22 @@
     "ssh_private_key_file": "{{user `proxmox_source_vm_private_key_file`}}",
     "template_name": "jambonz-mini-{{user `jambonz_version`}}-template",
     "nameserver": "8.8.8.8",
-    "cloud_init": true,
+    "cloud_init": false,
     "network_adapters": [
       {
-        "bridge": "{{user `proxmox_bridge`}}"
+        "bridge": "{{user `proxmox_bridge_public`}}"
+      },
+      {
+        "bridge": "{{user `proxmox_bridge_private`}}"
       }
     ],
     "ipconfig": [
       {
-        "ip": "{{user `proxmox_ip`}}",
+        "ip": "{{user `proxmox_ip_public`}}",
         "gateway": "{{user `proxmox_gateway`}}"
+      },
+      {
+        "ip": "{{user `proxmox_ip_private`}}"
       }
     ]
   }],
@@ -73,7 +81,7 @@
         "libevent-dev libpcap-dev libxmlrpc-core-c3-dev markdown libjson-glib-dev lsb-release \\",
         "libhiredis-dev gperf libspandsp-dev default-libmysqlclient-dev htop dnsutils gdb \\",
         "gnupg2 wget pkg-config ca-certificates libjpeg-dev libsqlite3-dev libpcre3-dev libldns-dev snapd \\",
-        "libspeex-dev libspeexdsp-dev libedit-dev libtiff-dev yasm libswscale-dev haveged jq fail2ban \\",
+        "libspeex-dev libspeexdsp-dev libedit-dev libtiff-dev yasm libswscale-dev haveged jq fail2ban pandoc \\",
         "libopus-dev libsndfile-dev libshout3-dev libmpg123-dev libmp3lame-dev libopusfile-dev libgoogle-perftools-dev",
         "sudo chmod a+w /usr/local/src",
         "mkdir ~/apps",
@@ -95,6 +103,10 @@
       "type": "file",
       "source": "files/",
       "destination": "/tmp"
+    },
+    {
+      "type": "shell",
+      "script": "scripts/install_apiban.sh"
     },
     {
       "type": "shell",

@@ -19,6 +19,8 @@ sudo apt-get install -y telegraf
 
 sudo cp /tmp/telegraf.conf /etc/telegraf/telegraf.conf
 sudo sed -i -e "s/influxdb:8086/$INFLUXDB_IP:8086/g"  /etc/telegraf/telegraf.conf
+sudo sed -i -e "s/# mount_points = /mount_points = /g"  /etc/telegraf/telegraf.conf
+sudo sed -i -e "s/ignore_fs = /#ignore_fs = /g"  /etc/telegraf/telegraf.conf
 
 sudo systemctl enable telegraf
 sudo systemctl start telegraf

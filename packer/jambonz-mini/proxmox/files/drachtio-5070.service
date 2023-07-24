@@ -6,7 +6,8 @@ After=syslog.target network.target local-fs.target
 [Service]
 ; service
 Type=forking
-ExecStart=/usr/local/bin/drachtio --daemon -f /etc/drachtio-5070.conf.xml --contact sip:*:5070;transport=udp,tcp --address 0.0.0.0 --port 9023
+ExecStartPre=/bin/sh -c 'systemctl set-environment LOCAL_IP=`ip addr show eth1 | awk \'/inet / {print $2}\' | cut -d \'/\' -f 1`'
+ExecStart=/usr/local/bin/drachtio --daemon -f /etc/drachtio-5070.conf.xml --contact sip:${LOCAL_IP}:5070;transport=udp,tcp --address 0.0.0.0 --port 9023
 TimeoutSec=15s
 Restart=always
 ; exec
@@ -26,3 +27,4 @@ UMask=0007
 
 [Install]
 WantedBy=multi-user.target
+
