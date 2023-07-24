@@ -21,9 +21,8 @@ echo "installing cassandra"
 
 sudo apt-get install -y default-jdk
 
-wget https://dlcdn.apache.org/cassandra/4.1.2/apache-cassandra-4.1.2-bin.tar.gz
-tar xvfz apache-cassandra-4.1.2-bin.tar.gz
-mv apache-cassandra-4.1.2 /usr/local/cassandra
+tar xvfz apache-cassandra-4.1.3-bin.tar.gz
+mv apache-cassandra-4.1.3 /usr/local/cassandra
 sudo cp cassandra.yaml /usr/local/cassandra/conf
 sudo chown -R admin:admin /usr/local/cassandra/
 cat /usr/local/cassandra/conf/cassandra.yaml 
