@@ -186,8 +186,8 @@ Conditions:
 Mappings:
   AWSRegion2AMI:
     eu-west-3:
-      MediumServerAmi: ami-0acffc8bde75ca93e
-      MonitoringServerAmi: ami-084e6a6a6affe0fc5
+      MediumServerAmi: ami-0c42c0be4f8cd2bcf
+      MonitoringServerAmi: ami-045b88ba6e8adda51
   RegionConfig:
     af-south-1:
       EFS: 'Yes'
