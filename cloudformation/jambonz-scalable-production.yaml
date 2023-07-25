@@ -812,7 +812,7 @@ Resources:
           # restart heplify-server
           sudo systemctl restart heplify-server.service
           sudo systemctl restart cassandra.service        
-          sleep 15
+          sleep 60
           sudo systemctl restart jaeger-collector.service
           sudo systemctl restart jaeger-query.service
       Tags:

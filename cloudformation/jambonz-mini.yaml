@@ -281,6 +281,11 @@ Resources:
               sudo -u admin bash -c "pm2 save"
               sudo env PATH=$PATH:/usr/bin /usr/lib/node_modules/pm2/bin/pm2 startup systemd -u admin --hp /home/admin
 
+              sudo systemctl restart cassandra.service        
+              echo "waiting 60 secs for cassandra to start.."
+              sleep 60
+              echo "now start jaeger"
+
               # restart jaeger 
               sudo systemctl restart jaeger-collector.service
               sudo systemctl restart jaeger-query.service

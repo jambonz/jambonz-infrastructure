@@ -120,13 +120,13 @@ resource "null_resource" "cloud_init_config_files" {
   }
 }
 
-resource "proxmox_vm_qemu" "jambonz-mini-v084-2" {
+resource "proxmox_vm_qemu" "jambonz-mini-v084-3" {
   depends_on = [
     null_resource.cloud_init_config_files,
   ]
 
   count             = var.vm_count
-  name              = "jambonz-mini-v084-2"
+  name              = "jambonz-mini-v084-3"
   target_node       = var.pm_target_node
   clone             = var.pm_source_template  
   full_clone        = true
