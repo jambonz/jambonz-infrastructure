@@ -1,10 +1,10 @@
 {
   "variables": {
-    "region": "us-east-1",
+    "region": "eu-west-3",
     "ssh_username": "admin",
     "ami_description": "jambonz monitoring server", 
     "instance_type": "t2.xlarge",
-    "jambonz_version": "v0.8.3-rc4",
+    "jambonz_version": "v0.8.3-3",
     "homer_user": "homer_user",
     "homer_password": "XcapJTqy11LnsYRtxXGPTYQkAnI",
     "install_influxdb":  "yes",
