@@ -1,8 +1,0 @@
-[nginx-noscript]
-
-enabled  = true
-port     = http,https
-filter   = nginx-noscript
-logpath  = /var/log/nginx/access.log
-maxretry = 1
-bantime = 86400

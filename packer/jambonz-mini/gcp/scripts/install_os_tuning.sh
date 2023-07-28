@@ -3,8 +3,7 @@ sudo sed -i '/# End of file/i *                hard       nofile          65535'
 sudo sed -i '/# End of file/i *                soft       nofile          65535'  /etc/security/limits.conf
 sudo sed -i '/# End of file/i root             hard       nofile          65535'  /etc/security/limits.conf
 sudo sed -i '/# End of file/i root             soft       nofile          65535'  /etc/security/limits.conf
-sudo sed -i s/#DefaultLimitNOFILE=/DefaultLimitNOFILE=65535/g /etc/systemd/system.conf
-sudo sed -i s/#DefaultLimitNOFILE=/DefaultLimitNOFILE=65535/g /etc/systemd/user.conf
+sudo sed -i s/^#DefaultLimitNOFILE=.*$/DefaultLimitNOFILE=65535:65535/g /etc/systemd/system.conf
 
 sudo bash -c 'cat >> /etc/sysctl.conf << EOT
 net.core.rmem_max=26214400

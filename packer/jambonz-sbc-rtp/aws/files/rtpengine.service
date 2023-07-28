@@ -19,7 +19,7 @@ ExecStart=/usr/local/bin/rtpengine \
 --dtmf-log-dest=127.0.0.1:22223 \
 --listen-cli=127.0.0.1:9900 \
 --table=42 \
---pidfile /var/run/rtpengine.pid \
+--pidfile /run/rtpengine.pid \
 --port-min 40000 \
 --port-max 60000 \
 --recording-dir /tmp \
@@ -27,7 +27,7 @@ ExecStart=/usr/local/bin/rtpengine \
 --recording-format eth \
 --log-level 5 \
 --delete-delay 0
-PIDFile=/var/run/rtpengine.pid
+PIDFile=/run/rtpengine.pid
 TimeoutSec=15s
 Restart=always
 ; exec

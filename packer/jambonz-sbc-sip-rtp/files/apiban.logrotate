@@ -1,6 +1,0 @@
-/var/log/apiban-client.log {
-  daily
-  copytruncate
-  rotate 7
-  compress
-}
