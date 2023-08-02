@@ -5,7 +5,7 @@
     "ami_description": "jambonz SBC SIP+RTP", 
     "instance_type": "t3.xlarge",
     "drachtio_version": "v0.8.22",
-    "jambonz_version": "v0.8.4-3",
+    "jambonz_version": "v0.8.4-4",
     "ami_base_image_arch": "amd64",
     "ami_base_image_owner": "136693071363",
     "rtp_engine_version": "mr11.3.1.8",
@@ -137,6 +137,7 @@
         "sudo apt-get -y install iptables-persistent",
         "sudo rm -Rf /tmp/*",
         "sudo rm /root/.ssh/authorized_keys",
+        "sudo rm /home/admin/.ssh/known_hosts",
         "sudo rm /home/admin/.ssh/authorized_keys"
       ]
     }

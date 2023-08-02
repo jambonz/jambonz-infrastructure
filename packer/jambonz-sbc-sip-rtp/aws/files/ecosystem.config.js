@@ -117,6 +117,8 @@ module.exports = {
       NODE_ENV: 'production',
       JAMBONES_LOGLEVEL: 'info',
       JAMBONES_NETWORK_CIDR: '${VPC_CIDR}',
+      JAMBONES_RTPENGINES: '127.0.0.1:22222',
+
       ENABLE_DATADOG_METRICS: 0,
       DRACHTIO_HOST: '127.0.0.1',
       DRACHTIO_PORT: 9022,

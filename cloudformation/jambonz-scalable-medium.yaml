@@ -4,9 +4,9 @@ AWSTemplateFormatVersion: "2010-09-09"
 Mappings:
   AWSRegion2AMI:
     us-east-1:
-      SbcAmi: ami-086a5604713571940
-      FsAmi: ami-0da8085ac0ed7a976
-      WebMonitoringAmi: ami-026327c7f52ba6911
+      SbcAmi: ami-069f90ebe1a9c8103
+      FsAmi: ami-09b873571c4a9a7df
+      WebMonitoringAmi: ami-08cf33749f86936a1
 
 Parameters:
   KeyName:
@@ -668,10 +668,11 @@ Resources:
               echo "running jambonz web and monitoring server user data script"
             
               echo "seeding database.."
+              INSTANCE_ID="$(curl -s http://169.254.169.254/latest/meta-data/instance-id)" 
               mysql -h ${JAMBONES_MYSQL_HOST} -u admin -D jambones -p${JAMBONES_MYSQL_PASSWORD} < /home/admin/apps/jambonz-api-server/db/jambones-sql.sql
               sudo sed -i 's/public-apps.jambonz.us/public-apps.${URLPortal}/g' /home/admin/apps/jambonz-api-server/db/seed-production-database-open-source.sql
               mysql -h ${JAMBONES_MYSQL_HOST} -u admin -D jambones -p${JAMBONES_MYSQL_PASSWORD} < /home/admin/apps/jambonz-api-server/db/seed-production-database-open-source.sql
-              JAMBONES_MYSQL_HOST=${JAMBONES_MYSQL_HOST} JAMBONES_MYSQL_USER=admin JAMBONES_MYSQL_PASSWORD=${JAMBONES_MYSQL_PASSWORD} JAMBONES_MYSQL_DATABASE=jambones /home/admin/apps/jambonz-api-server/db/reset_admin_password.js
+              JAMBONES_ADMIN_INITIAL_PASSWORD=$INSTANCE_ID JAMBONES_MYSQL_HOST=${JAMBONES_MYSQL_HOST} JAMBONES_MYSQL_USER=admin JAMBONES_MYSQL_PASSWORD=${JAMBONES_MYSQL_PASSWORD} JAMBONES_MYSQL_DATABASE=jambones /home/admin/apps/jambonz-api-server/db/reset_admin_password.js
 
               # add row to system information table 
               mysql -h ${JAMBONES_MYSQL_HOST} -u admin -D jambones -p${JAMBONES_MYSQL_PASSWORD} -e $'insert into system_information (domain_name, sip_domain_name, monitoring_domain_name) values ('\'''"${URLPortal}"''\'', '\''sip.'"${URLPortal}"''\'', '\''grafana.'"${URLPortal}"''\'')'
@@ -916,11 +917,15 @@ Resources:
             - |
               #!/bin/bash
               echo "running jambonz user data script"
+
+              sudo sytemctl stop rtpengine
+              sudo systemctl stop drachtio
+
               PRE_PUBLIC_IP=`curl -s http://169.254.169.254/latest/meta-data/public-ipv4`
               echo "before retrieving EIP for jambonz SBC, public IP is $PRE_PUBLIC_IP"
 
               /usr/local/bin/auto-assign-elastic-ip.sh
-              sleep 15
+              sleep 20
 
               PUBLIC_IP=`curl -s http://169.254.169.254/latest/meta-data/public-ipv4`
               echo "after retrieving EIP for SIP server, public IP is $PUBLIC_IP"
@@ -1413,18 +1418,37 @@ Resources:
       RoleARN: !GetAtt FeatureServerSNSPublishRole.Arn
 
 Outputs: 
+  BaseApiURL:
+    Value: !Join 
+      - ''
+      - - 'http://'
+        - !Ref URLPortal
+        - '/api/v1'
+    Description: URL for the jambonz portal
   PortalURL:
     Value: !Join 
       - ''
       - - 'http://'
         - !Ref URLPortal
     Description: URL for the jambonz portal
+  PortalUsername:
+    Value: admin
+    Description: Login username for the jambonz portal
+  PortalPassword:
+    Value: !Ref WebMonitoringServerEC2
+    Description: Initial password for grafana portal; you will be forced to change it on first login.
   GrafanaURL:
     Value: !Join 
       - ''
       - - 'http://grafana.'
         - !Ref URLPortal
     Description: URL for the grafana portal
+  GrafanaUsername:
+    Value: admin
+    Description: Login username for the grafana portal
+  GrafanaPassword:
+    Value: admin
+    Description: Initial password for grafana portal; you will be forced to change it on first login.
   SbcServerIP:
     Value: !GetAtt 
       - SbcServerEIP
