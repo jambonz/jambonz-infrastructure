@@ -5,7 +5,7 @@
     "ami_description": "jambonz feature server",
     "instance_type": "t2.xlarge",
     "drachtio_version": "v0.8.22",
-    "jambonz_version": "v0.8.4-1",
+    "jambonz_version": "v0.8.4-4",
     "ami_base_image_arch": "amd64",
     "ami_base_image_owner": "136693071363",
     "install_telegraf": "yes",
@@ -83,17 +83,17 @@
     },
     {
       "type": "shell",
-      "execute_command": "chmod +x {{ .Path }}; sudo '{{ .Path }}' {{user `install_cloudwatch`}}",
-      "script": "scripts/install_cloudwatch.sh"
-    },
-    {
-      "type": "shell",
       "environment_vars": [
         "ARCH={{user `ami_base_image_arch`}}",
         "MEDIA_SERVER_NAME={{user `mediaserver_name`}}",
         "PREFERRED_CODEC_LIST={{user `preferred_codec_list`}}"
       ],
       "script": "scripts/install_freeswitch.sh"
+    },
+    {
+      "type": "shell",
+      "execute_command": "chmod +x {{ .Path }}; sudo '{{ .Path }}' {{user `install_cloudwatch`}}",
+      "script": "scripts/install_cloudwatch.sh"
     },
     {
       "type": "shell",
@@ -131,6 +131,7 @@
         "sudo apt-get -y install iptables-persistent",
         "sudo rm -Rf /tmp/*",
         "sudo rm /root/.ssh/authorized_keys",
+        "sudo rm /home/admin/.ssh/known_hosts",
         "sudo rm /home/admin/.ssh/authorized_keys"
       ]
     }

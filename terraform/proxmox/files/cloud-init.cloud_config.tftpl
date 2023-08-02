@@ -7,7 +7,8 @@ write_files:
       #!/bin/bash -xe
 
       # get instance metadata
-      PRIVATE_IPV4="$(/bin/ip -4 addr show eth0 | grep -oP '(?<=inet )\d+(\.\d+){3}' | head -n 1)"
+      # note: eth0 must be public ip, eth1 must be private ip
+      PRIVATE_IPV4="$(/bin/ip -4 addr show eth1 | grep -oP '(?<=inet )\d+(\.\d+){3}' | head -n 1)"
       PUBLIC_IPV4="$(/usr/bin/curl -s http://ipecho.net/plain)" 
       
       # change the database password to a random id

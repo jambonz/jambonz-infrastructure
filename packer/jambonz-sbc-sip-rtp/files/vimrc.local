@@ -1,5 +1,0 @@
-source /usr/share/vim/vim80/defaults.vim
-let skip_defaults_vim = 1
-if has('mouse')
-  set mouse=r
-endif
