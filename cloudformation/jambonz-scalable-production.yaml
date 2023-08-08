@@ -1318,7 +1318,7 @@ Resources:
                     JAMBONES_TTS_TRIM_SILENCE: 1,
                     JWT_SECRET: '${JWT_SECRET}',
                     AWS_REGION: '${AWS_REGION}',
-                    JAMBONES_API_BASE_URL: 'http://${URLPortal}/v1',
+                    JAMBONES_API_BASE_URL: 'http://api.${URLPortal}/v1',
                     ENABLE_METRICS: 1,
                     STATS_HOST: '127.0.0.1',
                     STATS_PORT: 8125,
