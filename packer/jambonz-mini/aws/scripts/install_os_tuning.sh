@@ -14,3 +14,12 @@ vm.dirty_writeback_centisecs=100
 EOT'
 
 sudo cp /tmp/20auto-upgrades /etc/apt/apt.conf.d/20auto-upgrades
+
+# Fix locales
+sudo bash -c 'cat >> /etc/default/locale << EOT
+LANG="en_US.UTF-8"
+LANGUAGE="en_US:en"
+EOT'
+
+sudo sed -i -e 's/# en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/' /etc/locale.gen
+sudo dpkg-reconfigure --frontend=noninteractive locales
