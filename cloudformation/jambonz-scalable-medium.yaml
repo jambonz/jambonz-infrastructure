@@ -670,7 +670,7 @@ Resources:
               echo "seeding database.."
               INSTANCE_ID="$(curl -s http://169.254.169.254/latest/meta-data/instance-id)" 
               mysql -h ${JAMBONES_MYSQL_HOST} -u admin -D jambones -p${JAMBONES_MYSQL_PASSWORD} < /home/admin/apps/jambonz-api-server/db/jambones-sql.sql
-              sudo sed -i 's/public-apps.jambonz.us/public-apps.${URLPortal}/g' /home/admin/apps/jambonz-api-server/db/seed-production-database-open-source.sql
+              sudo sed -i 's/public-apps.jambonz.cloud/public-apps.${URLPortal}/g' /home/admin/apps/jambonz-api-server/db/seed-production-database-open-source.sql
               mysql -h ${JAMBONES_MYSQL_HOST} -u admin -D jambones -p${JAMBONES_MYSQL_PASSWORD} < /home/admin/apps/jambonz-api-server/db/seed-production-database-open-source.sql
               JAMBONES_ADMIN_INITIAL_PASSWORD=$INSTANCE_ID JAMBONES_MYSQL_HOST=${JAMBONES_MYSQL_HOST} JAMBONES_MYSQL_USER=admin JAMBONES_MYSQL_PASSWORD=${JAMBONES_MYSQL_PASSWORD} JAMBONES_MYSQL_DATABASE=jambones /home/admin/apps/jambonz-api-server/db/reset_admin_password.js
 
