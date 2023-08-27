@@ -4,8 +4,8 @@
     "ssh_username": "admin",
     "ami_description": "jambonz all-in-one AMI", 
     "instance_type": "c6in.xlarge",
-    "drachtio_version": "v0.8.22",
-    "jambonz_version": "v0.8.4-4",
+    "drachtio_version": "v0.8.24-rc1",
+    "jambonz_version": "v0.8.5-rc3",
     "jambonz_user": "admin",
     "jambonz_password": "JambonzR0ck$",
     "install_telegraf": "yes",
@@ -64,14 +64,14 @@
         "sudo apt-get update",
         "sudo apt-get remove --auto-remove nftables",
         "sudo apt-get purge nftables",
-        "sudo apt-get -y install python lsof gcc g++ make cmake build-essential git autoconf automake default-mysql-client redis-tools \\",
-        "curl argon2 telnet libtool libtool-bin libssl-dev libcurl4-openssl-dev libz-dev systemd-coredump liblz4-tool \\",
-        "libxtables-dev libip6tc-dev libip4tc-dev  libiptc-dev linux-headers-amd64 libavformat-dev liblua5.1-0-dev libavfilter-dev libavcodec-dev libswresample-dev \\",
+        "sudo apt-get -y install python-is-python3 lsof gcc g++ make cmake build-essential git autoconf automake default-mysql-client redis-tools \\",
+        "curl argon2 telnet libtool libtool-bin libssl-dev libcurl4-openssl-dev zlib1g-dev systemd-coredump liblz4-tool \\",
+        "libxtables-dev libip6tc-dev libip4tc-dev libiptc-dev libavformat-dev liblua5.1-0-dev libavfilter-dev libavcodec-dev libswresample-dev \\",
         "libevent-dev libpcap-dev libxmlrpc-core-c3-dev markdown libjson-glib-dev lsb-release \\",
-        "libhiredis-dev gperf libspandsp-dev default-libmysqlclient-dev htop dnsutils gdb \\",
-        "gnupg2 wget pkg-config ca-certificates libjpeg-dev libsqlite3-dev libpcre3-dev libldns-dev snapd \\",
-        "libspeex-dev libspeexdsp-dev libedit-dev libtiff-dev yasm libswscale-dev haveged jq fail2ban pandoc \\",
-        "libopus-dev libsndfile-dev libshout3-dev libmpg123-dev libmp3lame-dev libopusfile-dev libgoogle-perftools-dev",
+        "libhiredis-dev gperf libspandsp-dev default-libmysqlclient-dev htop dnsutils gdb autoconf-archive \\",
+        "gnupg2 wget pkg-config ca-certificates libjpeg-dev libsqlite3-dev libpcre3-dev libldns-dev snapd linux-headers-amd64 \\",
+        "libspeex-dev libspeexdsp-dev libedit-dev libtiff-dev yasm libswscale-dev haveged jq fail2ban pandoc libre2-dev \\",
+        "libopus-dev libsndfile1-dev libshout3-dev libmpg123-dev libmp3lame-dev libopusfile-dev libgoogle-perftools-dev",
         "sudo chmod a+w /usr/local/src",
         "mkdir ~/apps",
         "cd ~/apps",
@@ -99,8 +99,33 @@
     },
     {
       "type": "shell",
-      "execute_command": "chmod +x {{ .Path }}; sudo '{{ .Path }}' {{user `install_jaeger`}}",
+      "execute_command": "chmod +x {{ .Path }}; sudo '{{ .Path }}' {{user `install_jaeger`}} {{user `distro`}}",
       "script": "scripts/install_jaeger.sh"
+    },
+    {
+      "type": "shell",
+      "execute_command": "chmod +x {{ .Path }}; sudo '{{ .Path }}' {{user `install_homer`}} {{user `homer_user`}} {{user `homer_password`}}",
+      "script": "scripts/install_postgresql.sh"
+    },
+    {
+      "type": "shell",
+      "execute_command": "chmod +x {{ .Path }}; sudo '{{ .Path }}' {{user `install_homer`}} {{user `homer_user`}} {{user `homer_password`}}",
+      "script": "scripts/install_homer.sh"
+    },
+    {
+      "type": "shell",
+      "environment_vars": [
+        "ARCH=amd64",
+        "MEDIA_SERVER_NAME={{user `mediaserver_name`}}",
+        "PREFERRED_CODEC_LIST={{user `preferred_codec_list`}}",
+        "DISTRO={{user `distro`}}"
+      ],
+      "script": "scripts/install_freeswitch.sh"
+    },
+    {
+      "type": "shell",
+      "execute_command": "chmod +x {{ .Path }}; sudo '{{ .Path }}' {{user `drachtio_version`}}",
+      "script": "scripts/install_drachtio.sh"
     },
     {
       "type": "shell",
@@ -114,21 +139,7 @@
     },
     {
       "type": "shell",
-      "execute_command": "chmod +x {{ .Path }}; sudo '{{ .Path }}' {{user `drachtio_version`}}",
-      "script": "scripts/install_drachtio.sh"
-    },
-    {
-      "type": "shell",
       "script": "scripts/install_nodejs.sh"
-    },
-    {
-      "type": "shell",
-      "environment_vars": [
-        "ARCH=amd64",
-        "MEDIA_SERVER_NAME={{user `mediaserver_name`}}",
-        "PREFERRED_CODEC_LIST={{user `preferred_codec_list`}}"
-      ],
-      "script": "scripts/install_freeswitch.sh"
     },
     {
       "type": "shell",
@@ -147,11 +158,6 @@
     {
       "type": "shell",
       "script": "scripts/install_redis.sh"
-    },
-    {
-      "type": "shell",
-      "execute_command": "chmod +x {{ .Path }}; sudo '{{ .Path }}' {{user `install_homer`}} {{user `homer_user`}} {{user `homer_password`}}",
-      "script": "scripts/install_postgresql.sh"
     },
     {
       "type": "shell",
@@ -176,11 +182,6 @@
       "type": "shell",
       "execute_command": "chmod +x {{ .Path }}; sudo '{{ .Path }}' {{user `jambonz_version`}} {{user `jambonz_user`}} {{user `jambonz_password`}}",
       "script": "scripts/install_app.sh"
-    },
-    {
-      "type": "shell",
-      "execute_command": "chmod +x {{ .Path }}; sudo '{{ .Path }}' {{user `install_homer`}} {{user `homer_user`}} {{user `homer_password`}}",
-      "script": "scripts/install_homer.sh"
     },
     {
       "type": "shell",

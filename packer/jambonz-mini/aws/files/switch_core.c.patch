@@ -1,0 +1,22 @@
+--- switch_core.c	2023-08-22 14:51:14.809826416 +0000
++++ switch_core.c.new	2023-08-22 14:50:44.109074396 +0000
+@@ -45,6 +45,7 @@
+ #include "private/switch_core_pvt.h"
+ #include <switch_curl.h>
+ #include <switch_msrp.h>
++#include <aws_wrapper.h>
+ #ifndef WIN32
+ #include <switch_private.h>
+ #ifdef HAVE_SETRLIMIT
+@@ -2447,6 +2448,11 @@
+ 	const char *use = NULL;
+ #include "cc.h"
+
++#ifdef FREESWITCH_AWS_GLOBAL_INITIALIZATION
++	switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_NOTICE, "Initializing AWS SDK\n");
++	aws_init_api();
++#endif
++
+
+ 	if (switch_core_init(flags, console, err) != SWITCH_STATUS_SUCCESS) {
+ 		return SWITCH_STATUS_GENERR;

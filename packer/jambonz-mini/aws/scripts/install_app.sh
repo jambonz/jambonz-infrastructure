@@ -3,6 +3,9 @@ VERSION=$1
 DB_USER=$2
 DB_PASS=$3
 
+ALIAS_LINE="alias gl='git log --oneline --decorate'"
+echo "$ALIAS_LINE" >> ~/.bash_aliases
+
 cd /home/admin
 cp /tmp/ecosystem.config.js apps
 

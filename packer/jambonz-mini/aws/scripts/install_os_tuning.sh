@@ -18,7 +18,6 @@ sudo cp /tmp/20auto-upgrades /etc/apt/apt.conf.d/20auto-upgrades
 # disable ipv6
 echo "net.ipv6.conf.all.disable_ipv6 = 1" | sudo tee -a /etc/sysctl.conf > /dev/null
 echo "net.ipv6.conf.default.disable_ipv6 = 1" | sudo tee -a /etc/sysctl.conf > /dev/null
-sudo sysctl -p
 
 # install latest cmake
 cd /usr/local/src

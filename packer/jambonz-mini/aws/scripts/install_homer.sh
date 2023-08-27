@@ -5,6 +5,12 @@ DB_USER=$2
 DB_PASS=$3
 
 curl -s https://packagecloud.io/install/repositories/qxip/sipcapture/script.deb.sh | sudo bash
+
+# DH: TMP hack until homer releases debs for bookworm
+sudo sed -i 's/bookworm/bullseye/g' /etc/apt/sources.list.d/qxip_sipcapture.list
+sudo apt-get update 
+
+# now install homer
 sudo apt-get install -y homer-app heplify-server
 
 sudo cp /usr/local/homer/etc/webapp_config.json.example /usr/local/homer/etc/webapp_config.json

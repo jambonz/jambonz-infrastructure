@@ -95,7 +95,7 @@ Conditions:
 Mappings:
   AWSRegion2AMI:
     us-east-1:
-      Ami: ami-097781c08d5a30385
+      Ami: ami-03a4ad21e733e5a8b
 
 Resources:
   IamCloudwatchRole:
@@ -183,7 +183,7 @@ Resources:
               
               # change the database password to a random id
               NEW_DB_PASSWD="$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1)" 
-              echo "alter user 'admin'@'%' identified by '$NEW_DB_PASSWD'" | mysql -h localhost -u admin -D jambones -pJambonzR0ck$ 
+              echo "alter user 'admin'@'%' identified by '$NEW_DB_PASSWD'" | mysql -h 127.0.0.1 -u admin -D jambones -pJambonzR0ck$ 
               sudo sed -i -e "s/\(.*\)JAMBONES_MYSQL_PASSWORD.*/\1JAMBONES_MYSQL_PASSWORD: '$NEW_DB_PASSWD',/g" /home/admin/apps/ecosystem.config.js 
               
               # replace ip addresses in the ecosystem.config.js file
@@ -196,7 +196,7 @@ Resources:
               sudo sed -i -e "s/\(.*\)JWT-SECRET-GOES_HERE\(.*\)/\1$uuid\2/g" /home/admin/apps/ecosystem.config.js 
 
               # reset the database
-              JAMBONES_ADMIN_INITIAL_PASSWORD=$INSTANCE_ID JAMBONES_MYSQL_USER=admin JAMBONES_MYSQL_PASSWORD=$NEW_DB_PASSWD JAMBONES_MYSQL_DATABASE=jambones JAMBONES_MYSQL_HOST=localhost /home/admin/apps/jambonz-api-server/db/reset_admin_password.js
+              JAMBONES_ADMIN_INITIAL_PASSWORD=$INSTANCE_ID JAMBONES_MYSQL_USER=admin JAMBONES_MYSQL_PASSWORD=$NEW_DB_PASSWD JAMBONES_MYSQL_DATABASE=jambones JAMBONES_MYSQL_HOST=127.0.0.1 /home/admin/apps/jambonz-api-server/db/reset_admin_password.js
 
               # configure webapp
               if [[ -z "${URLPortal}" ]]; then
@@ -210,7 +210,7 @@ Resources:
                 API_BASE_URL=http://${URLPortal}/api/v1 TAG="<script>window.JAMBONZ = { API_BASE_URL: '$API_BASE_URL'};</script>"
                 sed -i -e "\@</head>@i\ $TAG" /home/admin/apps/jambonz-webapp/dist/index.html
                 # add row to system information table 
-                mysql -h localhost -u admin -D jambones -p$NEW_DB_PASSWD -e $'insert into system_information (domain_name, sip_domain_name, monitoring_domain_name) values ('\'''"${URLPortal}"''\'', '\''sip.'"${URLPortal}"''\'', '\''grafana.'"${URLPortal}"''\'')'
+                mysql -h 127.0.0.1 -u admin -D jambones -p$NEW_DB_PASSWD -e $'insert into system_information (domain_name, sip_domain_name, monitoring_domain_name) values ('\'''"${URLPortal}"''\'', '\''sip.'"${URLPortal}"''\'', '\''grafana.'"${URLPortal}"''\'')'
               
                 sudo cat << EOF > /etc/nginx/sites-available/default 
                 server {
@@ -218,11 +218,11 @@ Resources:
                     server_name ${URLPortal};
                     location /api/ {
                         rewrite ^/api/(.*)$ /\$1 break;
-                        proxy_pass http://localhost:3002;
+                        proxy_pass http://127.0.0.1:3002;
                         proxy_set_header Host \$host;
                     }
                     location / {
-                        proxy_pass http://localhost:3001;
+                        proxy_pass http://127.0.0.1:3001;
                         proxy_set_header Host \$host;
                     }
                 }
@@ -230,7 +230,7 @@ Resources:
                   listen 80;
                   server_name api.${URLPortal}; 
                   location / {
-                    proxy_pass http://localhost:3002; 
+                    proxy_pass http://127.0.0.1:3002; 
                     proxy_set_header Host \$host;
                   }
                 }
@@ -238,7 +238,7 @@ Resources:
                   listen 80;
                   server_name grafana.${URLPortal}; 
                   location / {
-                    proxy_pass http://localhost:3010; 
+                    proxy_pass http://127.0.0.1:3010; 
                     proxy_http_version 1.1;
                     proxy_set_header Upgrade \$http_upgrade;
                     proxy_set_header Connection 'upgrade';
@@ -250,7 +250,7 @@ Resources:
                   listen 80;
                   server_name homer.${URLPortal}; 
                   location / {
-                    proxy_pass http://localhost:9080; 
+                    proxy_pass http://127.0.0.1:9080; 
                     proxy_http_version 1.1;
                     proxy_set_header Upgrade \$http_upgrade;
                     proxy_set_header Connection 'upgrade';
