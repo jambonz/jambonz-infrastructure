@@ -6,7 +6,7 @@ GOOGLE_API_VERSION=29374574304f3356e64423acc9ad059fe43f09b5
 #AWS_SDK_VERSION=1.11.143 # newer but buggy with s2n_init crashes and weird slowdown on voice playout in FS
 AWS_SDK_VERSION=1.8.129
 LWS_VERSION=v4.3.2
-MODULES_VERSION=update-lws
+MODULES_VERSION=v0.8.0
 
 echo "freeswitch version to install is ${FREESWITCH_VERSION}"
 echo "drachtio modules version to install is ${MODULES_VERSION}"
@@ -134,7 +134,13 @@ cd /usr/local/src/freeswitch/libs/aws-sdk-cpp
 git submodule update --init --recursive
 mkdir -p build && cd build
 cmake .. -DBUILD_ONLY="lexv2-runtime;transcribestreaming" -DCMAKE_BUILD_TYPE=RelWithDebInfo -DBUILD_SHARED_LIBS=OFF -DCMAKE_CXX_FLAGS="-Wno-unused-parameter"
-make -j 4 && sudo make install
+if [ "$DISTRO" == "debian-12" ]; then
+  echo "patching aws-sdk-cpp to fix debian 12 build"
+  sudo sed -i 's/uint8_t arr\[16\];/uint8_t arr\[16\] = {0};/g' /usr/local/src/freeswitch/libs/aws-sdk-cpp/build/.deps/build/src/AwsCCommon/tests/byte_buf_test.c
+  sudo sed -i 's/char filename_array\[64\];/char filename_array\[64\] = {0};/g' /usr/local/src/freeswitch/libs/aws-sdk-cpp/build/.deps/build/src/AwsCCommon/tests/logging/logging_test_utilities.c
+  cmake .. -DBUILD_ONLY="lexv2-runtime;transcribestreaming" -DCMAKE_BUILD_TYPE=RelWithDebInfo -DBUILD_SHARED_LIBS=OFF -DCMAKE_CXX_FLAGS="-Wno-unused-parameter"
+fi
+sudo make -j 4 && sudo make install
 sudo find /usr/local/src/freeswitch/libs/aws-sdk-cpp/ -type f -name "*.pc" | sudo xargs cp -t /usr/local/lib/pkgconfig/
 
 # build grpc

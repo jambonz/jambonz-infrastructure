@@ -69,7 +69,7 @@
         "libxtables-dev libip6tc-dev libip4tc-dev libiptc-dev libavformat-dev liblua5.1-0-dev libavfilter-dev libavcodec-dev libswresample-dev \\",
         "libevent-dev libpcap-dev libxmlrpc-core-c3-dev markdown libjson-glib-dev lsb-release \\",
         "libhiredis-dev gperf libspandsp-dev default-libmysqlclient-dev htop dnsutils gdb autoconf-archive \\",
-        "gnupg2 wget pkg-config ca-certificates libjpeg-dev libsqlite3-dev libpcre3-dev libldns-dev snapd linux-headers-amd64 \\",
+        "gnupg2 wget pkg-config ca-certificates libjpeg-dev libsqlite3-dev libpcre3-dev libldns-dev snapd linux-headers-$(uname -r) \\",
         "libspeex-dev libspeexdsp-dev libedit-dev libtiff-dev yasm libswscale-dev haveged jq fail2ban pandoc libre2-dev \\",
         "libopus-dev libsndfile1-dev libshout3-dev libmpg123-dev libmp3lame-dev libopusfile-dev libgoogle-perftools-dev",
         "sudo chmod a+w /usr/local/src",
@@ -124,7 +124,7 @@
     },
     {
       "type": "shell",
-      "execute_command": "chmod +x {{ .Path }}; sudo '{{ .Path }}' {{user `drachtio_version`}}",
+      "execute_command": "chmod +x {{ .Path }}; sudo '{{ .Path }}' {{user `drachtio_version`}} {{user `distro`}}",
       "script": "scripts/install_drachtio.sh"
     },
     {
