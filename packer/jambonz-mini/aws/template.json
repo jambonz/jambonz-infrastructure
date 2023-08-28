@@ -17,11 +17,13 @@
     "install_cloudwatch":  "yes",
     "install_nodered":  "no",
     "influxdb_ip":  "127.0.0.1",
-    "rtp_engine_version": "mr11.4.1.3",
+    "rtp_engine_version": "mr11.4.1.4",
     "rtp_engine_min_port": "40000",
     "rtp_engine_max_port": "60000",
     "mediaserver_name" : "jambonz",
-    "preferred_codec_list" : "PCMU,PCMA,OPUS,G722"
+    "preferred_codec_list" : "PCMU,PCMA,OPUS,G722",
+    "distro": "debian-11",
+    "leave_source": "no"
   },
   "builders": [{
     "type": "amazon-ebs",
@@ -29,10 +31,10 @@
     "source_ami_filter": {
       "filters": {
         "virtualization-type": "hvm",
-        "name": "debian-11-amd64-*",
+        "name": "jambonz-base-image-{{user `distro`}}",
         "root-device-type": "ebs"
       },
-      "owners": ["136693071363"],
+      "owners": ["376029039784"],
       "most_recent": true
     },
     "instance_type": "{{user `instance_type`}}",
@@ -188,7 +190,8 @@
         "sudo apt-get -y install iptables-persistent",
         "sudo rm -Rf /tmp/*",
         "sudo rm /root/.ssh/authorized_keys",
-        "sudo rm /home/admin/.ssh/authorized_keys"
+        "sudo rm /home/admin/.ssh/authorized_keys",
+        "if [ \"{{user `leave_source`}}\" == \"no\" ]; then sudo rm -Rf /usr/local/src/*; fi"
       ]
     }
   ]

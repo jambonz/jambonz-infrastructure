@@ -27,11 +27,12 @@
     "install_jaeger":  "yes",
     "install_nodered":  "no",
     "influxdb_ip":  "127.0.0.1",
-    "rtp_engine_version": "mr11.4.1.3",
+    "rtp_engine_version": "mr11.4.1.4",
     "rtp_engine_min_port": "40000",
     "rtp_engine_max_port": "60000",
     "mediaserver_name": "jambonz",
-    "preferred_codec_list": "PCMU,PCMA,OPUS,G722"
+    "preferred_codec_list": "PCMU,PCMA,OPUS,G722",
+    "leave_source": "no"
   },
   "builders": [{
     "type": "proxmox-clone",
@@ -185,7 +186,8 @@
         "echo iptables-persistent iptables-persistent/autosave_v4 boolean true | sudo debconf-set-selections",
         "echo iptables-persistent iptables-persistent/autosave_v6 boolean true | sudo debconf-set-selections",
         "sudo apt-get -y install iptables-persistent",
-        "sudo rm -Rf /tmp/*"
+        "sudo rm -Rf /tmp/*",
+        "if [ \"{{user `leave_source`}}\" == \"no\" ]; then sudo rm -Rf /usr/local/src/*; fi"
       ]
     }
   ]

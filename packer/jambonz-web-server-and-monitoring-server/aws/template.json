@@ -16,7 +16,9 @@
     "install_jaeger":  "yes",
     "install_nodered":  "no",
     "install_cloudwatch":  "yes",
-    "influxdb_ip":  "127.0.0.1"
+    "influxdb_ip":  "127.0.0.1",
+    "distro": "debian-11",
+    "leave_source": "no"
 
   },
   "builders": [{
@@ -25,10 +27,10 @@
     "source_ami_filter": {
       "filters": {
         "virtualization-type": "hvm",
-        "name": "debian-11-{{user `ami_base_image_arch`}}-*",
+        "name": "jambonz-base-image-{{user `distro`}}",
         "root-device-type": "ebs"
       },
-      "owners": ["{{user `ami_base_image_owner`}}"],
+      "owners": ["376029039784"],
       "most_recent": true
     },
     "instance_type": "{{user `instance_type`}}",
@@ -153,7 +155,8 @@
         "sudo rm -Rf /tmp/*",
         "sudo rm /root/.ssh/authorized_keys",
         "sudo rm /home/admin/.ssh/known_hosts",
-        "sudo rm /home/admin/.ssh/authorized_keys"
+        "sudo rm /home/admin/.ssh/authorized_keys",
+        "if [ \"{{user `leave_source`}}\" == \"no\" ]; then sudo rm -Rf /usr/local/src/*; fi"
       ]
     }
   ]
