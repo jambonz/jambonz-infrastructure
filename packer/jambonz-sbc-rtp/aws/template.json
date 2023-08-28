@@ -8,13 +8,15 @@
     "ami_base_image_arch": "amd64",
     "ami_base_image_owner": "136693071363",
     "instance_type": "t3.xlarge",
-    "rtp_engine_version": "mr11.3.1.8",
+    "rtp_engine_version": "mr11.4.1.4",
     "rtp_engine_min_port": "40000",
     "rtp_engine_max_port": "60000",
     "install_datadog": "no",
     "datadog_key" : "",
     "install_cloudwatch":  "yes",
-    "install_telegraf": "yes"
+    "install_telegraf": "yes",
+    "distro": "debian-11",
+    "leave_source": "no"
   },
   "builders": [{
     "type": "amazon-ebs",
@@ -22,10 +24,10 @@
     "source_ami_filter": {
       "filters": {
         "virtualization-type": "hvm",
-        "name": "debian-11-{{user `ami_base_image_arch`}}-*",
+        "name": "jambonz-base-image-{{user `distro`}}",
         "root-device-type": "ebs"
       },
-      "owners": ["{{user `ami_base_image_owner`}}"],
+      "owners": ["376029039784"],
       "most_recent": true
     },
     "instance_type": "{{user `instance_type`}}",
@@ -61,7 +63,7 @@
         "libevent-dev libpcap-dev libxmlrpc-core-c3-dev markdown libjson-glib-dev lsb-release \\",
         "libhiredis-dev gperf libspandsp-dev default-libmysqlclient-dev htop dnsutils gdb libtcmalloc-minimal4 \\",
         "gnupg2 wget pkg-config ca-certificates libjpeg-dev libsqlite3-dev libpcre3-dev libldns-dev \\",
-        "libspeex-dev libspeexdsp-dev libedit-dev libtiff-dev yasm valgrind libswscale-dev haveged \\",
+        "libspeex-dev libspeexdsp-dev libedit-dev libtiff-dev yasm valgrind libswscale-dev haveged pandoc \\",
         "libopus-dev libsndfile-dev libshout3-dev libmpg123-dev libmp3lame-dev libopusfile-dev libgoogle-perftools-dev",
         "sudo chmod a+w /usr/local/src",
         "ssh-keyscan github.com >> ~/.ssh/known_hosts",
@@ -127,7 +129,8 @@
         "sudo apt-get -y install iptables-persistent",
         "sudo rm -Rf /tmp/*",
         "sudo rm /root/.ssh/authorized_keys",
-        "sudo rm /home/admin/.ssh/authorized_keys"
+        "sudo rm /home/admin/.ssh/authorized_keys",
+        "if [ \"{{user `leave_source`}}\" == \"no\" ]; then sudo rm -Rf /usr/local/src/*; fi"
       ]
     }
   ]
