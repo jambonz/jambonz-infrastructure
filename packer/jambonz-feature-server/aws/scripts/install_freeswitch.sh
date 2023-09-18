@@ -18,8 +18,8 @@ echo "LWS_VERSION version to install is ${LWS_VERSION}"
 export LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH
 
 cd /tmp
-tar xvfz SpeechSDK-Linux-1.30.0.tar.gz
-cd SpeechSDK-Linux-1.30.0
+tar xvfz SpeechSDK-Linux-1.31.0.tar.gz
+cd SpeechSDK-Linux-1.31.0
 sudo cp -r include /usr/local/include/MicrosoftSpeechSDK
 sudo cp -r lib/ /usr/local/lib/MicrosoftSpeechSDK
 if [ "$ARCH" == "arm64" ]; then
@@ -34,8 +34,8 @@ if [ "$ARCH" == "amd64" ]; then
 fi
 
 cd /usr/local/src
-echo remove SpeechSDK-Linux-1.30.0
-sudo rm -Rf /tmp/SpeechSDK-Linux-1.30.0.tgz /tmp/SpeechSDK-Linux-1.30.0
+echo remove SpeechSDK-Linux-1.31.0
+sudo rm -Rf /tmp/SpeechSDK-Linux-1.31.0.tgz /tmp/SpeechSDK-Linux-1.31.0
 echo done
 
 echo config git
