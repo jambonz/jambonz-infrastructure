@@ -26,7 +26,7 @@ Parameters:
       - c6g.large
       - c6g.xlarge
       - c6g.2xlarge
-      - c6g.metal    
+      - c6g.metal
   InstanceTypeSbcRtp:
     Description: "the EC2 instance type to use for the SBC Media server (arm64)"
     Type: String
@@ -38,7 +38,7 @@ Parameters:
       - c6g.large
       - c6g.xlarge
       - c6g.2xlarge
-      - c6g.metal    
+      - c6g.metal
 
   InstanceTypeFeatureServer:
     Description: "the EC2 instance type to use for the Feature Server (arm64)"
@@ -51,7 +51,7 @@ Parameters:
       - c6g.large
       - c6g.xlarge
       - c6g.2xlarge
-      - c6g.metal    
+      - c6g.metal
   InstanceTypeWebserver:
     Description: "the EC2 instance type to use for webServer (amd64)"
     Type: String
@@ -75,7 +75,7 @@ Parameters:
       - c5n.large
       - c5n.xlarge
       - c5n.2xlarge
-      - c5n.metal      
+      - c5n.metal
   InstanceTypeMonitoringServer:
     Description: "the EC2 instance type for the monitoring server (amd64)"
     Type: String
@@ -99,7 +99,7 @@ Parameters:
       - c5n.large
       - c5n.xlarge
       - c5n.2xlarge
-      - c5n.metal    
+      - c5n.metal
   ElastiCacheNodeType:
     Type: String
     Default: 'cache.t2.medium'
@@ -203,11 +203,11 @@ Parameters:
     Description: 'the database username'
     Type: String
     Default: 'admin'
-  MySQLPassword: 
+  MySQLPassword:
     NoEcho: true
     Description: 'The database admin account password'
     Type: String
-    Default: 'JambonzR0ck$'  
+    Default: 'JambonzR0ck$'
   EncryptionSecret:
     Type: String
     Description: "secret to use for encrypting jwt and other data"
@@ -216,23 +216,23 @@ Parameters:
     Type: String
     Description: "DNS name you will point to the jambonz webserver(s)"
     Default: "yourdomain.com"
-  StatsSampleRate: 
+  StatsSampleRate:
     Type: Number
     Description: sampling rate for metrics, a number between 0 and 1 inclusive
     Default: 1.0
     MinValue: 0.0
     MaxValue: 1.0
-  MysqlDataCachingTtl: 
+  MysqlDataCachingTtl:
     Type: Number
     Description: number of seconds to cache mysql query results locally (0=no caching)
     Default: 0
     MinValue: 0
-  EnableTracing: 
+  EnableTracing:
     Type: Number
     Description: enable opentelemetry application tracing?
     AllowedValues:
       - 0
-      - 1 
+      - 1
     Default: 1
   Cloudwatch:
     Description: Send jambonz logs to cloudwatch
@@ -268,7 +268,7 @@ Resources:
       Tags:
       - Key: "Name"
         Value: !Sub "${Prefix}-VPC"
-        
+
   # Create Internet Gateway
   InternetGateway:
     Type: "AWS::EC2::InternetGateway"
@@ -277,7 +277,7 @@ Resources:
       - Key: "Name"
         Value: !Sub "${Prefix}-IGW"
 
-  # Attach Internet Gateway to VPC 
+  # Attach Internet Gateway to VPC
   GatewayToInternet:
     Type: "AWS::EC2::VPCGatewayAttachment"
     Properties:
@@ -395,7 +395,7 @@ Resources:
       Tags:
        - Key: Name
          Value: !Sub '${Prefix}-redis-sg'
-  
+
   MySQLSecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
@@ -412,11 +412,11 @@ Resources:
         - IpProtocol: -1
           FromPort: 0
           ToPort: 0
-          CidrIp: 0.0.0.0/0    
+          CidrIp: 0.0.0.0/0
       Tags:
         - Key: Name
           Value: !Sub '${Prefix}-mysql-sg'
-          
+
   FeatureServerSecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
@@ -456,8 +456,8 @@ Resources:
           CidrIp: 0.0.0.0/0
       Tags:
        - Key: Name
-         Value: !Sub '${Prefix}-feature-server-sg' 
- 
+         Value: !Sub '${Prefix}-feature-server-sg'
+
   WebserverSecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
@@ -484,10 +484,10 @@ Resources:
         - IpProtocol: -1
           FromPort: 0
           ToPort: 0
-          CidrIp: 0.0.0.0/0    
+          CidrIp: 0.0.0.0/0
       Tags:
         - Key: Name
-          Value: !Sub '${Prefix}-webserver-sg' 
+          Value: !Sub '${Prefix}-webserver-sg'
 
   SbcSipSecurityGroup:
     Type: AWS::EC2::SecurityGroup
@@ -519,33 +519,13 @@ Resources:
         - IpProtocol: tcp
           FromPort: 5061
           ToPort: 5061
-          CidrIp: '52.114.148.0/32'
-          Description: sip (tls) for teams
+          CidrIp: '52.112.0.0/14'
+          Description: sip (tls) for teams cidr 1
         - IpProtocol: tcp
           FromPort: 5061
           ToPort: 5061
-          CidrIp: '52.114.132.46/32'
-          Description: sip (tls) for teams
-        - IpProtocol: tcp
-          FromPort: 5061
-          ToPort: 5061
-          CidrIp: '52.114.75.24/32'
-          Description: sip (tls) for teams
-        - IpProtocol: tcp
-          FromPort: 5061
-          ToPort: 5061
-          CidrIp: '52.114.76.76/32'
-          Description: sip (tls) for teams
-        - IpProtocol: tcp
-          FromPort: 5061
-          ToPort: 5061
-          CidrIp: '52.114.7.24/32'
-          Description: sip (tls) for teams
-        - IpProtocol: tcp
-          FromPort: 5061
-          ToPort: 5061
-          CidrIp: '52.114.14.70/32'
-          Description: sip (tls) for teams
+          CidrIp: '52.120.0.0/14'
+          Description: sip (tls) for teams cidr 2
         - IpProtocol: tcp
           FromPort: 4433
           ToPort: 4433
@@ -580,7 +560,7 @@ Resources:
         - IpProtocol: -1
           FromPort: 0
           ToPort: 0
-          CidrIp: 0.0.0.0/0    
+          CidrIp: 0.0.0.0/0
       Tags:
         - Key: Name
           Value: !Sub '${Prefix}-sbc-sip-sg'
@@ -621,7 +601,7 @@ Resources:
         - IpProtocol: -1
           FromPort: 0
           ToPort: 0
-          CidrIp: 0.0.0.0/0    
+          CidrIp: 0.0.0.0/0
       Tags:
         - Key: Name
           Value: !Sub '${Prefix}-spc-rtp-sg'
@@ -682,7 +662,7 @@ Resources:
         - IpProtocol: -1
           FromPort: 0
           ToPort: 0
-          CidrIp: 0.0.0.0/0    
+          CidrIp: 0.0.0.0/0
       Tags:
         - Key: Name
           Value: !Sub '${Prefix}-monitoring-sg'
@@ -691,7 +671,7 @@ Resources:
 #
 #      Aurora RDS Database
 #
-###########################################   
+###########################################
   DatabaseSubnetGroup:
     Type: AWS::RDS::DBSubnetGroup
     Properties:
@@ -700,8 +680,8 @@ Resources:
       SubnetIds:
         - !Ref PublicSubnet1
         - !Ref PublicSubnet2
-        
-        
+
+
   DatabaseCluster:
     Type: AWS::RDS::DBCluster
     Properties:
@@ -727,7 +707,7 @@ Resources:
 #
 #      ElastiCache Redis
 #
-###########################################           
+###########################################
   ElastiCacheSubnetGroup:
     Type: 'AWS::ElastiCache::SubnetGroup'
     Properties:
@@ -736,7 +716,7 @@ Resources:
       SubnetIds:
         - !Ref PublicSubnet1
         - !Ref PublicSubnet2
-        
+
   ElastiCacheCluster:
     Type: AWS::ElastiCache::CacheCluster
     Properties:
@@ -759,7 +739,7 @@ Resources:
 #      Monitoring Instance
 #
 ###########################################
-      
+
   MonitoringServerEC2:
     Type: 'AWS::EC2::Instance'
     Properties:
@@ -775,7 +755,7 @@ Resources:
         -
           Key: Name
           Value: !Sub '${Prefix}-monitoring-server'
-          
+
 
 ###########################################
 #      New SBC SIP instances
@@ -784,7 +764,7 @@ Resources:
 #      is what caused them to get associated when sip servers scale.
 #      The idea is simply to have a pre-allocated set of N EIPs
 #      for sip signaling so these can be whitelisted with carriers
-###########################################           
+###########################################
   SbcSipServerEIP1:
     Type: AWS::EC2::EIP
     Properties:
@@ -812,7 +792,7 @@ Resources:
  # --- SIP server EC2 IAM role
   SbcSipServerIamRole:
     Type: AWS::IAM::Role
-    Properties: 
+    Properties:
       Description: SBC RTP EC2 service role
       RoleName: !Sub '${Prefix}-sbc-sip-ec2-role'
       AssumeRolePolicyDocument:
@@ -847,7 +827,7 @@ Resources:
       KeyName: !Ref KeyName
       AssociatePublicIpAddress: true
       UserData:
-        Fn::Base64: 
+        Fn::Base64:
           Fn::Sub:
             - |
               #!/bin/bash
@@ -1090,7 +1070,7 @@ Resources:
     Type: AWS::EC2::PlacementGroup
     Properties:
       Strategy: spread
-    
+
   SbcSipServerAutoScalingGroup:
     Type: AWS::AutoScaling::AutoScalingGroup
     Properties:
@@ -1101,15 +1081,15 @@ Resources:
       DesiredCapacity: 2
       TerminationPolicies:
        - OldestInstance
-      VPCZoneIdentifier: 
+      VPCZoneIdentifier:
         - !Ref PublicSubnet1
         - !Ref PublicSubnet2
       Tags:
-        - 
+        -
           Key: Name
           Value: !Sub '${Prefix}-sip-server'
           PropagateAtLaunch: 'true'
-        - 
+        -
           Key: Environment
           Value: !Sub '${Prefix}-sbc-sip'
           PropagateAtLaunch: 'true'
@@ -1118,7 +1098,7 @@ Resources:
     Type: AWS::SNS::Topic
     Properties:
       TopicName: !Sub '${Prefix}-${AWS::Region}-sip-lifecycle-events'
-  
+
   SbcSipServerSNSPublishRole:
     Type: "AWS::IAM::Role"
     Properties:
@@ -1133,8 +1113,8 @@ Resources:
               - "sts:AssumeRole"
       ManagedPolicyArns:
         - "arn:aws:iam::aws:policy/service-role/AutoScalingNotificationAccessRole"
-                
-  SbcSipServerLifecycleHook: 
+
+  SbcSipServerLifecycleHook:
     Type: AWS::AutoScaling::LifecycleHook
     Properties:
       LifecycleHookName: !Sub '${Prefix}-sip-scale-in'
@@ -1152,7 +1132,7 @@ Resources:
   # --- Feature server EC2 IAM role
   FeatureServerIamRole:
     Type: AWS::IAM::Role
-    Properties: 
+    Properties:
       Description: Feature Server EC2 service role
       RoleName: !Sub '${Prefix}-feature-server-ec2-role'
       AssumeRolePolicyDocument:
@@ -1186,7 +1166,7 @@ Resources:
       KeyName: !Ref KeyName
       AssociatePublicIpAddress: true
       UserData:
-        Fn::Base64: 
+        Fn::Base64:
           Fn::Sub:
             - |
               #!/bin/bash -e
@@ -1291,7 +1271,7 @@ Resources:
     Type: AWS::EC2::PlacementGroup
     Properties:
       Strategy: spread
-    
+
   FeatureServerAutoScalingGroup:
     Type: AWS::AutoScaling::AutoScalingGroup
     Properties:
@@ -1302,11 +1282,11 @@ Resources:
       DesiredCapacity: 1
       TerminationPolicies:
        - OldestInstance
-      VPCZoneIdentifier: 
+      VPCZoneIdentifier:
         - !Ref PublicSubnet1
         - !Ref PublicSubnet2
       Tags:
-        - 
+        -
           Key: Name
           Value: !Sub '${Prefix}-feature-server'
           PropagateAtLaunch: 'true'
@@ -1315,7 +1295,7 @@ Resources:
     Type: AWS::SNS::Topic
     Properties:
       TopicName: !Sub '${Prefix}-${AWS::Region}-fs-lifecycle-events'
-  
+
   FeatureServerSNSPublishRole:
     Type: "AWS::IAM::Role"
     Properties:
@@ -1330,8 +1310,8 @@ Resources:
               - "sts:AssumeRole"
       ManagedPolicyArns:
         - "arn:aws:iam::aws:policy/service-role/AutoScalingNotificationAccessRole"
-                
-  FeatureServerLifecycleHook: 
+
+  FeatureServerLifecycleHook:
     Type: AWS::AutoScaling::LifecycleHook
     Properties:
       LifecycleHookName: !Sub '${Prefix}-fs-scale-in'
@@ -1349,7 +1329,7 @@ Resources:
  # --- Feature server EC2 IAM role
   SbcRTPServerIamRole:
     Type: AWS::IAM::Role
-    Properties: 
+    Properties:
       Description: SBC RTP EC2 service role
       RoleName: !Sub '${Prefix}-sbc-rtp-ec2-role'
       AssumeRolePolicyDocument:
@@ -1383,7 +1363,7 @@ Resources:
       KeyName: !Ref KeyName
       AssociatePublicIpAddress: true
       UserData:
-        Fn::Base64: 
+        Fn::Base64:
           Fn::Sub:
             - |
               #!/bin/bash
@@ -1463,7 +1443,7 @@ Resources:
     Type: AWS::EC2::PlacementGroup
     Properties:
       Strategy: spread
-    
+
   SbcRTPServerAutoScalingGroup:
     Type: AWS::AutoScaling::AutoScalingGroup
     Properties:
@@ -1474,11 +1454,11 @@ Resources:
       DesiredCapacity: 1
       TerminationPolicies:
        - OldestInstance
-      VPCZoneIdentifier: 
+      VPCZoneIdentifier:
         - !Ref PublicSubnet1
         - !Ref PublicSubnet2
       Tags:
-        - 
+        -
           Key: Name
           Value: !Sub '${Prefix}-rtp-server'
           PropagateAtLaunch: 'true'
@@ -1487,7 +1467,7 @@ Resources:
     Type: AWS::SNS::Topic
     Properties:
       TopicName: !Sub '${Prefix}-${AWS::Region}-rtp-lifecycle-events'
-  
+
   SbcRTPServerSNSPublishRole:
     Type: "AWS::IAM::Role"
     Properties:
@@ -1502,8 +1482,8 @@ Resources:
               - "sts:AssumeRole"
       ManagedPolicyArns:
         - "arn:aws:iam::aws:policy/service-role/AutoScalingNotificationAccessRole"
-                
-  SbcRTPServerLifecycleHook: 
+
+  SbcRTPServerLifecycleHook:
     Type: AWS::AutoScaling::LifecycleHook
     Properties:
       LifecycleHookName: !Sub '${Prefix}-rtp-scale-in'
@@ -1534,7 +1514,7 @@ Resources:
   # --- Web server EC2 IAM role
   WebServerIamRole:
     Type: AWS::IAM::Role
-    Properties: 
+    Properties:
       Description: Webserver EC2 service role
       RoleName: !Sub '${Prefix}-webserver-ec2-role'
       AssumeRolePolicyDocument:
@@ -1568,7 +1548,7 @@ Resources:
       KeyName: !Ref KeyName
       AssociatePublicIpAddress: true
       UserData:
-        Fn::Base64: 
+        Fn::Base64:
           Fn::Sub:
             - |
               #!/bin/bash
@@ -1774,7 +1754,7 @@ Resources:
     Type: AWS::EC2::PlacementGroup
     Properties:
       Strategy: spread
-    
+
   WebServerAutoScalingGroup:
     Type: AWS::AutoScaling::AutoScalingGroup
     Properties:
@@ -1785,27 +1765,27 @@ Resources:
       DesiredCapacity: 1
       TerminationPolicies:
       - OldestInstance
-      VPCZoneIdentifier: 
+      VPCZoneIdentifier:
         - !Ref PublicSubnet1
         - !Ref PublicSubnet2
       Tags:
-        - 
+        -
           Key: Name
           Value: !Sub '${Prefix}-webserver'
           PropagateAtLaunch: 'true'
-        - 
+        -
           Key: Environment
           Value: !Sub '${Prefix}-webserver'
           PropagateAtLaunch: 'true'
 
-Outputs: 
+Outputs:
   WebPortalURL:
     Description: jambonz portal URL, log in with admin/admin and change password
     Value: !Join [ "", [ "http://", !Ref "URLPortal" ] ]
     Export:
       Name: !Sub '${Prefix}-webserver-url'
 
-  VPC: 
+  VPC:
     Description: "A reference to the created VPC"
     Value: !Ref "VPC"
     Export:
