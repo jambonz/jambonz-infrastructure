@@ -173,7 +173,7 @@ endif
 
 # DH: GRPC
 if HAVE_GRPC
-CORE_CFLAGS += -DSWITCH_HAVE_GRPC # $(GRPC_CFLAGS)
+CORE_CFLAGS += -DSWITCH_HAVE_GRPC
 GRPC_LIBS += -lgrpc++_reflection -lprotobuf
 endif
 

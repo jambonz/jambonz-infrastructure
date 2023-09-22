@@ -1,12 +1,12 @@
 #!/bin/bash
-FREESWITCH_VERSION=v1.10.5
-GRPC_VERSION=c66d2cc
-#GRPC_VERSION=v1.39.1
-#GOOGLE_API_VERSION=v1p1beta1-speech
-GOOGLE_API_VERSION=e9da6f8b469c52b83f900e820be30762e9e05c57
+FREESWITCH_VERSION=v1.10.10
+SPAN_DSP_VERSION=0d2e6ac
+GRPC_VERSION=v1.57.0
+GOOGLE_API_VERSION=29374574304f3356e64423acc9ad059fe43f09b5
+#AWS_SDK_VERSION=1.11.143 # newer but buggy with s2n_init crashes and weird slowdown on voice playout in FS
 AWS_SDK_VERSION=1.8.129
-LWS_VERSION=v3.2.3
-MODULES_VERSION=v0.7.2
+LWS_VERSION=v4.3.2
+MODULES_VERSION=v0.8.3
 
 echo "freeswitch version to install is ${FREESWITCH_VERSION}"
 echo "drachtio modules version to install is ${MODULES_VERSION}"
@@ -18,8 +18,8 @@ echo "LWS_VERSION version to install is ${LWS_VERSION}"
 export LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH
 
 cd /tmp
-tar xvfz SpeechSDK-Linux-1.31.0.tar.gz
-cd SpeechSDK-Linux-1.31.0
+tar xvfz SpeechSDK-Linux-1.32.1.tar.gz
+cd SpeechSDK-Linux-1.32.1
 sudo cp -r include /usr/local/include/MicrosoftSpeechSDK
 sudo cp -r lib/ /usr/local/lib/MicrosoftSpeechSDK
 if [ "$ARCH" == "arm64" ]; then
@@ -34,8 +34,8 @@ if [ "$ARCH" == "amd64" ]; then
 fi
 
 cd /usr/local/src
-echo remove SpeechSDK-Linux-1.31.0
-sudo rm -Rf /tmp/SpeechSDK-Linux-1.31.0.tgz /tmp/SpeechSDK-Linux-1.31.0
+echo remove SpeechSDK-Linux-1.32.1
+sudo rm -Rf /tmp/SpeechSDK-Linux-1.32.1.tgz /tmp/SpeechSDK-Linux-1.32.1
 echo done
 
 echo config git
@@ -51,8 +51,8 @@ cd freeswitch/libs
 git clone https://github.com/drachtio/nuance-asr-grpc-api.git -b main
 git clone https://github.com/drachtio/riva-asr-grpc-api.git -b main
 git clone https://github.com/drachtio/soniox-asr-grpc-api.git -b main
-git clone https://github.com/freeswitch/spandsp.git -b master
-cd spandsp && git checkout 728b60abdd1a71e254b8e831e9156521d788b2b9 && cd ..
+git clone https://github.com/drachtio/cobalt-asr-grpc-api.git -b main
+git clone https://github.com/freeswitch/spandsp.git && cd spandsp && git checkout ${SPAN_DSP_VERSION} && cd ..
 git clone https://github.com/freeswitch/sofia-sip.git -b master
 git clone https://github.com/dpirch/libfvad.git
 git clone https://github.com/aws/aws-sdk-cpp.git -b ${AWS_SDK_VERSION}
@@ -64,6 +64,7 @@ sudo cp -r /usr/local/src/drachtio-freeswitch-modules/modules/mod_audio_fork /us
 sudo cp -r /usr/local/src/drachtio-freeswitch-modules/modules/mod_aws_transcribe /usr/local/src/freeswitch/src/mod/applications/mod_aws_transcribe
 sudo cp -r /usr/local/src/drachtio-freeswitch-modules/modules/mod_azure_transcribe /usr/local/src/freeswitch/src/mod/applications/mod_azure_transcribe
 sudo cp -r /usr/local/src/drachtio-freeswitch-modules/modules/mod_aws_lex /usr/local/src/freeswitch/src/mod/applications/mod_aws_lex
+sudo cp -r /usr/local/src/drachtio-freeswitch-modules/modules/mod_cobalt_transcribe /usr/local/src/freeswitch/src/mod/applications/mod_cobalt_transcribe
 sudo cp -r /usr/local/src/drachtio-freeswitch-modules/modules/mod_deepgram_transcribe /usr/local/src/freeswitch/src/mod/applications/mod_deepgram_transcribe
 sudo cp -r /usr/local/src/drachtio-freeswitch-modules/modules/mod_google_transcribe /usr/local/src/freeswitch/src/mod/applications/mod_google_transcribe
 sudo cp -r /usr/local/src/drachtio-freeswitch-modules/modules/mod_ibm_transcribe /usr/local/src/freeswitch/src/mod/applications/mod_ibm_transcribe
@@ -73,9 +74,6 @@ sudo cp -r /usr/local/src/drachtio-freeswitch-modules/modules/mod_soniox_transcr
 sudo cp -r /usr/local/src/drachtio-freeswitch-modules/modules/mod_jambonz_transcribe /usr/local/src/freeswitch/src/mod/applications/mod_jambonz_transcribe
 sudo cp -r /usr/local/src/drachtio-freeswitch-modules/modules/mod_google_tts /usr/local/src/freeswitch/src/mod/applications/mod_google_tts
 sudo cp -r /usr/local/src/drachtio-freeswitch-modules/modules/mod_dialogflow /usr/local/src/freeswitch/src/mod/applications/mod_dialogflow
- 
-sudo sed -i -r -e 's/(.*AM_CFLAGS\))/\1 -g -O0/g' /usr/local/src/freeswitch/src/mod/applications/mod_audio_fork/Makefile.am
-sudo sed -i -r -e 's/(.*-std=c++11)/\1 -g -O0/g' /usr/local/src/freeswitch/src/mod/applications/mod_audio_fork/Makefile.am
 
 # copy Makefiles and patches into place
 cp /tmp/configure.ac.extra /usr/local/src/freeswitch/configure.ac
@@ -88,44 +86,67 @@ cp /tmp/switch_core_media.c.patch /usr/local/src/freeswitch/src
 cp /tmp/mod_avmd.c.patch /usr/local/src/freeswitch/src/mod/applications/mod_avmd
 cp /tmp/mod_httapi.c.patch /usr/local/src/freeswitch/src/mod/applications/mod_httapi
 
-# patch freeswitch
 cd /usr/local/src/freeswitch/src
+echo patching switch_rtp
 patch < switch_rtp.c.patch
+echo patching switch_core_media
 patch < switch_core_media.c.patch
 cd /usr/local/src/freeswitch/src/mod/applications/mod_avmd
+echo patching mod_avmd
 patch < mod_avmd.c.patch
 cd /usr/local/src/freeswitch/src/mod/applications/mod_httapi
+echo patching mod_httapi
 patch < mod_httapi.c.patch
 
 # build libwebsockets
+echo building lws
 cd /usr/local/src/libwebsockets
 sudo mkdir -p build && cd build && sudo cmake .. -DCMAKE_BUILD_TYPE=RelWithDebInfo && sudo make && sudo make install
 
 # build libfvad
 cd /usr/local/src/freeswitch/libs/libfvad
+# use our version of libfvad configure.ac - should only do this on debian 12
+if [ "$DISTRO" == "debian-12" ]; then
+  echo "patching libfvad configure.ac to remove deprecated commands"
+  sudo cp /tmp/configure.ac.libfvad configure.ac
+fi
+echo building libfvad
 sudo autoreconf -i && sudo ./configure && sudo make -j 4 && sudo make install
 
 # build spandsp
+echo building spandsp
 cd /usr/local/src/freeswitch/libs/spandsp
 ./bootstrap.sh && ./configure && make -j 4 && sudo make install
 
 # build sofia
+echo building sofia
 cd /usr/local/src/freeswitch/libs/sofia-sip
 ./bootstrap.sh && ./configure && make -j 4 && sudo make install
 
 # build aws-c-common
+echo building aws-c-common
 cd /usr/local/src/freeswitch/libs/aws-c-common
 mkdir -p build && cd build
 cmake .. -DCMAKE_BUILD_TYPE=RelWithDebInfo -DBUILD_SHARED_LIBS=OFF -DCMAKE_CXX_FLAGS="-Wno-unused-parameter"
 make -j 4 && sudo make install
 
 # build aws-sdk-cpp
+echo building aws-sdk-cpp
 cd /usr/local/src/freeswitch/libs/aws-sdk-cpp
+git submodule update --init --recursive
 mkdir -p build && cd build
 cmake .. -DBUILD_ONLY="lexv2-runtime;transcribestreaming" -DCMAKE_BUILD_TYPE=RelWithDebInfo -DBUILD_SHARED_LIBS=OFF -DCMAKE_CXX_FLAGS="-Wno-unused-parameter"
-make -j 4 && sudo make install
+if [ "$DISTRO" == "debian-12" ]; then
+  echo "patching aws-sdk-cpp to fix debian 12 build"
+  sudo sed -i 's/uint8_t arr\[16\];/uint8_t arr\[16\] = {0};/g' /usr/local/src/freeswitch/libs/aws-sdk-cpp/build/.deps/build/src/AwsCCommon/tests/byte_buf_test.c
+  sudo sed -i 's/char filename_array\[64\];/char filename_array\[64\] = {0};/g' /usr/local/src/freeswitch/libs/aws-sdk-cpp/build/.deps/build/src/AwsCCommon/tests/logging/logging_test_utilities.c
+  cmake .. -DBUILD_ONLY="lexv2-runtime;transcribestreaming" -DCMAKE_BUILD_TYPE=RelWithDebInfo -DBUILD_SHARED_LIBS=OFF -DCMAKE_CXX_FLAGS="-Wno-unused-parameter"
+fi
+sudo make -j 4 && sudo make install
+sudo find /usr/local/src/freeswitch/libs/aws-sdk-cpp/ -type f -name "*.pc" | sudo xargs cp -t /usr/local/lib/pkgconfig/
 
 # build grpc
+echo building grpc
 cd /usr/local/src/grpc
 git submodule update --init --recursive
 mkdir -p cmake/build
@@ -135,6 +156,7 @@ make -j 4
 sudo make install
 
 # build googleapis
+echo building googleapis
 cd /usr/local/src/freeswitch/libs/googleapis
 echo "Ref: https://github.com/GoogleCloudPlatform/cpp-samples/issues/113"
 sed -i 's/\$fields/fields/' google/maps/routes/v1/route_service.proto
@@ -156,11 +178,16 @@ echo "building protobuf stubs for sonioxasr"
 cd /usr/local/src/freeswitch/libs/soniox-asr-grpc-api
 LANGUAGE=cpp make 
 
+# build cobalt protobufs
+echo "building protobuf stubs for cobalt"
+cd /usr/local/src/freeswitch/libs/cobalt-asr-grpc-api
+LANGUAGE=cpp make 
+
 # build freeswitch
 echo "building freeswitch"
 cd /usr/local/src/freeswitch
 sudo ./bootstrap.sh -j
-sudo ./configure --enable-tcmalloc=yes --with-lws=yes --with-extra=yes
+sudo ./configure --enable-tcmalloc=yes --with-lws=yes --with-extra=yes --with-aws=yes
 sudo make -j 4
 sudo make install
 sudo make cd-sounds-install cd-moh-install
@@ -186,4 +213,3 @@ sudo chmod a+x /etc/cron.daily/freeswitch_log_rotation
 echo "downloading soniox root verification certificate"
 cd /usr/local/freeswitch/certs
 wget https://raw.githubusercontent.com/grpc/grpc/master/etc/roots.pem
-
