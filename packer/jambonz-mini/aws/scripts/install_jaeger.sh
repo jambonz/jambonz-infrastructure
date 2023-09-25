@@ -17,20 +17,35 @@ sudo chmod 644 /etc/systemd/system/jaeger-collector.service
 sudo cp jaeger-query.service /etc/systemd/system
 sudo chmod 644 /etc/systemd/system/jaeger-query.service
 
-echo "installing cassandra"
+echo "installing cassandra on $2"
 
-sudo apt-get install -y default-jdk
+if [ "$2" == "debian-12" ]; then
+
+  # if debian 12 we need to downgrade java JDK to 11
+  echo "downgrading Java JSDK to 11 because cassandra requires it"
+  wget https://github.com/AdoptOpenJDK/openjdk11-binaries/releases/download/jdk-11.0.9%2B11.1/OpenJDK11U-jdk_x64_linux_hotspot_11.0.9_11.tar.gz
+  sudo tar -xvf OpenJDK11U-jdk_x64_linux_hotspot_11.0.9_11.tar.gz -C /opt/
+  sudo update-alternatives --install /usr/bin/java java /opt/jdk-11.0.9+11/bin/java 100
+  sudo update-alternatives --install /usr/bin/javac javac /opt/jdk-11.0.9+11/bin/javac 100
+  sudo update-alternatives --set java /opt/jdk-11.0.9+11/bin/java
+  sudo update-alternatives --set javac /opt/jdk-11.0.9+11/bin/javac
+  echo "export JAVA_HOME=/opt/jdk-11.0.9+11" >> ~/.bashrc
+  echo "export PATH=$PATH:$JAVA_HOME/bin" >> ~/.bashrc
+  source ~/.bashrc
+else
+  sudo apt-get install -y default-jdk
+fi
+# Verify the installation
+java -version
 
 tar xvfz apache-cassandra-4.1.3-bin.tar.gz
-mv apache-cassandra-4.1.3 /usr/local/cassandra
+sudo mv apache-cassandra-4.1.3 /usr/local/cassandra
 sudo cp cassandra.yaml /usr/local/cassandra/conf
 sudo chown -R admin:admin /usr/local/cassandra/
-cat /usr/local/cassandra/conf/cassandra.yaml 
-
 chown -R admin:admin /usr/local/cassandra/
 
-echo 'export PATH=$PATH:/usr/local/cassandra/bin' | tee -a /home/admin/.bashrc
-echo 'export PATH=$PATH:/usr/local/cassandra/bin' | tee -a /etc/profile
+echo 'export PATH=$PATH:/usr/local/cassandra/bin' | sudo tee -a /home/admin/.bashrc
+echo 'export PATH=$PATH:/usr/local/cassandra/bin' | sudo tee -a /etc/profile
 export PATH=$PATH:/usr/local/cassandra/bin
 
 sudo cp cassandra.service /etc/systemd/system

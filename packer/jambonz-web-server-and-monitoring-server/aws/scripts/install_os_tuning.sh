@@ -1,4 +1,6 @@
 #!/bin/bash
+DISTRO=$1
+
 sudo sed -i '/# End of file/i *                hard       nofile          65535'  /etc/security/limits.conf
 sudo sed -i '/# End of file/i *                soft       nofile          65535'  /etc/security/limits.conf
 sudo sed -i '/# End of file/i root             hard       nofile          65535'  /etc/security/limits.conf
@@ -18,12 +20,13 @@ sudo cp /tmp/20auto-upgrades /etc/apt/apt.conf.d/20auto-upgrades
 # disable ipv6
 echo "net.ipv6.conf.all.disable_ipv6 = 1" | sudo tee -a /etc/sysctl.conf > /dev/null
 echo "net.ipv6.conf.default.disable_ipv6 = 1" | sudo tee -a /etc/sysctl.conf > /dev/null
-sudo sysctl -p
 
 # install latest cmake
-cd /usr/local/src
-wget https://github.com/Kitware/CMake/archive/refs/tags/v3.27.4.tar.gz
-tar xvfz v3.27.4.tar.gz
-cd CMake-3.27.4
-./bootstrap && make -j 4 && sudo make install
-cmake --version
+if [ "$DISTRO" == "debian-12" ]; then
+  cd /usr/local/src
+  wget https://github.com/Kitware/CMake/archive/refs/tags/v3.27.4.tar.gz
+  tar xvfz v3.27.4.tar.gz
+  cd CMake-3.27.4
+  ./bootstrap && make -j 4 && sudo make install
+  cmake --version
+fi

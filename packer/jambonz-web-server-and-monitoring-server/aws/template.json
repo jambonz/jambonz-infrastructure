@@ -4,7 +4,7 @@
     "ssh_username": "admin",
     "ami_description": "jambonz web+monitoring server", 
     "instance_type": "t3.xlarge",
-    "jambonz_version": "v0.8.4-4",
+    "jambonz_version": "v0.8.5-rc9",
     "ami_base_image_arch": "amd64",
     "ami_base_image_owner": "136693071363",
     "install_datadog": "no",
@@ -83,6 +83,7 @@
     },
     {
       "type": "shell",
+      "execute_command": "chmod +x {{ .Path }}; sudo '{{ .Path }}' {{user `distro`}}",
       "script": "scripts/install_os_tuning.sh"
     },
     {
@@ -149,14 +150,15 @@
     {
       "type": "shell",
       "inline": [
+        "set -e",
+        "set -x",
         "echo iptables-persistent iptables-persistent/autosave_v4 boolean true | sudo debconf-set-selections",
         "echo iptables-persistent iptables-persistent/autosave_v6 boolean true | sudo debconf-set-selections",
         "sudo apt-get -y install iptables-persistent",
         "sudo rm -Rf /tmp/*",
         "sudo rm /root/.ssh/authorized_keys",
-        "sudo rm /home/admin/.ssh/known_hosts",
         "sudo rm /home/admin/.ssh/authorized_keys",
-        "if [ \"{{user `leave_source`}}\" == \"no\" ]; then sudo rm -Rf /usr/local/src/*; fi"
+        "if [ \"{{user `leave_source`}}\" = 'no' ]; then sudo rm -Rf /usr/local/src/*; fi"
       ]
     }
   ]
