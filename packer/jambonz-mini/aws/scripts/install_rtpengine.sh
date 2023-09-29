@@ -9,7 +9,7 @@ cd bcg729
 cmake . -DCMAKE_INSTALL_PREFIX=/usr && make && sudo make install chdir=/usr/local/src/bcg729
 cd /usr/local/src
 
-git clone https://github.com/warmcat/libwebsockets.git -b v3.2.3
+git clone https://github.com/warmcat/libwebsockets.git -b v4.3.2
 cd /usr/local/src/libwebsockets
 sudo mkdir -p build && cd build && sudo cmake .. -DCMAKE_BUILD_TYPE=RelWithDebInfo && sudo make && sudo make install
 

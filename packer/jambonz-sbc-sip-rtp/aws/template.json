@@ -5,7 +5,7 @@
     "ami_description": "jambonz SBC SIP+RTP", 
     "instance_type": "t3.xlarge",
     "drachtio_version": "v0.8.24-rc1",
-    "jambonz_version": "v0.8.5-rc9",
+    "jambonz_version": "v0.8.5-rc10",
     "ami_base_image_arch": "amd64",
     "ami_base_image_owner": "136693071363",
     "rtp_engine_version": "mr11.5.1.1",

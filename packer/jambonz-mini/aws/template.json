@@ -5,7 +5,7 @@
     "ami_description": "jambonz all-in-one AMI", 
     "instance_type": "c6in.xlarge",
     "drachtio_version": "v0.8.24-rc1",
-    "jambonz_version": "v0.8.5-rc9",
+    "jambonz_version": "v0.8.5-rc10",
     "jambonz_user": "admin",
     "jambonz_password": "JambonzR0ck$",
     "install_telegraf": "yes",
