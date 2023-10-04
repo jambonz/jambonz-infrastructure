@@ -1,0 +1,149 @@
+{
+  "variables": {
+    "region": "us-east-1",
+    "ssh_username": "ec2-user",
+    "ami_description": "jambonz SBC SIP", 
+    "instance_type": "t3.xlarge",
+    "drachtio_version": "v0.8.24-rc1",
+    "jambonz_version": "v0.8.5-rc10",
+    "ami_base_image_arch": "amd64",
+    "ami_base_image_owner": "309956199498",
+    "install_datadog": "no",
+    "datadog_key" : "",
+    "install_cloudwatch":  "yes",
+    "install_telegraf": "yes",
+    "distro": "rhel-9",
+    "redhat_username": "daveh-beachdog",
+    "redhat_password": "4DXUYYISNO460PMy",
+    "leave_source": "no"
+  },
+  "builders": [{
+    "type": "amazon-ebs",
+    "region": "{{user `region`}}",
+    "source_ami_filter": {
+      "filters": {
+        "virtualization-type": "hvm",
+        "name": "RHEL-9.2*",
+        "root-device-type": "ebs",
+        "architecture": "x86_64"
+      },
+      "owners": ["{{user `ami_base_image_owner`}}"],
+      "most_recent": true
+    },
+    "instance_type": "{{user `instance_type`}}",
+    "ssh_username": "{{user `ssh_username`}}",
+    "ami_name": "jambonz-sbc-sip-rtp-{{user `jambonz_version`}}-{{user `distro`}}-{{user `ami_base_image_arch`}}-{{isotime |clean_resource_name }}",
+    "ami_description": "{{user `ami_description`}}",
+    "launch_block_device_mappings": [
+      {
+        "device_name": "/dev/sda1",
+        "volume_size": 60,
+        "volume_type": "gp3",
+        "delete_on_termination": true
+      }
+    ],
+    "tags": {
+      "Name": "jambonz-sbc-sip"
+    },
+    "run_tags": {
+      "Name": "jambonz-sbc-sip-build"
+    }
+  }],
+  "provisioners": [
+    {
+      "type": "shell",
+      "inline": [
+        "export PATH=/usr/local/bin:$PATH",
+        "export LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH",
+        "export PKG_CONFIG_PATH=/usr/local/lib/pkgconfig:$PKG_CONFIG_PATH",
+        "sudo setenforce 0",
+        "sudo sed -i 's/SELINUX=enforcing/SELINUX=disabled/' /etc/selinux/config",
+        "echo registering",
+        "sudo subscription-manager register --username={{user `redhat_username`}} --password={{user `redhat_password`}}",
+        "sudo dnf upgrade -y",
+        "sudo sed -i 's/manage_repos = 0/manage_repos = 1/' /etc/rhsm/rhsm.conf",
+        "cat /etc/rhsm/rhsm.conf",
+        "echo installing codeready repos",
+        "sudo subscription-manager repos --enable=codeready-builder-for-rhel-9-x86_64-rpms",
+        "echo installing epel repo",
+        "sudo dnf install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-9.noarch.rpm",
+        "sudo dnf upgrade -y",
+        "echo running /usr/bin/crb",
+        "sudo /usr/bin/crb enable",
+        "echo installing rpmfusion repo",
+        "sudo dnf install -y https://download1.rpmfusion.org/free/el/rpmfusion-free-release-9.noarch.rpm",
+        "echo installing Development tools",
+        "sudo dnf groupinstall -y 'RPM Development Tools'",
+        "sudo dnf groupinstall -y 'Development Tools'",
+        "echo installing needed packages",
+        "sudo dnf install -y htop pandoc wget cmake \\",
+        "google-perftools-devel libcurl-devel jq telnet gperf \\",
+        "hiredis-devel mariadb-devel dnsutils snapd",
+        "sudo chmod a+w /usr/local/src",
+        "ssh-keyscan github.com >> ~/.ssh/known_hosts",
+        "mkdir ~/apps",
+        "cd ~/apps",
+        "git config --global advice.detachedHead false",
+        "git clone https://github.com/jambonz/sbc-sip-sidecar.git -b {{user `jambonz_version`}}",
+        "git clone https://github.com/jambonz/sbc-outbound.git -b {{user `jambonz_version`}}",
+        "git clone https://github.com/jambonz/sbc-inbound.git -b {{user `jambonz_version`}}",
+        "git clone https://github.com/jambonz/jambonz-smpp-esme.git -b {{user `jambonz_version`}}",
+        "git clone https://github.com/jambonz/sbc-call-router.git  -b {{user `jambonz_version`}}"
+      ]
+    },
+    {
+      "type": "file",
+      "source": "files/",
+      "destination": "/tmp"
+    },
+    {
+      "type": "shell",
+      "execute_command": "chmod +x {{ .Path }}; sudo '{{ .Path }}' {{user `distro`}}",
+      "script": "scripts/install_os_tuning.sh"
+    },
+    {
+      "type": "shell",
+      "execute_command": "chmod +x {{ .Path }}; sudo '{{ .Path }}' {{build `ID`}}",
+      "script": "scripts/install_apiban.sh"
+    },
+    {
+      "type": "shell",
+      "execute_command": "chmod +x {{ .Path }}; sudo '{{ .Path }}' {{user `distro`}}",
+      "script": "scripts/install_nodejs.sh"
+    },
+    {
+      "type": "shell",
+      "execute_command": "chmod +x {{ .Path }}; sudo '{{ .Path }}' {{user `install_cloudwatch`}} {{user `distro`}}",
+      "script": "scripts/install_cloudwatch.sh"
+    },
+    {
+      "type": "shell",
+      "environment_vars": [
+        "DD_KEY={{user `datadog_key`}}",
+        "DD_INSTALL={{user `install_datadog`}}"
+      ],
+      "execute_command": "chmod +x {{ .Path }}; sudo '{{ .Path }}'",
+      "script": "scripts/install_datadog.sh"
+    },
+    {
+      "type": "shell",
+      "execute_command": "chmod +x {{ .Path }}; sudo '{{ .Path }}' {{user `install_telegraf`}} {{user `distro`}}",
+      "script": "scripts/install_telegraf.sh"
+    },
+    {
+      "type": "shell",
+      "execute_command": "chmod +x {{ .Path }}; sudo '{{ .Path }}' {{user `drachtio_version`}}  {{user `distro`}}",
+      "script": "scripts/install_drachtio.sh"
+    },
+    {
+      "type": "shell",
+      "execute_command": "chmod +x {{ .Path }}; sudo '{{ .Path }}' {{user `jambonz_version`}} {{user `distro`}}",
+      "script": "scripts/install_app.sh"
+    },
+    {
+      "type": "shell",
+      "execute_command": "chmod +x {{ .Path }}; sudo '{{ .Path }}' {{user `leave_source`}} {{user `distro`}}",
+      "script": "scripts/cleanup.sh"
+    }
+  ]
+}

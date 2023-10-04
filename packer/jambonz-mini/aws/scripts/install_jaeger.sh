@@ -1,6 +1,7 @@
 #!/bin/bash
+DISTRO=$1
 
-if [ "$1" == "yes" ]; then 
+if [ "$2" == "yes" ]; then 
 
 cd /tmp
 
@@ -16,10 +17,11 @@ sudo chmod 644 /etc/systemd/system/jaeger-collector.service
 
 sudo cp jaeger-query.service /etc/systemd/system
 sudo chmod 644 /etc/systemd/system/jaeger-query.service
+sudo systemctl daemon-reload
 
 echo "installing cassandra on $2"
 
-if [ "$2" == "debian-12" ]; then
+if [ "$DISTRO" == "debian-12" ]; then
 
   # if debian 12 we need to downgrade java JDK to 11
   echo "downgrading Java JSDK to 11 because cassandra requires it"
@@ -32,6 +34,8 @@ if [ "$2" == "debian-12" ]; then
   echo "export JAVA_HOME=/opt/jdk-11.0.9+11" >> ~/.bashrc
   echo "export PATH=$PATH:$JAVA_HOME/bin" >> ~/.bashrc
   source ~/.bashrc
+elif [[ "$DISTRO" == rhel* ]]; then
+  sudo dnf install -y java-11-openjdk-devel
 else
   sudo apt-get install -y default-jdk
 fi
@@ -41,15 +45,23 @@ java -version
 tar xvfz apache-cassandra-4.1.3-bin.tar.gz
 sudo mv apache-cassandra-4.1.3 /usr/local/cassandra
 sudo cp cassandra.yaml /usr/local/cassandra/conf
-sudo chown -R admin:admin /usr/local/cassandra/
-chown -R admin:admin /usr/local/cassandra/
 
-echo 'export PATH=$PATH:/usr/local/cassandra/bin' | sudo tee -a /home/admin/.bashrc
+if [[ "$DISTRO" == rhel* ]] ; then
+  chown -R ec2-user:ec2-user /usr/local/cassandra/
+  echo 'export PATH=$PATH:/usr/local/cassandra/bin' | sudo tee -a /home/ec2-user/.bashrc
+  sed -i 's/\badmin\b/ec2-user/g' cassandra.service
+else 
+  sudo chown -R admin:admin /usr/local/cassandra/
+  chown -R admin:admin /usr/local/cassandra/
+  echo 'export PATH=$PATH:/usr/local/cassandra/bin' | sudo tee -a /home/admin/.bashrc
+fi
+
 echo 'export PATH=$PATH:/usr/local/cassandra/bin' | sudo tee -a /etc/profile
 export PATH=$PATH:/usr/local/cassandra/bin
 
 sudo cp cassandra.service /etc/systemd/system
 sudo chmod 644 /etc/systemd/system/cassandra.service
+sudo systemctl daemon-reload
 sudo systemctl enable cassandra
 sudo systemctl start cassandra
 
@@ -75,7 +87,12 @@ git clone https://github.com/jaegertracing/jaeger.git
 cd jaeger/plugin/storage/cassandra/schema
 MODE=prod DATACENTER=datacenter1 TRACE_TTL=604800 KEYSPACE=jaeger_v1_dc1 ./create.sh | cqlsh localhost -u cassandra -p cassandra
 
-systemctl enable jaeger-collector
-systemctl enable jaeger-query
+if [[ "$DISTRO" == rhel* ]] ; then
+  sudo sed -i 's/User=admin/User=ec2-user/' /etc/systemd/system/jaeger-collector.service
+  sudo sed -i 's/User=admin/User=ec2-user/' /etc/systemd/system/jaeger-query.service
+fi
+
+sudo systemctl enable jaeger-collector
+sudo systemctl enable jaeger-query
 
 fi

@@ -1,4 +1,5 @@
 #!/bin/bash
+DISTRO=$1
 
 sudo cp /etc/fail2ban/jail.conf /etc/fail2ban/jail.local
 

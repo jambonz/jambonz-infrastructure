@@ -1,0 +1,214 @@
+{
+  "variables": {
+    "region": "us-east-1",
+    "ssh_username": "ec2-user",
+    "ami_description": "jambonz all-in-one AMI", 
+    "instance_type": "c6in.2xlarge",
+    "drachtio_version": "v0.8.24-rc1",
+    "jambonz_version": "v0.8.5-rc10",
+    "jambonz_user": "admin",
+    "jambonz_password": "JambonzR0ck$",
+    "ami_base_image_owner": "309956199498",
+    "install_telegraf": "yes",
+    "homer_user": "homer_user",
+    "homer_password": "XcapJTqy11LnsYRtxXGPTYQkAnI",
+    "install_influxdb":  "yes",
+    "install_grafana":  "yes",
+    "install_homer":  "yes",
+    "install_jaeger":  "yes",
+    "install_cloudwatch":  "yes",
+    "install_nodered":  "no",
+    "influxdb_ip":  "127.0.0.1",
+    "rtp_engine_version": "mr11.4.1.4",
+    "rtp_engine_min_port": "40000",
+    "rtp_engine_max_port": "60000",
+    "mediaserver_name" : "jambonz",
+    "preferred_codec_list" : "PCMU,PCMA,OPUS,G722",
+    "distro": "rhel-9",
+    "redhat_username": "daveh-beachdog",
+    "redhat_password": "4DXUYYISNO460PMy",
+    "leave_source": "yes"
+  },
+  "builders": [{
+    "type": "amazon-ebs",
+    "region": "{{user `region`}}",
+    "source_ami_filter": {
+      "filters": {
+        "virtualization-type": "hvm",
+        "name": "RHEL-9.2*",
+        "root-device-type": "ebs",
+        "architecture": "x86_64"
+      },
+      "owners": ["{{user `ami_base_image_owner`}}"],
+      "most_recent": true
+    },
+    "instance_type": "{{user `instance_type`}}",
+    "ssh_username": "{{user `ssh_username`}}",
+    "ami_name": "jambonz-sbc-sip-rtp-{{user `jambonz_version`}}-{{user `distro`}}-{{isotime |clean_resource_name }}",
+    "ami_description": "{{user `ami_description`}}",
+    "launch_block_device_mappings": [
+      {
+        "device_name": "/dev/sda1",
+        "volume_size": 100,
+        "volume_type": "gp3",
+        "delete_on_termination": true
+      }
+    ],
+    "tags": {
+      "Name": "jambonz-mini"
+    },
+    "run_tags": {
+      "Name": "jambonz-mini-build"
+    }
+  }],
+  "provisioners": [
+    {
+      "type": "shell",
+      "inline": [
+        "while [ ! -f /var/lib/cloud/instance/boot-finished ]; do echo 'Waiting for cloud-init...'; sleep 1; done",
+        "export PATH=/usr/local/bin:$PATH",
+        "export LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH",
+        "export PKG_CONFIG_PATH=/usr/local/lib/pkgconfig:$PKG_CONFIG_PATH",
+        "sudo setenforce 0",
+        "sudo sed -i 's/SELINUX=enforcing/SELINUX=disabled/' /etc/selinux/config",
+        "sudo subscription-manager register --username={{user `redhat_username`}} --password={{user `redhat_password`}}",
+        "sudo dnf upgrade -y",
+        "sudo sed -i 's/manage_repos = 0/manage_repos = 1/' /etc/rhsm/rhsm.conf",
+        "sudo subscription-manager repos --enable=codeready-builder-for-rhel-9-x86_64-rpms",
+        "sudo dnf install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-9.noarch.rpm",
+        "sudo /usr/bin/crb enable",
+        "sudo dnf install -y https://download1.rpmfusion.org/free/el/rpmfusion-free-release-9.noarch.rpm",
+        "sudo dnf groupinstall -y 'RPM Development Tools'",
+        "sudo dnf groupinstall -y 'Development Tools'",
+        "sudo dnf install -y iptables-devel htop pandoc wget cmake ffmpeg ffmpeg-devel fail2ban \\",
+        "perl-IPC-Cmd pcre-devel google-perftools-devel libcurl-devel curl jq telnet \\",
+        "libevent-devel xmlrpc-c-devel gperf libpcap-devel glib2-devel json-glib-devel \\",
+        "hiredis-devel spandsp-devel mariadb-devel dnsutils speex libedit-devel \\",
+        "opus-devel lsof redis yasm perl-ExtUtils-Embed libmpg123-devel libshout-devel \\",
+        "systemd-devel speex-devel speexdsp-devel re2-devel opusfile-devel libtiff-devel \\",
+        "snapd libjpeg-devel libsndfile-devel lua-devel sqlite-devel libuuid-devel \\",
+        "lame-devel libyuv-devel protobuf-compiler tcpdump",
+        "sudo dnf debuginfo-install -y binutils",
+        "sudo chmod a+w /usr/local/src",
+        "mkdir ~/apps",
+        "cd ~/apps",
+        "git config --global advice.detachedHead false",
+        "git clone https://github.com/jambonz/sbc-call-router.git -b {{user `jambonz_version`}}",
+        "git clone https://github.com/jambonz/fsw-clear-old-calls.git -b {{user `jambonz_version`}}",
+        "git clone https://github.com/jambonz/sbc-outbound.git -b {{user `jambonz_version`}}",
+        "git clone https://github.com/jambonz/sbc-inbound.git -b {{user `jambonz_version`}}",
+        "git clone https://github.com/jambonz/sbc-sip-sidecar.git -b {{user `jambonz_version`}}",
+        "git clone https://github.com/jambonz/jambonz-feature-server.git -b {{user `jambonz_version`}}",
+        "git clone https://github.com/jambonz/jambonz-api-server.git -b {{user `jambonz_version`}}",
+        "git clone https://github.com/jambonz/jambonz-webapp.git -b {{user `jambonz_version`}}",
+        "git clone https://github.com/jambonz/jambonz-smpp-esme.git -b {{user `jambonz_version`}}",
+        "git clone https://github.com/jambonz/sbc-rtpengine-sidecar.git -b {{user `jambonz_version`}}"
+      ]
+    },
+    {
+      "type": "file",
+      "source": "files/",
+      "destination": "/tmp"
+    },
+    {
+      "type": "shell",
+      "execute_command": "chmod +x {{ .Path }}; sudo '{{ .Path }}' {{user `distro`}}",
+      "script": "scripts/install_os_tuning.sh"
+    },
+    {
+      "type": "shell",
+      "execute_command": "chmod +x {{ .Path }}; sudo '{{ .Path }}'  {{user `distro`}} {{user `drachtio_version`}}",
+      "script": "scripts/install_drachtio.sh"
+    },
+    {
+      "type": "shell",
+      "execute_command": "chmod +x {{ .Path }}; sudo '{{ .Path }}' {{user `distro`}}",
+      "script": "scripts/install_fail2ban.sh"
+    },
+    {
+      "type": "shell",
+      "execute_command": "chmod +x {{ .Path }}; sudo '{{ .Path }}' {{user `distro`}}",
+      "script": "scripts/install_redis.sh"
+    },
+    {
+      "type": "shell",
+      "execute_command": "chmod +x {{ .Path }}; sudo '{{ .Path }}'  {{user `distro`}} {{user `jambonz_user`}} {{user `jambonz_password`}}",
+      "script": "scripts/install_mysql.sh"
+    },
+    {
+      "type": "shell",
+      "execute_command": "chmod +x {{ .Path }}; sudo '{{ .Path }}'  {{user `distro`}} {{user `install_influxdb`}}",
+      "script": "scripts/install_influxdb.sh"
+    },
+    {
+      "type": "shell",
+      "execute_command": "chmod +x {{ .Path }}; sudo '{{ .Path }}'  {{user `distro`}} {{user `install_homer`}} {{user `homer_user`}} {{user `homer_password`}}",
+      "script": "scripts/install_postgresql.sh"
+    },
+    {
+      "type": "shell",
+      "execute_command": "chmod +x {{ .Path }}; sudo '{{ .Path }}'  {{user `distro`}} {{user `install_telegraf`}} {{user `influxdb_ip`}}",
+      "script": "scripts/install_telegraf.sh"
+    },
+    {
+      "type": "shell",
+      "execute_command": "chmod +x {{ .Path }}; sudo '{{ .Path }}'  {{user `distro`}} {{user `install_grafana`}}",
+      "script": "scripts/install_grafana.sh"
+    },
+    {
+      "type": "shell",
+      "execute_command": "chmod +x {{ .Path }}; sudo '{{ .Path }}'  {{user `distro`}} {{user `install_jaeger`}}",
+      "script": "scripts/install_jaeger.sh"
+    },
+    {
+      "type": "shell",
+      "execute_command": "chmod +x {{ .Path }}; sudo '{{ .Path }}' {{user `distro`}} {{user `install_homer`}} {{user `homer_user`}} {{user `homer_password`}}",
+      "script": "scripts/install_homer.sh"
+    },
+    {
+      "type": "shell",
+      "execute_command": "chmod +x {{ .Path }}; sudo '{{ .Path }}' {{user `distro`}}",
+      "script": "scripts/install_nginx.sh"
+    },
+    {
+      "type": "shell",
+      "execute_command": "chmod +x {{ .Path }}; sudo '{{ .Path }}'  {{user `distro`}} {{user `install_cloudwatch`}}",
+      "script": "scripts/install_cloudwatch.sh"
+    },
+    {
+      "type": "shell",
+      "execute_command": "chmod +x {{ .Path }}; sudo '{{ .Path }}'  {{user `distro`}} {{build `ID`}}",
+      "script": "scripts/install_apiban.sh"
+    },
+    {
+      "type": "shell",
+      "execute_command": "chmod +x {{ .Path }}; sudo '{{ .Path }}'  {{user `distro`}} {{user `rtp_engine_version`}}",
+      "script": "scripts/install_rtpengine.sh"
+    },
+    {
+      "type": "shell",
+      "execute_command": "chmod +x {{ .Path }}; sudo '{{ .Path }}' {{user `distro`}}",
+      "script": "scripts/install_nodejs.sh"
+    },
+    {
+      "type": "shell",
+      "environment_vars": [
+        "ARCH=amd64",
+        "MEDIA_SERVER_NAME={{user `mediaserver_name`}}",
+        "PREFERRED_CODEC_LIST={{user `preferred_codec_list`}}"
+      ],
+      "execute_command": "chmod +x {{ .Path }}; sudo '{{ .Path }}' {{user `distro`}}",
+      "script": "scripts/install_freeswitch.sh"
+    },
+    {
+      "type": "shell",
+      "execute_command": "chmod +x {{ .Path }}; sudo '{{ .Path }}'  {{user `distro`}} {{user `jambonz_version`}} {{user `jambonz_user`}} {{user `jambonz_password`}}",
+      "script": "scripts/install_app.sh"
+    },
+    {
+      "type": "shell",
+      "execute_command": "chmod +x {{ .Path }}; sudo '{{ .Path }}'  {{user `distro`}} {{user `leave_source`}}",
+      "script": "scripts/cleanup.sh"
+    }
+  ]
+}

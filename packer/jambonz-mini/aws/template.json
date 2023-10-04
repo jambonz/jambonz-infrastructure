@@ -61,6 +61,9 @@
       "type": "shell",
       "inline": [
         "while [ ! -f /var/lib/cloud/instance/boot-finished ]; do echo 'Waiting for cloud-init...'; sleep 1; done",
+        "echo disable SELinux",
+        "sudo setenforce 0",
+        "sudo sed -i 's/^SELINUX=.*/SELINUX=disabled/g' /etc/selinux/config",
         "sudo apt-get update",
         "sudo apt-get remove --auto-remove nftables",
         "sudo apt-get purge nftables",

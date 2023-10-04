@@ -1,4 +1,7 @@
 #!/bin/bash
+
+DISTRO=$1
+
 FREESWITCH_VERSION=v1.10.10
 SPAN_DSP_VERSION=0d2e6ac
 GRPC_VERSION=v1.57.0
@@ -8,34 +11,49 @@ AWS_SDK_VERSION=1.8.129
 LWS_VERSION=v4.3.2
 MODULES_VERSION=v0.8.4
 
+if [ "$EUID" -ne 0 ]; then
+  echo "Switching to root user..."
+  bash "$0" --as-root
+  exit
+fi
+
+# Your script continues here, as root
 echo "freeswitch version to install is ${FREESWITCH_VERSION}"
 echo "drachtio modules version to install is ${MODULES_VERSION}"
 echo "GRPC version to install is ${GRPC_VERSION}"
 echo "GOOGLE_API_VERSION version to install is ${GOOGLE_API_VERSION}"
 echo "AWS_SDK_VERSION version to install is ${AWS_SDK_VERSION}"
 echo "LWS_VERSION version to install is ${LWS_VERSION}"
+echo "DISTRO is ${DISTRO}"
 
-export LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH
+export PATH=/usr/local/bin:$PATH
+export LD_LIBRARY_PATH=/usr/local/lib:/usr/local/lib64:$LD_LIBRARY_PATH
+if [ -n "$PKG_CONFIG_PATH" ]; then
+  export PKG_CONFIG_PATH=/usr/local/lib/pkgconfig:$PKG_CONFIG_PATH
+else
+  export PKG_CONFIG_PATH=/usr/local/lib/pkgconfig
+fi
+
 
 cd /tmp
 tar xvfz SpeechSDK-Linux-1.32.1.tar.gz
 cd SpeechSDK-Linux-1.32.1
-sudo cp -r include /usr/local/include/MicrosoftSpeechSDK
-sudo cp -r lib/ /usr/local/lib/MicrosoftSpeechSDK
+cp -r include /usr/local/include/MicrosoftSpeechSDK
+cp -r lib/ /usr/local/lib/MicrosoftSpeechSDK
 if [ "$ARCH" == "arm64" ]; then
   echo installing Microsoft arm64 libs...
-  sudo cp /usr/local/lib/MicrosoftSpeechSDK/arm64/libMicrosoft.*.so /usr/local/lib/
+  cp /usr/local/lib/MicrosoftSpeechSDK/arm64/libMicrosoft.*.so /usr/local/lib/
   echo done
 fi 
 if [ "$ARCH" == "amd64" ]; then
   echo installing Microsoft x64 libs...
-  sudo cp /usr/local/lib/MicrosoftSpeechSDK/x64/libMicrosoft.*.so /usr/local/lib/
+  cp /usr/local/lib/MicrosoftSpeechSDK/x64/libMicrosoft.*.so /usr/local/lib/
   echo done
 fi
 
 cd /usr/local/src
 echo remove SpeechSDK-Linux-1.32.1
-sudo rm -Rf /tmp/SpeechSDK-Linux-1.32.1.tgz /tmp/SpeechSDK-Linux-1.32.1
+rm -Rf /tmp/SpeechSDK-Linux-1.32.1.tgz /tmp/SpeechSDK-Linux-1.32.1
 echo done
 
 echo config git
@@ -60,21 +78,21 @@ git clone https://github.com/googleapis/googleapis -b master
 cd googleapis && git checkout ${GOOGLE_API_VERSION} && cd ..
 git clone https://github.com/awslabs/aws-c-common.git
 
-sudo cp -r /usr/local/src/drachtio-freeswitch-modules/modules/mod_audio_fork /usr/local/src/freeswitch/src/mod/applications/mod_audio_fork
-sudo cp -r /usr/local/src/drachtio-freeswitch-modules/modules/mod_aws_transcribe /usr/local/src/freeswitch/src/mod/applications/mod_aws_transcribe
-sudo cp -r /usr/local/src/drachtio-freeswitch-modules/modules/mod_azure_transcribe /usr/local/src/freeswitch/src/mod/applications/mod_azure_transcribe
-sudo cp -r /usr/local/src/drachtio-freeswitch-modules/modules/mod_aws_lex /usr/local/src/freeswitch/src/mod/applications/mod_aws_lex
-sudo cp -r /usr/local/src/drachtio-freeswitch-modules/modules/mod_cobalt_transcribe /usr/local/src/freeswitch/src/mod/applications/mod_cobalt_transcribe
-sudo cp -r /usr/local/src/drachtio-freeswitch-modules/modules/mod_deepgram_transcribe /usr/local/src/freeswitch/src/mod/applications/mod_deepgram_transcribe
-sudo cp -r /usr/local/src/drachtio-freeswitch-modules/modules/mod_google_transcribe /usr/local/src/freeswitch/src/mod/applications/mod_google_transcribe
-sudo cp -r /usr/local/src/drachtio-freeswitch-modules/modules/mod_ibm_transcribe /usr/local/src/freeswitch/src/mod/applications/mod_ibm_transcribe
-sudo cp -r /usr/local/src/drachtio-freeswitch-modules/modules/mod_nuance_transcribe /usr/local/src/freeswitch/src/mod/applications/mod_nuance_transcribe
-sudo cp -r /usr/local/src/drachtio-freeswitch-modules/modules/mod_nvidia_transcribe /usr/local/src/freeswitch/src/mod/applications/mod_nvidia_transcribe
-sudo cp -r /usr/local/src/drachtio-freeswitch-modules/modules/mod_soniox_transcribe /usr/local/src/freeswitch/src/mod/applications/mod_soniox_transcribe
-sudo cp -r /usr/local/src/drachtio-freeswitch-modules/modules/mod_jambonz_transcribe /usr/local/src/freeswitch/src/mod/applications/mod_jambonz_transcribe
-sudo cp -r /usr/local/src/drachtio-freeswitch-modules/modules/mod_google_tts /usr/local/src/freeswitch/src/mod/applications/mod_google_tts
-sudo cp -r /usr/local/src/drachtio-freeswitch-modules/modules/mod_dialogflow /usr/local/src/freeswitch/src/mod/applications/mod_dialogflow
- 
+cp -r /usr/local/src/drachtio-freeswitch-modules/modules/mod_audio_fork /usr/local/src/freeswitch/src/mod/applications/mod_audio_fork
+cp -r /usr/local/src/drachtio-freeswitch-modules/modules/mod_aws_transcribe /usr/local/src/freeswitch/src/mod/applications/mod_aws_transcribe
+cp -r /usr/local/src/drachtio-freeswitch-modules/modules/mod_azure_transcribe /usr/local/src/freeswitch/src/mod/applications/mod_azure_transcribe
+cp -r /usr/local/src/drachtio-freeswitch-modules/modules/mod_aws_lex /usr/local/src/freeswitch/src/mod/applications/mod_aws_lex
+cp -r /usr/local/src/drachtio-freeswitch-modules/modules/mod_cobalt_transcribe /usr/local/src/freeswitch/src/mod/applications/mod_cobalt_transcribe
+cp -r /usr/local/src/drachtio-freeswitch-modules/modules/mod_deepgram_transcribe /usr/local/src/freeswitch/src/mod/applications/mod_deepgram_transcribe
+cp -r /usr/local/src/drachtio-freeswitch-modules/modules/mod_google_transcribe /usr/local/src/freeswitch/src/mod/applications/mod_google_transcribe
+cp -r /usr/local/src/drachtio-freeswitch-modules/modules/mod_ibm_transcribe /usr/local/src/freeswitch/src/mod/applications/mod_ibm_transcribe
+cp -r /usr/local/src/drachtio-freeswitch-modules/modules/mod_nuance_transcribe /usr/local/src/freeswitch/src/mod/applications/mod_nuance_transcribe
+cp -r /usr/local/src/drachtio-freeswitch-modules/modules/mod_nvidia_transcribe /usr/local/src/freeswitch/src/mod/applications/mod_nvidia_transcribe
+cp -r /usr/local/src/drachtio-freeswitch-modules/modules/mod_soniox_transcribe /usr/local/src/freeswitch/src/mod/applications/mod_soniox_transcribe
+cp -r /usr/local/src/drachtio-freeswitch-modules/modules/mod_jambonz_transcribe /usr/local/src/freeswitch/src/mod/applications/mod_jambonz_transcribe
+cp -r /usr/local/src/drachtio-freeswitch-modules/modules/mod_google_tts /usr/local/src/freeswitch/src/mod/applications/mod_google_tts
+cp -r /usr/local/src/drachtio-freeswitch-modules/modules/mod_dialogflow /usr/local/src/freeswitch/src/mod/applications/mod_dialogflow
+
 # copy Makefiles and patches into place
 cp /tmp/configure.ac.extra /usr/local/src/freeswitch/configure.ac
 cp /tmp/Makefile.am.extra /usr/local/src/freeswitch/Makefile.am
@@ -101,49 +119,51 @@ patch < mod_httapi.c.patch
 # build libwebsockets
 echo building lws
 cd /usr/local/src/libwebsockets
-sudo mkdir -p build && cd build && sudo cmake .. -DCMAKE_BUILD_TYPE=RelWithDebInfo && sudo make && sudo make install
+mkdir -p build && cd build && cmake .. -DCMAKE_BUILD_TYPE=RelWithDebInfo && make && make install
 
 # build libfvad
 cd /usr/local/src/freeswitch/libs/libfvad
 # use our version of libfvad configure.ac - should only do this on debian 12
 if [ "$DISTRO" == "debian-12" ]; then
   echo "patching libfvad configure.ac to remove deprecated commands"
-  sudo cp /tmp/configure.ac.libfvad configure.ac
+  cp /tmp/configure.ac.libfvad configure.ac
 fi
 echo building libfvad
-sudo autoreconf -i && sudo ./configure && sudo make -j 4 && sudo make install
+autoreconf -i && ./configure && make -j 4 && make install
 
 # build spandsp
 echo building spandsp
 cd /usr/local/src/freeswitch/libs/spandsp
-./bootstrap.sh && ./configure && make -j 4 && sudo make install
+./bootstrap.sh && ./configure && make -j 4 && make install
 
 # build sofia
 echo building sofia
 cd /usr/local/src/freeswitch/libs/sofia-sip
-./bootstrap.sh && ./configure && make -j 4 && sudo make install
+./bootstrap.sh && ./configure && make -j 4 && make install
 
 # build aws-c-common
 echo building aws-c-common
 cd /usr/local/src/freeswitch/libs/aws-c-common
 mkdir -p build && cd build
 cmake .. -DCMAKE_BUILD_TYPE=RelWithDebInfo -DBUILD_SHARED_LIBS=OFF -DCMAKE_CXX_FLAGS="-Wno-unused-parameter"
-make -j 4 && sudo make install
+make -j 4 && make install
 
 # build aws-sdk-cpp
 echo building aws-sdk-cpp
 cd /usr/local/src/freeswitch/libs/aws-sdk-cpp
 git submodule update --init --recursive
 mkdir -p build && cd build
-cmake .. -DBUILD_ONLY="lexv2-runtime;transcribestreaming" -DCMAKE_BUILD_TYPE=RelWithDebInfo -DBUILD_SHARED_LIBS=OFF -DCMAKE_CXX_FLAGS="-Wno-unused-parameter"
-if [ "$DISTRO" == "debian-12" ]; then
-  echo "patching aws-sdk-cpp to fix debian 12 build"
-  sudo sed -i 's/uint8_t arr\[16\];/uint8_t arr\[16\] = {0};/g' /usr/local/src/freeswitch/libs/aws-sdk-cpp/build/.deps/build/src/AwsCCommon/tests/byte_buf_test.c
-  sudo sed -i 's/char filename_array\[64\];/char filename_array\[64\] = {0};/g' /usr/local/src/freeswitch/libs/aws-sdk-cpp/build/.deps/build/src/AwsCCommon/tests/logging/logging_test_utilities.c
-  cmake .. -DBUILD_ONLY="lexv2-runtime;transcribestreaming" -DCMAKE_BUILD_TYPE=RelWithDebInfo -DBUILD_SHARED_LIBS=OFF -DCMAKE_CXX_FLAGS="-Wno-unused-parameter"
+cmake .. -DBUILD_ONLY="lexv2-runtime;transcribestreaming" -DCMAKE_BUILD_TYPE=RelWithDebInfo -DBUILD_SHARED_LIBS=OFF -DCMAKE_CXX_FLAGS="-Wno-unused-parameter -Wno-error=nonnull -Wno-error=deprecated-declarations -Wno-error=uninitialized -Wno-error=maybe-uninitialized"
+if [ "$DISTRO" == "debian-12" ] ||[[ "$DISTRO" == rhel* ]] ; then
+  echo "patching aws-sdk-cpp to fix warnings treated as errors"
+  sed -i 's/uint8_t arr\[16\];/uint8_t arr\[16\] = {0};/g' /usr/local/src/freeswitch/libs/aws-sdk-cpp/build/.deps/build/src/AwsCCommon/tests/byte_buf_test.c
+  sed -i 's/char filename_array\[64\];/char filename_array\[64\] = {0};/g' /usr/local/src/freeswitch/libs/aws-sdk-cpp/build/.deps/build/src/AwsCCommon/tests/logging/logging_test_utilities.c
+  echo "re-running cmake after patching aws-sdk-cpp"
+  cmake .. -DBUILD_ONLY="lexv2-runtime;transcribestreaming" -DCMAKE_BUILD_TYPE=RelWithDebInfo -DBUILD_SHARED_LIBS=OFF -DCMAKE_CXX_FLAGS="-Wno-unused-parameter -Wno-error=nonnull -Wno-error=deprecated-declarations -Wno-error=uninitialized -Wno-error=maybe-uninitialized"
+  echo cmake completed
 fi
-sudo make -j 4 && sudo make install
-sudo find /usr/local/src/freeswitch/libs/aws-sdk-cpp/ -type f -name "*.pc" | sudo xargs cp -t /usr/local/lib/pkgconfig/
+make -j 4 && make install
+find /usr/local/src/freeswitch/libs/aws-sdk-cpp/ -type f -name "*.pc" | xargs cp -t /usr/local/lib/pkgconfig/
 
 # build grpc
 echo building grpc
@@ -153,7 +173,7 @@ mkdir -p cmake/build
 cd cmake/build
 cmake -DBUILD_SHARED_LIBS=ON -DgRPC_SSL_PROVIDER=package -DBUILD_SHARED_LIBS=ON -DCMAKE_BUILD_TYPE=RelWithDebInfo ../..
 make -j 4
-sudo make install
+make install
 
 # build googleapis
 echo building googleapis
@@ -161,7 +181,11 @@ cd /usr/local/src/freeswitch/libs/googleapis
 echo "Ref: https://github.com/GoogleCloudPlatform/cpp-samples/issues/113"
 sed -i 's/\$fields/fields/' google/maps/routes/v1/route_service.proto
 sed -i 's/\$fields/fields/' google/maps/routes/v1alpha/route_service.proto
-LANGUAGE=cpp make -j 4
+if [ "$DISTRO" == "debian-12" ] || [ "$DISTRO" == rhel* ] ; then
+  LANGUAGE=cpp FLAGS+='--experimental_allow_proto3_optional' make -j 4
+else
+  LANGUAGE=cpp make -j 4
+fi
 
 # build nuance protobufs
 echo "building protobuf stubs for Nuance asr"
@@ -186,29 +210,29 @@ LANGUAGE=cpp make
 # build freeswitch
 echo "building freeswitch"
 cd /usr/local/src/freeswitch
-sudo ./bootstrap.sh -j
-sudo ./configure --enable-tcmalloc=yes --with-lws=yes --with-extra=yes --with-aws=yes
-sudo make -j 4
-sudo make install
-sudo make cd-sounds-install cd-moh-install
-sudo cp /tmp/acl.conf.xml /usr/local/freeswitch/conf/autoload_configs
-sudo cp /tmp/event_socket.conf.xml /usr/local/freeswitch/conf/autoload_configs
-sudo cp /tmp/switch.conf.xml /usr/local/freeswitch/conf/autoload_configs
-sudo cp /tmp/conference.conf.xml /usr/local/freeswitch/conf/autoload_configs
-sudo rm -Rf /usr/local/freeswitch/conf/dialplan/*
-sudo rm -Rf /usr/local/freeswitch/conf/sip_profiles/*
-sudo cp /tmp/mrf_dialplan.xml /usr/local/freeswitch/conf/dialplan
-sudo cp /tmp/mrf_sip_profile.xml /usr/local/freeswitch/conf/sip_profiles
-sudo cp /usr/local/src/freeswitch/conf/vanilla/autoload_configs/modules.conf.xml /usr/local/freeswitch/conf/autoload_configs
-sudo cp /tmp/freeswitch.service /etc/systemd/system
-sudo chown root:root -R /usr/local/freeswitch
-sudo chmod 644 /etc/systemd/system/freeswitch.service
-sudo sed -i -e 's/global_codec_prefs=OPUS,G722,PCMU,PCMA,H264,VP8/global_codec_prefs=PCMU,PCMA,OPUS,G722/g' /usr/local/freeswitch/conf/vars.xml
-sudo sed -i -e 's/outbound_codec_prefs=OPUS,G722,PCMU,PCMA,H264,VP8/outbound_codec_prefs=PCMU,PCMA,OPUS,G722/g' /usr/local/freeswitch/conf/vars.xml
-sudo systemctl enable freeswitch
-sudo cp /tmp/freeswitch_log_rotation /etc/cron.daily/freeswitch_log_rotation
-sudo chown root:root /etc/cron.daily/freeswitch_log_rotation
-sudo chmod a+x /etc/cron.daily/freeswitch_log_rotation
+./bootstrap.sh -j
+./configure --enable-tcmalloc=yes --with-lws=yes --with-extra=yes --with-aws=yes
+make -j 8
+make install
+make cd-sounds-install cd-moh-install
+cp /tmp/acl.conf.xml /usr/local/freeswitch/conf/autoload_configs
+cp /tmp/event_socket.conf.xml /usr/local/freeswitch/conf/autoload_configs
+cp /tmp/switch.conf.xml /usr/local/freeswitch/conf/autoload_configs
+cp /tmp/conference.conf.xml /usr/local/freeswitch/conf/autoload_configs
+rm -Rf /usr/local/freeswitch/conf/dialplan/*
+rm -Rf /usr/local/freeswitch/conf/sip_profiles/*
+cp /tmp/mrf_dialplan.xml /usr/local/freeswitch/conf/dialplan
+cp /tmp/mrf_sip_profile.xml /usr/local/freeswitch/conf/sip_profiles
+cp /usr/local/src/freeswitch/conf/vanilla/autoload_configs/modules.conf.xml /usr/local/freeswitch/conf/autoload_configs
+cp /tmp/freeswitch.service /etc/systemd/system
+chown root:root -R /usr/local/freeswitch
+chmod 644 /etc/systemd/system/freeswitch.service
+sed -i -e 's/global_codec_prefs=OPUS,G722,PCMU,PCMA,H264,VP8/global_codec_prefs=PCMU,PCMA,OPUS,G722/g' /usr/local/freeswitch/conf/vars.xml
+sed -i -e 's/outbound_codec_prefs=OPUS,G722,PCMU,PCMA,H264,VP8/outbound_codec_prefs=PCMU,PCMA,OPUS,G722/g' /usr/local/freeswitch/conf/vars.xml
+systemctl enable freeswitch
+cp /tmp/freeswitch_log_rotation /etc/cron.daily/freeswitch_log_rotation
+chown root:root /etc/cron.daily/freeswitch_log_rotation
+chmod a+x /etc/cron.daily/freeswitch_log_rotation
 
 echo "downloading soniox root verification certificate"
 cd /usr/local/freeswitch/certs

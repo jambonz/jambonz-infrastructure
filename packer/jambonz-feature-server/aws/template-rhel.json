@@ -1,0 +1,158 @@
+{
+  "variables": {
+    "region": "us-east-1",
+    "ssh_username": "ec2-user",
+    "ami_description": "jambonz feature server",
+    "instance_type": "c6in.xlarge",
+    "drachtio_version": "v0.8.24-rc1",
+    "jambonz_version": "v0.8.5-rc10",
+    "ami_base_image_arch": "amd64",
+    "ami_base_image_owner": "309956199498",
+    "install_telegraf": "yes",
+    "install_datadog": "no",
+    "datadog_key" : "",
+    "install_cloudwatch":  "yes",
+    "mediaserver_name" : "jambonz",
+    "preferred_codec_list" : "PCMU,PCMA,OPUS,G722",
+    "distro": "rhel-9",
+    "redhat_username": "daveh-beachdog",
+    "redhat_password": "4DXUYYISNO460PMy",
+    "leave_source": "yes"
+  },
+  "builders": [{
+    "type": "amazon-ebs",
+    "region": "{{user `region`}}",
+    "source_ami_filter": {
+      "filters": {
+        "virtualization-type": "hvm",
+        "name": "RHEL-9.2*",
+        "root-device-type": "ebs",
+        "architecture": "x86_64"
+      },
+      "owners": ["{{user `ami_base_image_owner`}}"],
+      "most_recent": true
+    },
+    "instance_type": "{{user `instance_type`}}",
+    "ssh_username": "{{user `ssh_username`}}",
+    "ami_name": "jambonz-feature-server-{{user `jambonz_version`}}-{{user `distro`}}-{{user `ami_base_image_arch`}}-{{isotime |clean_resource_name }}",
+    "ami_description": "{{user `ami_description`}}",
+    "launch_block_device_mappings": [
+      {
+        "device_name": "/dev/sda1",
+        "volume_size": 60,
+        "volume_type": "gp3",
+        "delete_on_termination": true
+      }
+    ],
+    "tags": {
+      "Name": "jambonz-feature-server"
+    },
+    "run_tags": {
+      "Name": "jambonz-feature-server-build"
+    }
+  }],
+  "provisioners": [
+    {
+      "type": "shell",
+      "inline": [
+        "while [ ! -f /var/lib/cloud/instance/boot-finished ]; do echo 'Waiting for cloud-init...'; sleep 1; done",
+        "export PATH=/usr/local/bin:$PATH",
+        "export LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH",
+        "export PKG_CONFIG_PATH=/usr/local/lib/pkgconfig:$PKG_CONFIG_PATH",
+        "sudo setenforce 0",
+        "sudo sed -i 's/SELINUX=enforcing/SELINUX=disabled/' /etc/selinux/config",
+        "echo registering",
+        "sudo subscription-manager register --username={{user `redhat_username`}} --password={{user `redhat_password`}}",
+        "sudo dnf upgrade -y",
+        "sudo sed -i 's/manage_repos = 0/manage_repos = 1/' /etc/rhsm/rhsm.conf",
+        "cat /etc/rhsm/rhsm.conf",
+        "echo installing codeready repos",
+        "sudo subscription-manager repos --enable=codeready-builder-for-rhel-9-x86_64-rpms",
+        "echo installing epel repo",
+        "sudo dnf install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-9.noarch.rpm",
+        "sudo dnf upgrade -y",
+        "echo running /usr/bin/crb",
+        "sudo /usr/bin/crb enable",
+        "echo installing rpmfusion repo",
+        "sudo dnf install -y https://download1.rpmfusion.org/free/el/rpmfusion-free-release-9.noarch.rpm",
+        "echo installing Development tools",
+        "sudo dnf groupinstall -y 'RPM Development Tools'",
+        "sudo dnf groupinstall -y 'Development Tools'",
+        "echo installing needed packages",
+        "sudo dnf install -y iptables-devel htop lsof redis pandoc wget yasm cmake ffmpeg ffmpeg-devel perl-ExtUtils-Embed perl-IPC-Cmd pcre-devel iptables-devel \\",
+        "google-perftools-devel libcurl-devel jq telnet libevent-devel xmlrpc-c-devel gperf libpcap-devel libmpg123-devel libshout-devel systemd-devel \\",
+        "glib2-devel json-glib-devel hiredis-devel mariadb-devel dnsutils speex speex-devel speexdsp-devel re2-devel libedit-devel opus-devel opusfile-devel \\",
+        "glib2-devel json-glib-devel hiredis-devel libtiff-devel libevent-devel xmlrpc-c-devel perl-IPC-Cmd mariadb-devel snapd \\",
+        "libjpeg-devel libsndfile-devel lua-devel sqlite-devel libuuid-devel lame-devel libyuv-devel protobuf-compiler",
+        "sudo dnf debuginfo-install -y binutils",
+        "sudo chmod a+w /usr/local/src",
+        "ssh-keyscan github.com >> ~/.ssh/known_hosts",
+        "mkdir ~/apps",
+        "cd ~/apps",
+        "git config --global advice.detachedHead false",
+        "git clone https://github.com/jambonz/jambonz-feature-server.git -b {{user `jambonz_version`}}",
+        "git clone https://github.com/jambonz/fsw-clear-old-calls.git -b {{user `jambonz_version`}}",
+        "sudo find / -name authorized_keys | sudo xargs -0 -r rm -Rf"
+      ]
+    },
+    {
+      "type": "file",
+      "source": "files/",
+      "destination": "/tmp"
+    },
+    {
+      "type": "shell",
+      "execute_command": "chmod +x {{ .Path }}; sudo '{{ .Path }}' {{user `distro`}}",
+      "script": "scripts/install_os_tuning.sh"
+    },
+    {
+      "type": "shell",
+      "environment_vars": [
+        "ARCH={{user `ami_base_image_arch`}}",
+        "MEDIA_SERVER_NAME={{user `mediaserver_name`}}",
+        "PREFERRED_CODEC_LIST={{user `preferred_codec_list`}}"
+      ],
+      "execute_command": "chmod +x {{ .Path }}; sudo '{{ .Path }}' {{user `distro`}}",
+      "script": "scripts/install_freeswitch.sh"
+    },
+    {
+      "type": "shell",
+      "execute_command": "chmod +x {{ .Path }}; sudo '{{ .Path }}' {{user `install_cloudwatch`}} {{user `distro`}}",
+      "script": "scripts/install_cloudwatch.sh"
+    },
+    {
+      "type": "shell",
+      "execute_command": "chmod +x {{ .Path }}; sudo '{{ .Path }}' {{user `distro`}}",
+      "script": "scripts/install_nodejs.sh"
+    },
+    {
+      "type": "shell",
+      "environment_vars": [
+        "DD_KEY={{user `datadog_key`}}",
+        "DD_INSTALL={{user `install_datadog`}}"
+      ],
+      "execute_command": "chmod +x {{ .Path }}; sudo '{{ .Path }}'",
+      "script": "scripts/install_datadog.sh"
+    },
+    {
+      "type": "shell",
+      "execute_command": "chmod +x {{ .Path }}; sudo '{{ .Path }}' {{user `install_telegraf`}} {{user `distro`}}",
+      "script": "scripts/install_telegraf.sh"
+    },
+    {
+      "type": "shell",
+      "execute_command": "chmod +x {{ .Path }}; sudo '{{ .Path }}' {{user `drachtio_version`}} {{user `distro`}}",
+      "script": "scripts/install_drachtio.sh"
+    },
+    {
+      "type": "shell",
+      "execute_command": "chmod +x {{ .Path }}; sudo '{{ .Path }}' {{user `jambonz_version`}} {{user `distro`}}",
+      "script": "scripts/install_app.sh"
+    },
+    {
+      "type": "shell",
+      "execute_command": "chmod +x {{ .Path }}; sudo '{{ .Path }}' {{user `leave_source`}} {{user `distro`}}",
+      "script": "scripts/cleanup.sh"
+    }
+  ]
+}

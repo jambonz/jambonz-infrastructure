@@ -1,5 +1,6 @@
 #!/bin/bash
 VERSION=$1
+DISTRO=$2
 
 echo "drachtio version to install is ${VERSION}"
 
