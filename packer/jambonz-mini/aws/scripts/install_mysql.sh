@@ -2,21 +2,22 @@
 DISTRO=$1
 DB_USER=$2
 DB_PASS=$3
+RHEL_RELEASE=
 
 if [[ "$DISTRO" == rhel* ]] ; then
+  RHEL_RELEASE="${DISTRO:5}"
   HOME=/home/ec2-user
   cd /tmp
-  wget https://repo.mysql.com//mysql80-community-release-el9-1.noarch.rpm
-  sudo dnf install -y mysql80-community-release-el9-1.noarch.rpm
-  sudo dnf install -y mysql-community-server
-  echo "starting mysql"
-  sudo systemctl enable mysqld
-  sudo systemctl start mysqld
-  echo checking mysql status
-  sudo systemctl status mysqld
-  TEMP_PASS=$(sudo grep 'A temporary password is generated' /var/log/mysqld.log | tail -1 | awk '{print $NF}')
-  echo "temporary password is $TEMP_PASS"
-  mysql -u root -p"${TEMP_PASS}" --connect-expired-password << EOL
+  wget https://repo.mysql.com//mysql80-community-release-el${RHEL_RELEASE}-1.noarch.rpm
+  sudo dnf install -y mysql80-community-release-el${RHEL_RELEASE}-1.noarch.rpm
+  if [ "$RHEL_RELEASE" == "8" ]; then
+    sudo dnf install -y @mysql
+    echo "starting mysql"
+    sudo systemctl enable mysqld
+    sudo systemctl start mysqld
+    echo checking mysql status
+    sudo systemctl status mysqld
+    mysql -u root << EOL
 ALTER USER 'root'@'localhost' IDENTIFIED BY 'JambonzR0ck$';
 DELETE FROM mysql.user WHERE User='';
 DELETE FROM mysql.user WHERE User='root' AND Host NOT IN ('localhost', '127.0.0.1', '::1');
@@ -24,6 +25,24 @@ DROP DATABASE IF EXISTS test;
 DELETE FROM mysql.db WHERE Db='test' OR Db='test\\_%';
 FLUSH PRIVILEGES;
 EOL
+else
+    sudo dnf install -y mysql-community-server
+    echo "starting mysql"
+    sudo systemctl enable mysqld
+    sudo systemctl start mysqld
+    echo checking mysql status
+    sudo systemctl status mysqld
+    TEMP_PASS=$(sudo grep 'A temporary password is generated' /var/log/mysqld.log | tail -1 | awk '{print $NF}')
+    echo "temporary password is $TEMP_PASS"
+    mysql -u root -p"${TEMP_PASS}" --connect-expired-password << EOL
+ALTER USER 'root'@'localhost' IDENTIFIED BY 'JambonzR0ck$';
+DELETE FROM mysql.user WHERE User='';
+DELETE FROM mysql.user WHERE User='root' AND Host NOT IN ('localhost', '127.0.0.1', '::1');
+DROP DATABASE IF EXISTS test;
+DELETE FROM mysql.db WHERE Db='test' OR Db='test\\_%';
+FLUSH PRIVILEGES;
+EOL
+  fi
 else
   HOME=/home/admin
   sudo apt install -y dirmngr

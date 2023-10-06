@@ -25,9 +25,10 @@
     "mediaserver_name" : "jambonz",
     "preferred_codec_list" : "PCMU,PCMA,OPUS,G722",
     "distro": "rhel-9",
+    "rhel_major_release_number": "9",
     "redhat_username": "daveh-beachdog",
     "redhat_password": "4DXUYYISNO460PMy",
-    "leave_source": "yes"
+    "leave_source": "no"
   },
   "builders": [{
     "type": "amazon-ebs",
@@ -35,7 +36,7 @@
     "source_ami_filter": {
       "filters": {
         "virtualization-type": "hvm",
-        "name": "RHEL-9.2*",
+        "name": "RHEL-8.8*",
         "root-device-type": "ebs",
         "architecture": "x86_64"
       },
@@ -44,7 +45,7 @@
     },
     "instance_type": "{{user `instance_type`}}",
     "ssh_username": "{{user `ssh_username`}}",
-    "ami_name": "jambonz-sbc-sip-rtp-{{user `jambonz_version`}}-{{user `distro`}}-{{isotime |clean_resource_name }}",
+    "ami_name": "jambonz-mini-{{user `jambonz_version`}}-{{user `distro`}}-{{isotime |clean_resource_name }}",
     "ami_description": "{{user `ami_description`}}",
     "launch_block_device_mappings": [
       {
@@ -76,7 +77,7 @@
         "sudo sed -i 's/manage_repos = 0/manage_repos = 1/' /etc/rhsm/rhsm.conf",
         "sudo subscription-manager repos --enable=codeready-builder-for-rhel-9-x86_64-rpms",
         "sudo dnf install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-9.noarch.rpm",
-        "sudo /usr/bin/crb enable",
+        "sudo /usr/bin/crb enable || true",
         "sudo dnf install -y https://download1.rpmfusion.org/free/el/rpmfusion-free-release-9.noarch.rpm",
         "sudo dnf groupinstall -y 'RPM Development Tools'",
         "sudo dnf groupinstall -y 'Development Tools'",

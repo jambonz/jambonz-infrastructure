@@ -9,6 +9,7 @@ echo "running cleanup.sh on $DISTRO, leaving source: $LEAVE_SOURCE"
 
 if [[ "$DISTRO" == rhel* ]]; then
   sudo dnf install -y iptables-services
+  sudo subscription-manager unregister
 else
   echo iptables-persistent iptables-persistent/autosave_v4 boolean true | sudo debconf-set-selections
   echo iptables-persistent iptables-persistent/autosave_v6 boolean true | sudo debconf-set-selections

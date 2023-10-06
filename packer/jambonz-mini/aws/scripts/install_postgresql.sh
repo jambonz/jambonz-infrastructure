@@ -5,9 +5,13 @@ if [ "$2" == "yes" ]; then
 
 DB_USER=$3
 DB_PASS=$4
+RHEL_RELEASE
 
 if [[ "$DISTRO" == rhel* ]] ; then
-  sudo dnf install -y https://download.postgresql.org/pub/repos/yum/reporpms/EL-9-x86_64/pgdg-redhat-repo-latest.noarch.rpm
+  RHEL_RELEASE="${DISTRO:5}"
+
+  sudo dnf install -y https://download.postgresql.org/pub/repos/yum/reporpms/EL-${RHEL_RELEASE}-x86_64/pgdg-redhat-repo-latest.noarch.rpm
+  dnf -qy module disable postgresql
   sudo dnf install -y postgresql12 postgresql12-server
 
   sudo /usr/pgsql-12/bin/postgresql-12-setup initdb

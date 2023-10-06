@@ -95,9 +95,9 @@ Conditions:
 Mappings:
   AWSRegion2AMI:
     us-east-1:
-      Ami: ami-013d4980e6e0e39f3
+      Ami: ami-0431217c9cbe73ea6
     us-east-2:
-      Ami: ami-0c48efc8ef4bb0158
+      Ami: ami-008d6e54f5b6f4947
 
 Resources:
   IamCloudwatchRole:
@@ -185,6 +185,8 @@ Resources:
                   echo disabling firewalld
                   sudo systemctl stop firewalld
                   sudo systemctl disable firewalld
+
+                  sudo systemctl restart rtpengine
               else
                   USER=admin
                   HOME=/home/admin

@@ -224,7 +224,12 @@ rm -Rf /usr/local/freeswitch/conf/sip_profiles/*
 cp /tmp/mrf_dialplan.xml /usr/local/freeswitch/conf/dialplan
 cp /tmp/mrf_sip_profile.xml /usr/local/freeswitch/conf/sip_profiles
 cp /usr/local/src/freeswitch/conf/vanilla/autoload_configs/modules.conf.xml /usr/local/freeswitch/conf/autoload_configs
-cp /tmp/freeswitch.service /etc/systemd/system
+
+if [[ "$DISTRO" == rhel* ]]; then
+  cp /tmp/freeswitch-rhel.service /etc/systemd/system/freeswitch.service
+else
+  cp /tmp/freeswitch.service /etc/systemd/system
+fi
 chown root:root -R /usr/local/freeswitch
 chmod 644 /etc/systemd/system/freeswitch.service
 sed -i -e 's/global_codec_prefs=OPUS,G722,PCMU,PCMA,H264,VP8/global_codec_prefs=PCMU,PCMA,OPUS,G722/g' /usr/local/freeswitch/conf/vars.xml

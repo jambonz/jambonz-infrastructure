@@ -6,7 +6,7 @@ echo "installing nginx"
 if [[ "$DISTRO" == rhel* ]]; then
   sudo dnf install -y nginx httpd-tools
   cd /etc/nginx/conf.d
-  sudo mv /tmp/nginx.default default
+  sudo mv /tmp/nginx.default default.conf
 else
   sudo apt-get install -y nginx apache2-utils
   cd /etc/nginx/sites-available
