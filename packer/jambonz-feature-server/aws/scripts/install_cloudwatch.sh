@@ -1,10 +1,10 @@
 #!/bin/bash
-DISTRO=$2
+DISTRO=$1
 
-if [ "$1" == "yes" ]; then 
+if [ "$2" == "yes" ]; then 
 
   #install cloudwatch
-  if [ "$DISTRO" == "rhel-9" ]; then
+if [[ "$DISTRO" == rhel* ]]; then
     sudo wget https://s3.amazonaws.com/amazoncloudwatch-agent/redhat/amd64/latest/amazon-cloudwatch-agent.rpm -O /tmp/amazon-cloudwatch-agent.rpm
     sudo dnf install -y /tmp/amazon-cloudwatch-agent.rpm
     sudo rm -rf /tmp/amazon-cloudwatch-agent.rpm

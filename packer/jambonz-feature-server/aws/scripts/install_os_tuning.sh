@@ -17,7 +17,7 @@ vm.dirty_expire_centisecs=200
 vm.dirty_writeback_centisecs=100
 EOT'
 
-if [ "$DISTRO" == "rhel-9" ] ; then
+if [[ "$DISTRO" == rhel* ]] ; then
   grep -q "* soft core unlimited" /etc/security/limits.conf
   if [ $? -ne 0 ]; then
     echo "* soft core unlimited" | sudo tee -a /etc/security/limits.conf > /dev/null
@@ -37,13 +37,19 @@ echo "net.ipv6.conf.all.disable_ipv6 = 1" | sudo tee -a /etc/sysctl.conf > /dev/
 echo "net.ipv6.conf.default.disable_ipv6 = 1" | sudo tee -a /etc/sysctl.conf > /dev/null
 
 # install latest cmake
-if [ "$DISTRO" == "debian-12" ] || [ "$DISTRO" == "rhel-9" ] ; then
-  echo building an update cmake 3.27
+if [ "$DISTRO" == "debian-12" ] || [[ "$DISTRO" == rhel* ]] ; then
+  echo disable RHEL firewall
+  sudo systemctl stop firewalld
+  sudo systemctl disable firewalld
+
+  echo build cmake 3.27, required by bcg729
   cd /usr/local/src
   wget https://github.com/Kitware/CMake/archive/refs/tags/v3.27.4.tar.gz
   tar xvfz v3.27.4.tar.gz
   cd CMake-3.27.4
-  ./bootstrap && make -j 4 && sudo make install
+  echo "building cmake"
+  ./bootstrap && make -j 8 && sudo make install
+  echo "cmake built and installed"
   export PATH=/usr/local/bin:$PATH
   cmake --version
 fi

@@ -25,9 +25,8 @@
     "mediaserver_name" : "jambonz",
     "preferred_codec_list" : "PCMU,PCMA,OPUS,G722",
     "distro": "rhel-9",
-    "rhel_major_release_number": "9",
-    "redhat_username": "daveh-beachdog",
-    "redhat_password": "4DXUYYISNO460PMy",
+    "redhat_username": "your-redhat_username-here",
+    "redhat_password": "your-redhat_password-here",
     "leave_source": "no"
   },
   "builders": [{
@@ -36,7 +35,7 @@
     "source_ami_filter": {
       "filters": {
         "virtualization-type": "hvm",
-        "name": "RHEL-8.8*",
+        "name": "RHEL-9.2*",
         "root-device-type": "ebs",
         "architecture": "x86_64"
       },

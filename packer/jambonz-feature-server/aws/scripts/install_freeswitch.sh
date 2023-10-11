@@ -154,7 +154,7 @@ cd /usr/local/src/freeswitch/libs/aws-sdk-cpp
 git submodule update --init --recursive
 mkdir -p build && cd build
 cmake .. -DBUILD_ONLY="lexv2-runtime;transcribestreaming" -DCMAKE_BUILD_TYPE=RelWithDebInfo -DBUILD_SHARED_LIBS=OFF -DCMAKE_CXX_FLAGS="-Wno-unused-parameter -Wno-error=nonnull -Wno-error=deprecated-declarations -Wno-error=uninitialized -Wno-error=maybe-uninitialized"
-if [ "$DISTRO" == "debian-12" ] || [ "$DISTRO" == "rhel-9" ] ; then
+if [ "$DISTRO" == "debian-12" ] ||[[ "$DISTRO" == rhel* ]] ; then
   echo "patching aws-sdk-cpp to fix warnings treated as errors"
   sed -i 's/uint8_t arr\[16\];/uint8_t arr\[16\] = {0};/g' /usr/local/src/freeswitch/libs/aws-sdk-cpp/build/.deps/build/src/AwsCCommon/tests/byte_buf_test.c
   sed -i 's/char filename_array\[64\];/char filename_array\[64\] = {0};/g' /usr/local/src/freeswitch/libs/aws-sdk-cpp/build/.deps/build/src/AwsCCommon/tests/logging/logging_test_utilities.c
@@ -181,7 +181,7 @@ cd /usr/local/src/freeswitch/libs/googleapis
 echo "Ref: https://github.com/GoogleCloudPlatform/cpp-samples/issues/113"
 sed -i 's/\$fields/fields/' google/maps/routes/v1/route_service.proto
 sed -i 's/\$fields/fields/' google/maps/routes/v1alpha/route_service.proto
-if [ "$DISTRO" == "debian-12" ] || [ "$DISTRO" == "rhel-9" ] ; then
+if [ "$DISTRO" == "debian-12" ] || [ "$DISTRO" == rhel* ] ; then
   LANGUAGE=cpp FLAGS+='--experimental_allow_proto3_optional' make -j 4
 else
   LANGUAGE=cpp make -j 4
@@ -212,7 +212,7 @@ echo "building freeswitch"
 cd /usr/local/src/freeswitch
 ./bootstrap.sh -j
 ./configure --enable-tcmalloc=yes --with-lws=yes --with-extra=yes --with-aws=yes
-make -j 4
+make -j 8
 make install
 make cd-sounds-install cd-moh-install
 cp /tmp/acl.conf.xml /usr/local/freeswitch/conf/autoload_configs
@@ -224,7 +224,12 @@ rm -Rf /usr/local/freeswitch/conf/sip_profiles/*
 cp /tmp/mrf_dialplan.xml /usr/local/freeswitch/conf/dialplan
 cp /tmp/mrf_sip_profile.xml /usr/local/freeswitch/conf/sip_profiles
 cp /usr/local/src/freeswitch/conf/vanilla/autoload_configs/modules.conf.xml /usr/local/freeswitch/conf/autoload_configs
-cp /tmp/freeswitch.service /etc/systemd/system
+
+if [[ "$DISTRO" == rhel* ]]; then
+  cp /tmp/freeswitch-rhel.service /etc/systemd/system/freeswitch.service
+else
+  cp /tmp/freeswitch.service /etc/systemd/system
+fi
 chown root:root -R /usr/local/freeswitch
 chmod 644 /etc/systemd/system/freeswitch.service
 sed -i -e 's/global_codec_prefs=OPUS,G722,PCMU,PCMA,H264,VP8/global_codec_prefs=PCMU,PCMA,OPUS,G722/g' /usr/local/freeswitch/conf/vars.xml

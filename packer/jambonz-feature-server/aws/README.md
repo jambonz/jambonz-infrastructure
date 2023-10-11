@@ -4,11 +4,20 @@ A [packer](https://www.packer.io/) template to build an AMI for the jambonz feat
 
 ## Installing 
 
-To build an amd64 image:
-
+To build a debian 11 AMI (preferred):
 ```
 $  packer build -color=false template.json
 ```
+
+To build an RHEL-9 AMI:
+```
+packer build -color=false -var "redhat_username=<my-rh-username>" -var "redhat_password=<my-rh-password>" template-rhel.json
+```
+
+To build an RHEL-8 AMI:
+```
+packer build -color=false-var "redhat_username=<my-rh-username>" -var "redhat_password=<my-rh-password>" \
+-var "distro=rhel-8" -var "rhel_major_release_number=8"  template-rhel.json```
 
 To build an arm64 image:
 

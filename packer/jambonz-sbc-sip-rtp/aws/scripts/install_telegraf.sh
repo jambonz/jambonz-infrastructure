@@ -1,13 +1,11 @@
 #!/bin/bash
-DISTRO=$2
+DISTRO=$1
 
-if [ "$1" == "yes" ]; then 
-
-INFLUXDB_IP=$2
+if [ "$2" == "yes" ]; then 
 
 cd /tmp
 
-if [ "$DISTRO" == "rhel-9" ]; then
+if [[ "$DISTRO" == rhel* ]]; then
   cat <<EOF | sudo tee /etc/yum.repos.d/influxdata.repo
 [influxdata]
 name = InfluxData Repository

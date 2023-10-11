@@ -1,20 +1,23 @@
 #!/bin/bash
-VERSION=$1
-DISTRO=$2
+DISTRO=$1
+VERSION=$2
+RHEL_RELEASE=""
 
-if [ "$DISTRO" == "rhel-9" ]; then
-  HOME=/home/ec2-user
-  cd $HOME
-  mkdir -p apps
-  cp /tmp/ecosystem-rhel.config.js apps/ecosystem.config.js
-  cd apps
+if [[ "$DISTRO" == rhel* ]]; then
+    RHEL_RELEASE="${DISTRO:5}"
+    HOME=/home/ec2-user
+    sed -i "s|/home/admin|${HOME}|g" /tmp/ecosystem.config.js
 else
-  HOME=/home/admin
-  cd $HOME
-  mkdir -p apps
-  cp /tmp/ecosystem.config.js apps
-  cd apps
+    HOME=/home/admin
 fi
+mkdir -p $HOME/apps
+
+ALIAS_LINE="alias gl='git log --oneline --decorate'"
+echo "$ALIAS_LINE" >> ~/.bash_aliases
+
+cd $HOME
+cp /tmp/ecosystem.config.js apps
+
 
 cd $HOME/apps/sbc-inbound && npm ci --unsafe-perm
 cd $HOME/apps/sbc-outbound && npm ci --unsafe-perm

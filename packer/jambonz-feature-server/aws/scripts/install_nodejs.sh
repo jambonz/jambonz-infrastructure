@@ -1,7 +1,7 @@
 #!/bin/bash
 DISTRO=$1
 
-if [ "$DISTRO" == "rhel-9" ]; then
+if [[ "$DISTRO" == rhel* ]]; then
   dnf install -y crypto-policies-scripts
   sudo update-crypto-policies --set DEFAULT
   sudo rpm --import https://rpm.nodesource.com/pub/el/NODESOURCE-GPG-SIGNING-KEY-EL

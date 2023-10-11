@@ -17,6 +17,7 @@ ALIAS_LINE="alias gl='git log --oneline --decorate'"
 echo "$ALIAS_LINE" >> ~/.bash_aliases
 
 cd $HOME
+mkdir -p $HOME/apps
 cp /tmp/ecosystem.config.js apps
 
 echo "building jambonz-feature-server.."
@@ -69,5 +70,3 @@ else
   sudo rm /usr/bin/certbot
   sudo ln -s /snap/bin/certbot /usr/bin/certbot
 fi
-sudo rm $HOME/apps/jambonz-webapp/.env
-

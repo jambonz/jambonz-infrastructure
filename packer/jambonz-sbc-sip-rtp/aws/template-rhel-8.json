@@ -1,23 +1,25 @@
+
 {
   "variables": {
     "region": "us-east-1",
     "ssh_username": "ec2-user",
-    "ami_description": "jambonz feature server",
+    "ami_description": "jambonz SBC SIP+RTP", 
     "instance_type": "c6in.xlarge",
     "drachtio_version": "v0.8.24-rc1",
     "jambonz_version": "v0.8.5-rc10",
     "ami_base_image_arch": "amd64",
     "ami_base_image_owner": "309956199498",
-    "install_telegraf": "yes",
+    "rtp_engine_version": "mr11.5.1.1",
+    "rtp_engine_min_port": "40000",
+    "rtp_engine_max_port": "60000",
     "install_datadog": "no",
     "datadog_key" : "",
     "install_cloudwatch":  "yes",
-    "mediaserver_name" : "jambonz",
-    "preferred_codec_list" : "PCMU,PCMA,OPUS,G722",
-    "distro": "rhel-9",
-    "redhat_username": "daveh-beachdog",
-    "redhat_password": "4DXUYYISNO460PMy",
-    "leave_source": "yes"
+    "install_telegraf": "yes",
+    "distro": "rhel-8",
+    "redhat_username": "your-redhat_username-here",
+    "redhat_password": "your-redhat_password-here",
+    "leave_source": "no"
   },
   "builders": [{
     "type": "amazon-ebs",
@@ -25,7 +27,7 @@
     "source_ami_filter": {
       "filters": {
         "virtualization-type": "hvm",
-        "name": "RHEL-9.2*",
+        "name": "RHEL-8.8*",
         "root-device-type": "ebs",
         "architecture": "x86_64"
       },
@@ -34,7 +36,7 @@
     },
     "instance_type": "{{user `instance_type`}}",
     "ssh_username": "{{user `ssh_username`}}",
-    "ami_name": "jambonz-feature-server-{{user `jambonz_version`}}-{{user `distro`}}-{{user `ami_base_image_arch`}}-{{isotime |clean_resource_name }}",
+    "ami_name": "jambonz-sbc-sip-rtp-{{user `jambonz_version`}}-{{user `distro`}}-{{user `ami_base_image_arch`}}-{{isotime |clean_resource_name }}",
     "ami_description": "{{user `ami_description`}}",
     "launch_block_device_mappings": [
       {
@@ -45,10 +47,10 @@
       }
     ],
     "tags": {
-      "Name": "jambonz-feature-server"
+      "Name": "jambonz-sbc-sip-rtp"
     },
     "run_tags": {
-      "Name": "jambonz-feature-server-build"
+      "Name": "jambonz-sbc-sip-rtp-build"
     }
   }],
   "provisioners": [
@@ -67,9 +69,9 @@
         "sudo sed -i 's/manage_repos = 0/manage_repos = 1/' /etc/rhsm/rhsm.conf",
         "cat /etc/rhsm/rhsm.conf",
         "echo installing codeready repos",
-        "sudo subscription-manager repos --enable=codeready-builder-for-rhel-9-x86_64-rpms",
+        "sudo subscription-manager repos --enable=codeready-builder-for-rhel-8-x86_64-rpms",
         "echo installing epel repo",
-        "sudo dnf install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-9.noarch.rpm",
+        "sudo dnf install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm",
         "sudo dnf upgrade -y",
         "echo running /usr/bin/crb",
         "sudo /usr/bin/crb enable",
@@ -79,19 +81,22 @@
         "sudo dnf groupinstall -y 'RPM Development Tools'",
         "sudo dnf groupinstall -y 'Development Tools'",
         "echo installing needed packages",
-        "sudo dnf install -y iptables-devel htop lsof redis pandoc wget yasm cmake ffmpeg ffmpeg-devel perl-ExtUtils-Embed perl-IPC-Cmd pcre-devel iptables-devel \\",
-        "google-perftools-devel libcurl-devel jq telnet libevent-devel xmlrpc-c-devel gperf libpcap-devel libmpg123-devel libshout-devel systemd-devel \\",
-        "glib2-devel json-glib-devel hiredis-devel mariadb-devel dnsutils speex speex-devel speexdsp-devel re2-devel libedit-devel opus-devel opusfile-devel \\",
-        "glib2-devel json-glib-devel hiredis-devel libtiff-devel libevent-devel xmlrpc-c-devel perl-IPC-Cmd mariadb-devel snapd \\",
-        "libjpeg-devel libsndfile-devel lua-devel sqlite-devel libuuid-devel lame-devel libyuv-devel protobuf-compiler",
+        "sudo dnf install -y iptables-devel htop pandoc wget cmake ffmpeg ffmpeg-devel perl-IPC-Cmd pcre-devel iptables-devel \\",
+        "google-perftools-devel libcurl-devel jq telnet libevent-devel xmlrpc-c-devel gperf libpcap-devel \\",
+        "glib2-devel json-glib-devel hiredis-devel spandsp-devel mariadb-devel dnsutils speex libedit-devel opus-devel \\",
+        "glib2-devel json-glib-devel spandsp-devel hiredis-devel libevent-devel xmlrpc-c-devel perl-IPC-Cmd mariadb-devel snapd",
         "sudo dnf debuginfo-install -y binutils",
         "sudo chmod a+w /usr/local/src",
         "ssh-keyscan github.com >> ~/.ssh/known_hosts",
         "mkdir ~/apps",
         "cd ~/apps",
         "git config --global advice.detachedHead false",
-        "git clone https://github.com/jambonz/jambonz-feature-server.git -b {{user `jambonz_version`}}",
-        "git clone https://github.com/jambonz/fsw-clear-old-calls.git -b {{user `jambonz_version`}}",
+        "git clone https://github.com/jambonz/sbc-sip-sidecar.git -b {{user `jambonz_version`}}",
+        "git clone https://github.com/jambonz/sbc-rtpengine-sidecar.git -b {{user `jambonz_version`}}",
+        "git clone https://github.com/jambonz/sbc-outbound.git -b {{user `jambonz_version`}}",
+        "git clone https://github.com/jambonz/sbc-inbound.git -b {{user `jambonz_version`}}",
+        "git clone https://github.com/jambonz/jambonz-smpp-esme.git -b {{user `jambonz_version`}}",
+        "git clone https://github.com/jambonz/sbc-call-router.git  -b {{user `jambonz_version`}}",
         "sudo find / -name authorized_keys | sudo xargs -0 -r rm -Rf"
       ]
     },
@@ -107,23 +112,23 @@
     },
     {
       "type": "shell",
-      "environment_vars": [
-        "ARCH={{user `ami_base_image_arch`}}",
-        "MEDIA_SERVER_NAME={{user `mediaserver_name`}}",
-        "PREFERRED_CODEC_LIST={{user `preferred_codec_list`}}"
-      ],
-      "execute_command": "chmod +x {{ .Path }}; sudo '{{ .Path }}' {{user `distro`}}",
-      "script": "scripts/install_freeswitch.sh"
+      "execute_command": "chmod +x {{ .Path }}; sudo '{{ .Path }}' {{build `ID`}}",
+      "script": "scripts/install_apiban.sh"
     },
     {
       "type": "shell",
-      "execute_command": "chmod +x {{ .Path }}; sudo '{{ .Path }}' {{user `install_cloudwatch`}} {{user `distro`}}",
+      "execute_command": "chmod +x {{ .Path }}; sudo '{{ .Path }}' {{user `distro`}} {{user `install_cloudwatch`}}",
       "script": "scripts/install_cloudwatch.sh"
     },
     {
       "type": "shell",
       "execute_command": "chmod +x {{ .Path }}; sudo '{{ .Path }}' {{user `distro`}}",
       "script": "scripts/install_nodejs.sh"
+    },
+    {
+      "type": "shell",
+      "execute_command": "chmod +x {{ .Path }}; sudo '{{ .Path }}'  {{user `distro`}} {{user `rtp_engine_version`}}",
+      "script": "scripts/install_rtpengine.sh"
     },
     {
       "type": "shell",
@@ -136,22 +141,22 @@
     },
     {
       "type": "shell",
-      "execute_command": "chmod +x {{ .Path }}; sudo '{{ .Path }}' {{user `install_telegraf`}} {{user `distro`}}",
-      "script": "scripts/install_telegraf.sh"
-    },
-    {
-      "type": "shell",
-      "execute_command": "chmod +x {{ .Path }}; sudo '{{ .Path }}' {{user `drachtio_version`}} {{user `distro`}}",
+      "execute_command": "chmod +x {{ .Path }}; sudo '{{ .Path }}'  {{user `distro`}} {{user `drachtio_version`}}",
       "script": "scripts/install_drachtio.sh"
     },
     {
       "type": "shell",
-      "execute_command": "chmod +x {{ .Path }}; sudo '{{ .Path }}' {{user `jambonz_version`}} {{user `distro`}}",
+      "execute_command": "chmod +x {{ .Path }}; sudo '{{ .Path }}'  {{user `distro`}} {{user `jambonz_version`}}",
       "script": "scripts/install_app.sh"
     },
     {
       "type": "shell",
-      "execute_command": "chmod +x {{ .Path }}; sudo '{{ .Path }}' {{user `leave_source`}} {{user `distro`}}",
+      "execute_command": "chmod +x {{ .Path }}; sudo '{{ .Path }}'  {{user `distro`}} {{user `install_telegraf`}}",
+      "script": "scripts/install_telegraf.sh"
+    },
+    {
+      "type": "shell",
+      "execute_command": "chmod +x {{ .Path }}; sudo '{{ .Path }}'  {{user `distro`}} {{user `leave_source`}}",
       "script": "scripts/cleanup.sh"
     }
   ]
