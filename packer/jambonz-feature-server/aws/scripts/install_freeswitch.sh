@@ -6,7 +6,7 @@ GOOGLE_API_VERSION=29374574304f3356e64423acc9ad059fe43f09b5
 #AWS_SDK_VERSION=1.11.143 # newer but buggy with s2n_init crashes and weird slowdown on voice playout in FS
 AWS_SDK_VERSION=1.8.129
 LWS_VERSION=v4.3.2
-MODULES_VERSION=v0.8.4
+MODULES_VERSION=v0.8.5
 
 echo "freeswitch version to install is ${FREESWITCH_VERSION}"
 echo "drachtio modules version to install is ${MODULES_VERSION}"
