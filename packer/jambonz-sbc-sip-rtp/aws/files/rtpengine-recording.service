@@ -19,10 +19,10 @@ LimitNPROC=60000
 ;LimitSTACK=240
 LimitRTPRIO=infinity
 LimitRTTIME=7000000
-IOSchedulingClass=realtime
-IOSchedulingPriority=2
-CPUSchedulingPolicy=rr
-CPUSchedulingPriority=89
+;IOSchedulingClass=realtime
+;IOSchedulingPriority=2
+;CPUSchedulingPolicy=rr
+;CPUSchedulingPriority=89
 UMask=0007
 
 [Install]

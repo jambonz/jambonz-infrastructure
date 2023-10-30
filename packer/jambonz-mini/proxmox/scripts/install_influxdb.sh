@@ -12,6 +12,5 @@ sudo systemctl enable influxdb
 sudo systemctl start influxdb
 
 sudo systemctl status influxdb.service
-sudo journalctl -xe
 
 fi

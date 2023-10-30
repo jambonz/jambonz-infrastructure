@@ -11,7 +11,7 @@ EnvironmentFile=-/etc/default/freeswitch
 Environment="MOD_AUDIO_FORK_SUBPROTOCOL_NAME=audio.jambonz.org"
 Environment="MOD_AUDIO_FORK_SERVICE_THREADS=1"
 Environment="MOD_AUDIO_FORK_BUFFER_SECS=3"
-Environment="LD_LIBRARY_PATH=/usr/local/lib"
+Environment="LD_LIBRARY_PATH=/usr/local/lib:/usr/local/lib64"
 Environment="GOOGLE_APPLICATION_CREDENTIALS=/home/admin/credentials/gcp.json"
 ExecStart=/usr/local/freeswitch/bin/freeswitch -nc -nonat
 TimeoutSec=45s
