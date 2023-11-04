@@ -5,7 +5,7 @@
     "ami_description": "jambonz all-in-one AMI", 
     "instance_type": "c6in.xlarge",
     "drachtio_version": "v0.8.24-rc1",
-    "jambonz_version": "v0.8.5-rc12",
+    "jambonz_version": "v0.8.5-rc17",
     "jambonz_user": "admin",
     "jambonz_password": "JambonzR0ck$",
     "install_telegraf": "yes",
@@ -23,7 +23,7 @@
     "mediaserver_name" : "jambonz",
     "preferred_codec_list" : "PCMU,PCMA,OPUS,G722",
     "distro": "debian-11",
-    "leave_source": "no"
+    "leave_source": "yes"
   },
   "builders": [{
     "type": "amazon-ebs",
@@ -100,6 +100,11 @@
     },
     {
       "type": "shell",
+      "execute_command": "chmod +x {{ .Path }}; sudo '{{ .Path }}' {{user `distro`}} {{user `drachtio_version`}}",
+      "script": "scripts/install_drachtio.sh"
+    },
+    {
+      "type": "shell",
       "environment_vars": [
         "ARCH=amd64",
         "MEDIA_SERVER_NAME={{user `mediaserver_name`}}",
@@ -110,41 +115,37 @@
     },
     {
       "type": "shell",
-      "execute_command": "chmod +x {{ .Path }}; sudo '{{ .Path }}' {{user `install_jaeger`}} {{user `distro`}}",
+      "execute_command": "chmod +x {{ .Path }}; sudo '{{ .Path }}' {{user `distro`}}  {{user `install_jaeger`}}",
       "script": "scripts/install_jaeger.sh"
     },
     {
       "type": "shell",
-      "execute_command": "chmod +x {{ .Path }}; sudo '{{ .Path }}' {{user `install_homer`}} {{user `homer_user`}} {{user `homer_password`}}",
+      "execute_command": "chmod +x {{ .Path }}; sudo '{{ .Path }}' {{user `distro`}} {{user `install_homer`}} {{user `homer_user`}} {{user `homer_password`}}",
       "script": "scripts/install_postgresql.sh"
     },
     {
       "type": "shell",
-      "execute_command": "chmod +x {{ .Path }}; sudo '{{ .Path }}' {{user `install_homer`}} {{user `homer_user`}} {{user `homer_password`}}",
+      "execute_command": "chmod +x {{ .Path }}; sudo '{{ .Path }}' {{user `distro`}}  {{user `install_homer`}} {{user `homer_user`}} {{user `homer_password`}}",
       "script": "scripts/install_homer.sh"
     },
     {
       "type": "shell",
-      "execute_command": "chmod +x {{ .Path }}; sudo '{{ .Path }}' {{user `drachtio_version`}} {{user `distro`}}",
-      "script": "scripts/install_drachtio.sh"
-    },
-    {
-      "type": "shell",
-      "execute_command": "chmod +x {{ .Path }}; sudo '{{ .Path }}' {{user `install_cloudwatch`}}",
+      "execute_command": "chmod +x {{ .Path }}; sudo '{{ .Path }}' {{user `distro`}} {{user `install_cloudwatch`}}",
       "script": "scripts/install_cloudwatch.sh"
     },
     {
       "type": "shell",
-      "execute_command": "chmod +x {{ .Path }}; sudo '{{ .Path }}' {{user `rtp_engine_version`}}",
+      "execute_command": "chmod +x {{ .Path }}; sudo '{{ .Path }}' {{user `distro`}} {{user `rtp_engine_version`}}",
       "script": "scripts/install_rtpengine.sh"
     },
     {
       "type": "shell",
+      "execute_command": "chmod +x {{ .Path }}; sudo '{{ .Path }}' {{user `distro`}}",
       "script": "scripts/install_nodejs.sh"
     },
     {
       "type": "shell",
-      "execute_command": "chmod +x {{ .Path }}; sudo '{{ .Path }}' {{user `install_influxdb`}}",
+      "execute_command": "chmod +x {{ .Path }}; sudo '{{ .Path }}'  {{user `distro`}} {{user `install_influxdb`}}",
       "script": "scripts/install_influxdb.sh"
     },
     {
@@ -154,20 +155,22 @@
     },
     {
       "type": "shell",
+      "execute_command": "chmod +x {{ .Path }}; sudo '{{ .Path }}'  {{user `distro`}}",
       "script": "scripts/install_nginx.sh"
     },
     {
       "type": "shell",
+      "execute_command": "chmod +x {{ .Path }}; sudo '{{ .Path }}'  {{user `distro`}}",
       "script": "scripts/install_redis.sh"
     },
     {
       "type": "shell",
-      "execute_command": "chmod +x {{ .Path }}; sudo '{{ .Path }}' {{user `install_homer`}} {{user `influxdb_ip`}}",
+      "execute_command": "chmod +x {{ .Path }}; sudo '{{ .Path }}'  {{user `distro`}} {{user `install_homer`}} {{user `influxdb_ip`}}",
       "script": "scripts/install_telegraf.sh"
     },
     {
       "type": "shell",
-      "execute_command": "chmod +x {{ .Path }}; sudo '{{ .Path }}' {{user `install_influxdb`}}",
+      "execute_command": "chmod +x {{ .Path }}; sudo '{{ .Path }}'  {{user `distro`}} {{user `install_influxdb`}}",
       "script": "scripts/install_grafana.sh"
     },
     {
@@ -176,12 +179,12 @@
     },
     {
       "type": "shell",
-      "execute_command": "chmod +x {{ .Path }}; sudo '{{ .Path }}'  {{user `jambonz_user`}} {{user `jambonz_password`}}",
+      "execute_command": "chmod +x {{ .Path }}; sudo '{{ .Path }}'  {{user `distro`}} {{user `jambonz_user`}} {{user `jambonz_password`}}",
       "script": "scripts/install_mysql.sh"
     },
     {
       "type": "shell",
-      "execute_command": "chmod +x {{ .Path }}; sudo '{{ .Path }}' {{user `jambonz_version`}} {{user `jambonz_user`}} {{user `jambonz_password`}}",
+      "execute_command": "chmod +x {{ .Path }}; sudo '{{ .Path }}'  {{user `distro`}} {{user `jambonz_version`}} {{user `jambonz_user`}} {{user `jambonz_password`}}",
       "script": "scripts/install_app.sh"
     },
     {

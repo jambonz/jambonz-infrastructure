@@ -64,7 +64,6 @@ EOF
 
   echo "creating file 42 in /proc/rtpengine/control"
   echo 'add 42' > /proc/rtpengine/control
-  cat /proc/rtpengine/control
   echo "installing iptables rule"
   iptables -I INPUT -p udp --dport 40000:60000 -j RTPENGINE --id 42
 

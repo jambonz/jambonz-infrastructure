@@ -1,8 +1,7 @@
 #!/bin/bash
 DISTRO=$1
 
-echo "installing node.js for ${DISTRO}"
-if [ "$DISTRO" == "rhel-9" ]; then
+if [[ "$DISTRO" == rhel* ]]; then
   dnf install -y crypto-policies-scripts
   sudo update-crypto-policies --set DEFAULT
   sudo rpm --import https://rpm.nodesource.com/pub/el/NODESOURCE-GPG-SIGNING-KEY-EL
@@ -18,7 +17,7 @@ else
   curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | sudo gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg
   echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_18.x nodistro main" | sudo tee /etc/apt/sources.list.d/nodesource.list
   sudo apt-get update
-  sudo apt-get install -y nodejs npm
+  sudo apt-get install -y nodejs
 fi
 
 sudo npm install -g npm@latest

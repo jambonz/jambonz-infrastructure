@@ -9,12 +9,14 @@ GOOGLE_API_VERSION=29374574304f3356e64423acc9ad059fe43f09b5
 #AWS_SDK_VERSION=1.11.143 # newer but buggy with s2n_init crashes and weird slowdown on voice playout in FS
 AWS_SDK_VERSION=1.8.129
 LWS_VERSION=v4.3.2
-MODULES_VERSION=v0.8.4
+MODULES_VERSION=v0.8.11
 
-if [ "$EUID" -ne 0 ]; then
-  echo "Switching to root user..."
-  bash "$0" --as-root
-  exit
+if [[ "$DISTRO" == rhel* ]]; then
+  if [ "$EUID" -ne 0 ]; then
+    echo "Switching to root user..."
+    bash "$0" --as-root
+    exit
+  fi
 fi
 
 # Your script continues here, as root
@@ -38,22 +40,22 @@ fi
 cd /tmp
 tar xvfz SpeechSDK-Linux-1.32.1.tar.gz
 cd SpeechSDK-Linux-1.32.1
-cp -r include /usr/local/include/MicrosoftSpeechSDK
-cp -r lib/ /usr/local/lib/MicrosoftSpeechSDK
+sudo cp -r include /usr/local/include/MicrosoftSpeechSDK
+sudo cp -r lib/ /usr/local/lib/MicrosoftSpeechSDK
 if [ "$ARCH" == "arm64" ]; then
   echo installing Microsoft arm64 libs...
-  cp /usr/local/lib/MicrosoftSpeechSDK/arm64/libMicrosoft.*.so /usr/local/lib/
+  sudo cp /usr/local/lib/MicrosoftSpeechSDK/arm64/libMicrosoft.*.so /usr/local/lib/
   echo done
 fi 
 if [ "$ARCH" == "amd64" ]; then
   echo installing Microsoft x64 libs...
-  cp /usr/local/lib/MicrosoftSpeechSDK/x64/libMicrosoft.*.so /usr/local/lib/
+  sudo cp /usr/local/lib/MicrosoftSpeechSDK/x64/libMicrosoft.*.so /usr/local/lib/
   echo done
 fi
 
 cd /usr/local/src
 echo remove SpeechSDK-Linux-1.32.1
-rm -Rf /tmp/SpeechSDK-Linux-1.32.1.tgz /tmp/SpeechSDK-Linux-1.32.1
+sudo rm -Rf /tmp/SpeechSDK-Linux-1.32.1.tgz /tmp/SpeechSDK-Linux-1.32.1
 echo done
 
 echo config git
@@ -80,6 +82,7 @@ git clone https://github.com/awslabs/aws-c-common.git
 
 cp -r /usr/local/src/drachtio-freeswitch-modules/modules/mod_audio_fork /usr/local/src/freeswitch/src/mod/applications/mod_audio_fork
 cp -r /usr/local/src/drachtio-freeswitch-modules/modules/mod_aws_transcribe /usr/local/src/freeswitch/src/mod/applications/mod_aws_transcribe
+cp -r /usr/local/src/drachtio-freeswitch-modules/modules/mod_assemblyai_transcribe /usr/local/src/freeswitch/src/mod/applications/mod_assemblyai_transcribe
 cp -r /usr/local/src/drachtio-freeswitch-modules/modules/mod_azure_transcribe /usr/local/src/freeswitch/src/mod/applications/mod_azure_transcribe
 cp -r /usr/local/src/drachtio-freeswitch-modules/modules/mod_aws_lex /usr/local/src/freeswitch/src/mod/applications/mod_aws_lex
 cp -r /usr/local/src/drachtio-freeswitch-modules/modules/mod_cobalt_transcribe /usr/local/src/freeswitch/src/mod/applications/mod_cobalt_transcribe
@@ -119,7 +122,7 @@ patch < mod_httapi.c.patch
 # build libwebsockets
 echo building lws
 cd /usr/local/src/libwebsockets
-mkdir -p build && cd build && cmake .. -DCMAKE_BUILD_TYPE=RelWithDebInfo && make && make install
+mkdir -p build && cd build && cmake .. -DCMAKE_BUILD_TYPE=RelWithDebInfo && make && sudo make install
 
 # build libfvad
 cd /usr/local/src/freeswitch/libs/libfvad
@@ -129,24 +132,24 @@ if [ "$DISTRO" == "debian-12" ]; then
   cp /tmp/configure.ac.libfvad configure.ac
 fi
 echo building libfvad
-autoreconf -i && ./configure && make -j 4 && make install
+autoreconf -i && ./configure && make -j 4 && sudo make install
 
 # build spandsp
 echo building spandsp
 cd /usr/local/src/freeswitch/libs/spandsp
-./bootstrap.sh && ./configure && make -j 4 && make install
+./bootstrap.sh && ./configure && make -j 4 && sudo make install
 
 # build sofia
 echo building sofia
 cd /usr/local/src/freeswitch/libs/sofia-sip
-./bootstrap.sh && ./configure && make -j 4 && make install
+./bootstrap.sh && ./configure && make -j 4 && sudo make install
 
 # build aws-c-common
 echo building aws-c-common
 cd /usr/local/src/freeswitch/libs/aws-c-common
 mkdir -p build && cd build
 cmake .. -DCMAKE_BUILD_TYPE=RelWithDebInfo -DBUILD_SHARED_LIBS=OFF -DCMAKE_CXX_FLAGS="-Wno-unused-parameter"
-make -j 4 && make install
+make -j 4 && sudo make install
 
 # build aws-sdk-cpp
 echo building aws-sdk-cpp
@@ -162,7 +165,7 @@ if [ "$DISTRO" == "debian-12" ] ||[[ "$DISTRO" == rhel* ]] ; then
   cmake .. -DBUILD_ONLY="lexv2-runtime;transcribestreaming" -DCMAKE_BUILD_TYPE=RelWithDebInfo -DBUILD_SHARED_LIBS=OFF -DCMAKE_CXX_FLAGS="-Wno-unused-parameter -Wno-error=nonnull -Wno-error=deprecated-declarations -Wno-error=uninitialized -Wno-error=maybe-uninitialized"
   echo cmake completed
 fi
-make -j 4 && make install
+make -j 4 && sudo make install
 find /usr/local/src/freeswitch/libs/aws-sdk-cpp/ -type f -name "*.pc" | xargs cp -t /usr/local/lib/pkgconfig/
 
 # build grpc
@@ -173,7 +176,7 @@ mkdir -p cmake/build
 cd cmake/build
 cmake -DBUILD_SHARED_LIBS=ON -DgRPC_SSL_PROVIDER=package -DBUILD_SHARED_LIBS=ON -DCMAKE_BUILD_TYPE=RelWithDebInfo ../..
 make -j 4
-make install
+sudo make install
 
 # build googleapis
 echo building googleapis
@@ -213,32 +216,32 @@ cd /usr/local/src/freeswitch
 ./bootstrap.sh -j
 ./configure --enable-tcmalloc=yes --with-lws=yes --with-extra=yes --with-aws=yes
 make -j 8
-make install
-make cd-sounds-install cd-moh-install
-cp /tmp/acl.conf.xml /usr/local/freeswitch/conf/autoload_configs
-cp /tmp/event_socket.conf.xml /usr/local/freeswitch/conf/autoload_configs
-cp /tmp/switch.conf.xml /usr/local/freeswitch/conf/autoload_configs
-cp /tmp/conference.conf.xml /usr/local/freeswitch/conf/autoload_configs
-rm -Rf /usr/local/freeswitch/conf/dialplan/*
-rm -Rf /usr/local/freeswitch/conf/sip_profiles/*
-cp /tmp/mrf_dialplan.xml /usr/local/freeswitch/conf/dialplan
-cp /tmp/mrf_sip_profile.xml /usr/local/freeswitch/conf/sip_profiles
-cp /usr/local/src/freeswitch/conf/vanilla/autoload_configs/modules.conf.xml /usr/local/freeswitch/conf/autoload_configs
+sudo make install
+sudo make cd-sounds-install cd-moh-install
+sudo cp /tmp/acl.conf.xml /usr/local/freeswitch/conf/autoload_configs
+sudo cp /tmp/event_socket.conf.xml /usr/local/freeswitch/conf/autoload_configs
+sudo cp /tmp/switch.conf.xml /usr/local/freeswitch/conf/autoload_configs
+sudo cp /tmp/conference.conf.xml /usr/local/freeswitch/conf/autoload_configs
+sudo rm -Rf /usr/local/freeswitch/conf/dialplan/*
+sudo rm -Rf /usr/local/freeswitch/conf/sip_profiles/*
+sudo cp /tmp/mrf_dialplan.xml /usr/local/freeswitch/conf/dialplan
+sudo cp /tmp/mrf_sip_profile.xml /usr/local/freeswitch/conf/sip_profiles
+sudo cp /usr/local/src/freeswitch/conf/vanilla/autoload_configs/modules.conf.xml /usr/local/freeswitch/conf/autoload_configs
 
 if [[ "$DISTRO" == rhel* ]]; then
-  cp /tmp/freeswitch-rhel.service /etc/systemd/system/freeswitch.service
+  sudo cp /tmp/freeswitch-rhel.service /etc/systemd/system/freeswitch.service
 else
-  cp /tmp/freeswitch.service /etc/systemd/system
+  sudo cp /tmp/freeswitch.service /etc/systemd/system
 fi
-chown root:root -R /usr/local/freeswitch
-chmod 644 /etc/systemd/system/freeswitch.service
-sed -i -e 's/global_codec_prefs=OPUS,G722,PCMU,PCMA,H264,VP8/global_codec_prefs=PCMU,PCMA,OPUS,G722/g' /usr/local/freeswitch/conf/vars.xml
-sed -i -e 's/outbound_codec_prefs=OPUS,G722,PCMU,PCMA,H264,VP8/outbound_codec_prefs=PCMU,PCMA,OPUS,G722/g' /usr/local/freeswitch/conf/vars.xml
-systemctl enable freeswitch
-cp /tmp/freeswitch_log_rotation /etc/cron.daily/freeswitch_log_rotation
-chown root:root /etc/cron.daily/freeswitch_log_rotation
-chmod a+x /etc/cron.daily/freeswitch_log_rotation
+sudo chown root:root -R /usr/local/freeswitch
+sudo chmod 644 /etc/systemd/system/freeswitch.service
+sudo sed -i -e 's/global_codec_prefs=OPUS,G722,PCMU,PCMA,H264,VP8/global_codec_prefs=PCMU,PCMA,OPUS,G722/g' /usr/local/freeswitch/conf/vars.xml
+sudo sed -i -e 's/outbound_codec_prefs=OPUS,G722,PCMU,PCMA,H264,VP8/outbound_codec_prefs=PCMU,PCMA,OPUS,G722/g' /usr/local/freeswitch/conf/vars.xml
+sudo  systemctl enable freeswitch
+sudo cp /tmp/freeswitch_log_rotation /etc/cron.daily/freeswitch_log_rotation
+sudo chown root:root /etc/cron.daily/freeswitch_log_rotation
+sudo chmod a+x /etc/cron.daily/freeswitch_log_rotation
 
 echo "downloading soniox root verification certificate"
 cd /usr/local/freeswitch/certs
-wget https://raw.githubusercontent.com/grpc/grpc/master/etc/roots.pem
+sudo wget https://raw.githubusercontent.com/grpc/grpc/master/etc/roots.pem
