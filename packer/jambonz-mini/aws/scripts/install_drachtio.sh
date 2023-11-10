@@ -10,7 +10,7 @@ cd /usr/local/src
 git clone https://github.com/drachtio/drachtio-server.git -b ${VERSION}
 cd drachtio-server
 git submodule update --init --recursive
-./autogen.sh && mkdir -p build && cd $_ && ../configure --enable-tcmalloc=yes CPPFLAGS='-DNDEBUG -g -O2' && make -j 8 && sudo make install
+./autogen.sh && mkdir -p build && cd $_ && ../configure --enable-tcmalloc=yes CPPFLAGS='-DNDEBUG -g -O2' && make -j 4 && sudo make install
 
 echo "installing drachtio for aws"
 
