@@ -72,5 +72,9 @@ EOL
 echo "creating schema"
 mysql -h localhost -u $DB_USER -p$DB_PASS -D jambones < $HOME/apps/jambonz-api-server/db/jambones-sql.sql
 echo "seeding initial data"
+DEFAULT_ACCOUNT_SID=$(uuidgen)
+DEFAULT_TOKEN=$(uuidgen)
+sudo sed -i "s/9351f46a-678c-43f5-b8a6-d4eb58d131af/${DEFAULT_ACCOUNT_SID}/g" $HOME/apps/jambonz-api-server/db/seed-production-database-open-source.sql
+sudo sed -i "s/38700987-c7a4-4685-a5bb-af378f9734de/${DEFAULT_TOKEN}/g" $HOME/apps/jambonz-api-server/db/seed-production-database-open-source.sql
 mysql -h localhost -u $DB_USER -p$DB_PASS -D jambones < $HOME/apps/jambonz-api-server/db/seed-production-database-open-source.sql
 

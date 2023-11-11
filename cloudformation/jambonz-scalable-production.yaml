@@ -1745,6 +1745,11 @@ Resources:
               ret=$?
               if [ $ret -ne 0 ]; then
                 mysql -h ${JAMBONES_MYSQL_HOST} -u admin -D jambones -p${JAMBONES_MYSQL_PASSWORD} < /home/admin/apps/jambonz-api-server/db/jambones-sql.sql
+                # replace default account sid and token
+                DEFAULT_ACCOUNT_SID=$(uuidgen)
+                DEFAULT_TOKEN=$(uuidgen)
+                sudo sed -i "s/9351f46a-678c-43f5-b8a6-d4eb58d131af/${DEFAULT_ACCOUNT_SID}/g" /home/admin/apps/jambonz-api-server/db/seed-production-database-open-source.sql
+                sudo sed -i "s/38700987-c7a4-4685-a5bb-af378f9734de/${DEFAULT_TOKEN}/g" /home/admin/apps/jambonz-api-server/db/seed-production-database-open-source.sql
                 mysql -h ${JAMBONES_MYSQL_HOST} -u admin -D jambones -p${JAMBONES_MYSQL_PASSWORD} < /home/admin/apps/jambonz-api-server/db/seed-production-database-open-source.sql
                 JAMBONES_MYSQL_HOST=${JAMBONES_MYSQL_HOST} JAMBONES_MYSQL_USER=admin JAMBONES_MYSQL_PASSWORD=${JAMBONES_MYSQL_PASSWORD} JAMBONES_MYSQL_DATABASE=jambones /home/admin/apps/jambonz-api-server/db/reset_admin_password.js
 
