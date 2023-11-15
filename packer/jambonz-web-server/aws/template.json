@@ -5,7 +5,7 @@
     "ami_description": "jambonz webserver", 
     "instance_type": "t3.xlarge",
     "drachtio_version": "v0.8.24",
-    "jambonz_version": "v0.8.5",
+    "jambonz_version": "v0.8.5-2",
     "ami_base_image_owner": "136693071363",
     "install_datadog": "no",
     "install_cloudwatch":  "yes",

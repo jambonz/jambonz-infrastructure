@@ -5,7 +5,7 @@
     "ami_description": "jambonz feature server",
     "instance_type": "c6in.xlarge",
     "drachtio_version": "v0.8.24",
-    "jambonz_version": "v0.8.5",
+    "jambonz_version": "v0.8.5-2",
     "ami_base_image_arch": "amd64",
     "ami_base_image_owner": "136693071363",
     "install_telegraf": "yes",
@@ -119,7 +119,7 @@
     },
     {
       "type": "shell",
-      "execute_command": "chmod +x {{ .Path }}; sudo '{{ .Path }}' {{user `install_telegraf`}}",
+      "execute_command": "chmod +x {{ .Path }}; sudo '{{ .Path }}' {{user `distro`}} {{user `install_telegraf`}}",
       "script": "scripts/install_telegraf.sh"
     },
     {

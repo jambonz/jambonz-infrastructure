@@ -8,7 +8,7 @@ if [ "$DISTRO" == rhel* ]; then
   HOME=/home/ec2-user
   sed -i "s|/home/admin|${HOME}|g" /tmp/ecosystem.config.js
 else
-  HOME=$HOME
+  HOME=/home/admin
   cd $HOME
 fi
 
