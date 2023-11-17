@@ -25,7 +25,8 @@ tar xvfz apache-cassandra-4.1.3-bin.tar.gz
 mv apache-cassandra-4.1.3 /usr/local/cassandra
 sudo cp cassandra.yaml /usr/local/cassandra/conf
 sudo chown -R admin:admin /usr/local/cassandra/
-cat /usr/local/cassandra/conf/cassandra.yaml 
+cat /usr/local/cassandra/conf/cassandra.yaml
+sudo cp jvm-server.options /usr/local/cassandra/conf
 
 chown -R admin:admin /usr/local/cassandra/
 
