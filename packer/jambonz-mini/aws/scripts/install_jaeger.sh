@@ -45,6 +45,7 @@ java -version
 tar xvfz apache-cassandra-4.1.3-bin.tar.gz
 sudo mv apache-cassandra-4.1.3 /usr/local/cassandra
 sudo cp cassandra.yaml /usr/local/cassandra/conf
+sudo cp jvm-server.options /usr/local/cassandra/conf
 
 if [[ "$DISTRO" == rhel* ]] ; then
   chown -R ec2-user:ec2-user /usr/local/cassandra/
