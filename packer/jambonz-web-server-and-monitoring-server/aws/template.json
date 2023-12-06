@@ -4,7 +4,7 @@
     "ssh_username": "admin",
     "ami_description": "jambonz web+monitoring server", 
     "instance_type": "t3.xlarge",
-    "jambonz_version": "v0.8.5-2",
+    "jambonz_version": "v0.8.5-5",
     "ami_base_image_arch": "amd64",
     "ami_base_image_owner": "136693071363",
     "install_datadog": "no",

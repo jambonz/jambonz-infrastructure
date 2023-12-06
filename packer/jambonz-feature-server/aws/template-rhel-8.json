@@ -5,7 +5,7 @@
     "ami_description": "jambonz feature server",
     "instance_type": "c6in.2xlarge",
     "drachtio_version": "v0.8.24-rc1",
-    "jambonz_version": "v0.8.5-rc10",
+    "jambonz_version": "v0.8.5-5",
     "ami_base_image_arch": "amd64",
     "ami_base_image_owner": "309956199498",
     "install_telegraf": "yes",

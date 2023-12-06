@@ -16,7 +16,7 @@
     "proxmox_ip_private": "{{user `proxmox_ip_private`}}",
     "proxmox_gateway": "{{user `proxmox_gateway`}}",
     "drachtio_version": "v0.8.24",
-    "jambonz_version": "v0.8.5-2",
+    "jambonz_version": "v0.8.5-5",
     "jambonz_user": "admin",
     "jambonz_password": "JambonzR0ck$",
     "install_telegraf": "yes",
