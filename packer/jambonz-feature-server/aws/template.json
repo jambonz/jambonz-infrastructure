@@ -5,7 +5,7 @@
     "ami_description": "jambonz feature server",
     "instance_type": "c6in.xlarge",
     "drachtio_version": "v0.8.24",
-    "jambonz_version": "v0.8.5-5",
+    "jambonz_version": "v0.8.5-6",
     "ami_base_image_arch": "amd64",
     "ami_base_image_owner": "136693071363",
     "install_telegraf": "yes",
@@ -94,7 +94,8 @@
       "environment_vars": [
         "ARCH={{user `ami_base_image_arch`}}",
         "MEDIA_SERVER_NAME={{user `mediaserver_name`}}",
-        "PREFERRED_CODEC_LIST={{user `preferred_codec_list`}}"
+        "PREFERRED_CODEC_LIST={{user `preferred_codec_list`}}",
+        "DISTRO={{user `distro`}}"
       ],
       "script": "scripts/install_freeswitch.sh"
     },

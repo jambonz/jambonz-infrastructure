@@ -32,6 +32,7 @@ cd /usr/local/src
 git clone https://github.com/warmcat/libwebsockets.git -b v4.3.2
 cd /usr/local/src/libwebsockets
 mkdir -p build && cd build && cmake .. -DCMAKE_BUILD_TYPE=RelWithDebInfo && make -j 8 && sudo make install
+export PKG_CONFIG_PATH=/usr/local/lib/pkgconfig
 
 cd /usr/local/src
 git clone https://github.com/sipwise/rtpengine.git -b ${VERSION}
@@ -46,26 +47,27 @@ if [[ "$DISTRO" == rhel* ]] && [[ "$RHEL_RELEASE" == "9" ]]; then
   systemctl enable rtpengine
   systemctl start rtpengine
 else
+  
+  if [[ "$DISTRO" == rhel* ]] && [[ "$RHEL_RELEASE" == "8" ]]; then
+    kernel_version="4.18.0-513.9.1.el8_9.x86_64"
+  else
+    kernel_version=$(uname -r)
+  fi
+
+  echo "build rtpengine with kernel version ${kernel_version}"
   echo make with_transcoding=yes with_iptables_option=yes with-kernel
-  make with_transcoding=yes with_iptables_option=yes with-kernel
+  make KSRC=/lib/modules/${kernel_version}/build with_transcoding=yes with_iptables_option=yes with-kernel
 
   # copy iptables extension into place
   echo "copying iptables extension into ${pkg-config xtables --variable=xtlibdir}"
   cp ./iptables-extension/libxt_RTPENGINE.so `pkg-config xtables --variable=xtlibdir`
-  echo "creating directory /lib/modules/$(uname -r)/updates/"
-  mkdir -p /lib/modules/`uname -r`/updates/
-  echo "copying kernel module into /lib/modules/$(uname -r)/updates"
-  cp ./kernel-module/xt_RTPENGINE.ko /lib/modules/`uname -r`/updates
-  depmod -a
-  modprobe xt_RTPENGINE
+  echo "copying kernel module into /lib/modules/${kernel_version}/updates"
+  cp ./kernel-module/xt_RTPENGINE.ko /lib/modules/${kernel_version}/updates
+  depmod -a ${kernel_version}
+  echo "xt_RTPENGINE" >> /etc/modules-load.d/rtpengine.conf
   cat << EOF >> /etc/modules
 xt_RTPENGINE
 EOF
-
-  echo "creating file 42 in /proc/rtpengine/control"
-  echo 'add 42' > /proc/rtpengine/control
-  echo "installing iptables rule"
-  iptables -I INPUT -p udp --dport 40000:60000 -j RTPENGINE --id 42
 
   cp /usr/local/src/rtpengine/daemon/rtpengine /usr/local/bin
   cp /usr/local/src/rtpengine/recording-daemon/rtpengine-recording /usr/local/bin/
@@ -76,8 +78,8 @@ EOF
     sudo mv /tmp/rtpengine.service /etc/systemd/system
   fi
   sudo chmod 644 /etc/systemd/system/rtpengine.service
-  sudo systemctl enable rtpengine
-  sudo systemctl start rtpengine
+  #sudo systemctl enable rtpengine
+  #sudo systemctl start rtpengine
 fi
 
 
