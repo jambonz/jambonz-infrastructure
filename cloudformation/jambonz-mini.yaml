@@ -95,9 +95,9 @@ Conditions:
 Mappings:
   AWSRegion2AMI:
     us-east-1:
-      Ami: ami-0525a66f4301a6e6d
+      Ami: ami-0c9308fe579edc67b
     us-east-2:
-      Ami: ami-0e45caebe3e25580c
+      Ami: ami-09a790787540f5772
 
 Resources:
   IamCloudwatchRole:
@@ -172,6 +172,18 @@ Resources:
             - |
               #!/bin/bash -xe
 
+              echo install rtpengine kernel module and iptables rule
+              if lsmod | grep -q xt_RTPENGINE; then
+                echo "xt_RTPENGINE module is already loaded."
+              else
+                echo "loading xt_RTPENGINE module."
+                modprobe xt_RTPENGINE
+                echo 'add 42' > /proc/rtpengine/control
+                iptables -I INPUT -p udp --dport 40000:60000 -j RTPENGINE --id 42
+              fi
+              echo "rtpengine module and iptables rule installed. Restarting rtpengine service."
+              systemctl restart rtpengine
+
               # Detecting the Linux distribution
               if grep -q 'ID="rhel"' /etc/os-release; then
                   USER=ec2-user
@@ -185,8 +197,6 @@ Resources:
                   echo disabling firewalld
                   sudo systemctl stop firewalld
                   sudo systemctl disable firewalld
-
-                  sudo systemctl restart rtpengine
               else
                   USER=admin
                   HOME=/home/admin

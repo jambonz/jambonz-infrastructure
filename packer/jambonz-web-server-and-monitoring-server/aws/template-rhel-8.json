@@ -35,7 +35,7 @@
     "source_ami_filter": {
       "filters": {
         "virtualization-type": "hvm",
-        "name": "RHEL-8.8.0*",
+        "name": "RHEL-8.8*",
         "root-device-type": "ebs",
         "architecture": "x86_64"
       },
@@ -86,7 +86,7 @@
         "opus-devel lsof redis yasm perl-ExtUtils-Embed libmpg123-devel libshout-devel \\",
         "systemd-devel speex-devel speexdsp-devel re2-devel opusfile-devel libtiff-devel \\",
         "snapd libjpeg-devel libsndfile-devel lua-devel sqlite-devel libuuid-devel \\",
-        "lame-devel libyuv-devel protobuf-compiler tcpdump kernel-devel-4.18.0-513.9.1.el8_9",
+        "lame-devel libyuv-devel protobuf-compiler tcpdump kernel-devel-$(uname -r)",
         "sudo dnf debuginfo-install -y binutils",
         "sudo chmod a+w /usr/local/src",
         "mkdir ~/apps",
@@ -108,16 +108,6 @@
       "type": "file",
       "source": "files/",
       "destination": "/tmp"
-    },
-    {
-      "type": "shell",
-      "environment_vars": [
-        "ARCH=amd64",
-        "MEDIA_SERVER_NAME={{user `mediaserver_name`}}",
-        "PREFERRED_CODEC_LIST={{user `preferred_codec_list`}}",
-        "DISTRO={{user `distro`}}"
-      ],
-      "script": "scripts/install_freeswitch.sh"
     },
     {
       "type": "shell",
@@ -198,6 +188,16 @@
       "type": "shell",
       "execute_command": "chmod +x {{ .Path }}; sudo '{{ .Path }}' {{user `distro`}}",
       "script": "scripts/install_nodejs.sh"
+    },
+    {
+      "type": "shell",
+      "environment_vars": [
+        "ARCH=amd64",
+        "MEDIA_SERVER_NAME={{user `mediaserver_name`}}",
+        "PREFERRED_CODEC_LIST={{user `preferred_codec_list`}}"
+      ],
+      "execute_command": "chmod +x {{ .Path }}; sudo '{{ .Path }}' {{user `distro`}}",
+      "script": "scripts/install_freeswitch.sh"
     },
     {
       "type": "shell",

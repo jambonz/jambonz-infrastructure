@@ -1,25 +1,13 @@
 #!/bin/bash
 
-DISTRO=$1
-
 FREESWITCH_VERSION=v1.10.10
 SPAN_DSP_VERSION=0d2e6ac
 GRPC_VERSION=v1.57.0
 GOOGLE_API_VERSION=29374574304f3356e64423acc9ad059fe43f09b5
-#AWS_SDK_VERSION=1.11.143 # newer but buggy with s2n_init crashes and weird slowdown on voice playout in FS
 AWS_SDK_VERSION=1.8.129
 LWS_VERSION=v4.3.2
 MODULES_VERSION=v0.8.11
 
-if [[ "$DISTRO" == rhel* ]]; then
-  if [ "$EUID" -ne 0 ]; then
-    echo "Switching to root user..."
-    bash "$0" --as-root
-    exit
-  fi
-fi
-
-# Your script continues here, as root
 echo "freeswitch version to install is ${FREESWITCH_VERSION}"
 echo "drachtio modules version to install is ${MODULES_VERSION}"
 echo "GRPC version to install is ${GRPC_VERSION}"
@@ -27,6 +15,17 @@ echo "GOOGLE_API_VERSION version to install is ${GOOGLE_API_VERSION}"
 echo "AWS_SDK_VERSION version to install is ${AWS_SDK_VERSION}"
 echo "LWS_VERSION version to install is ${LWS_VERSION}"
 echo "DISTRO is ${DISTRO}"
+echo "ARCH is ${ARCH}"
+
+if [[ "$DISTRO" == rhel* ]]; then
+  if [ "$EUID" -ne 0 ]; then
+    echo "Switching to root user..."
+    sudo ARCH="$ARCH" MEDIA_SERVER_NAME="$MEDIA_SERVER_NAME" PREFERRED_CODEC_LIST="$PREFERRED_CODEC_LIST" DISTRO="$DISTRO" bash "$0" --as-root
+    exit
+  fi
+fi
+
+# Your script continues here, as root
 
 export PATH=/usr/local/bin:$PATH
 export LD_LIBRARY_PATH=/usr/local/lib:/usr/local/lib64:$LD_LIBRARY_PATH
@@ -48,6 +47,7 @@ if [ "$ARCH" == "arm64" ]; then
   echo done
 fi 
 if [ "$ARCH" == "amd64" ]; then
+  PKG_CONFIG_PATH=/usr/local/lib64/pkgconfig:$PKG_CONFIG_PATH
   echo installing Microsoft x64 libs...
   sudo cp /usr/local/lib/MicrosoftSpeechSDK/x64/libMicrosoft.*.so /usr/local/lib/
   echo done
@@ -136,6 +136,7 @@ autoreconf -i && ./configure && make -j 4 && sudo make install
 
 # build spandsp
 echo building spandsp
+mv /usr/lib64/pkgconfig/spandsp.pc /usr/lib64/pkgconfig/spandsp.pc.bak # move old spandsp.pc out of the way
 cd /usr/local/src/freeswitch/libs/spandsp
 ./bootstrap.sh && ./configure && make -j 4 && sudo make install
 
@@ -214,7 +215,7 @@ LANGUAGE=cpp make
 echo "building freeswitch"
 cd /usr/local/src/freeswitch
 ./bootstrap.sh -j
-./configure --enable-tcmalloc=yes --with-lws=yes --with-extra=yes --with-aws=yes
+./configure --enable-tcmalloc=yes --with-lws=yes --with-extra=yes
 make -j 8
 sudo make install
 sudo make cd-sounds-install cd-moh-install

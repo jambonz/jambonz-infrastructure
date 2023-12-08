@@ -6,7 +6,7 @@
     "ami_description": "jambonz SBC SIP+RTP", 
     "instance_type": "c6in.xlarge",
     "drachtio_version": "v0.8.24",
-    "jambonz_version": "v0.8.5-5",
+    "jambonz_version": "v0.8.5-6",
     "ami_base_image_arch": "amd64",
     "ami_base_image_owner": "309956199498",
     "rtp_engine_version": "mr11.5.1.1",
@@ -19,7 +19,7 @@
     "distro": "rhel-8",
     "redhat_username": "your-redhat_username-here",
     "redhat_password": "your-redhat_password-here",
-    "leave_source": "no"
+    "leave_source": "yes"
   },
   "builders": [{
     "type": "amazon-ebs",
@@ -27,7 +27,7 @@
     "source_ami_filter": {
       "filters": {
         "virtualization-type": "hvm",
-        "name": "RHEL-8.8*",
+        "name": "RHEL-8.8.0*",
         "root-device-type": "ebs",
         "architecture": "x86_64"
       },
@@ -63,28 +63,22 @@
         "export PKG_CONFIG_PATH=/usr/local/lib/pkgconfig:$PKG_CONFIG_PATH",
         "sudo setenforce 0",
         "sudo sed -i 's/SELINUX=enforcing/SELINUX=disabled/' /etc/selinux/config",
-        "echo registering",
         "sudo subscription-manager register --username={{user `redhat_username`}} --password={{user `redhat_password`}}",
         "sudo dnf upgrade -y",
         "sudo sed -i 's/manage_repos = 0/manage_repos = 1/' /etc/rhsm/rhsm.conf",
-        "cat /etc/rhsm/rhsm.conf",
-        "echo installing codeready repos",
         "sudo subscription-manager repos --enable=codeready-builder-for-rhel-8-x86_64-rpms",
-        "echo installing epel repo",
         "sudo dnf install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm",
-        "sudo dnf upgrade -y",
-        "echo running /usr/bin/crb",
-        "sudo /usr/bin/crb enable",
-        "echo installing rpmfusion repo",
-        "sudo dnf install -y https://download1.rpmfusion.org/free/el/rpmfusion-free-release-9.noarch.rpm",
-        "echo installing Development tools",
+        "sudo dnf install -y https://download1.rpmfusion.org/free/el/rpmfusion-free-release-8.noarch.rpm",
         "sudo dnf groupinstall -y 'RPM Development Tools'",
         "sudo dnf groupinstall -y 'Development Tools'",
-        "echo installing needed packages",
-        "sudo dnf install -y iptables-devel htop pandoc wget cmake ffmpeg ffmpeg-devel perl-IPC-Cmd pcre-devel iptables-devel \\",
-        "google-perftools-devel libcurl-devel jq telnet libevent-devel xmlrpc-c-devel gperf libpcap-devel \\",
-        "glib2-devel json-glib-devel hiredis-devel spandsp-devel mariadb-devel dnsutils speex libedit-devel opus-devel \\",
-        "glib2-devel json-glib-devel spandsp-devel hiredis-devel libevent-devel xmlrpc-c-devel perl-IPC-Cmd mariadb-devel snapd",
+        "sudo dnf install -y iptables-devel htop pandoc wget cmake ffmpeg ffmpeg-devel fail2ban \\",
+        "perl-IPC-Cmd pcre-devel google-perftools-devel libcurl-devel curl jq telnet \\",
+        "libevent-devel xmlrpc-c-devel gperf libpcap-devel glib2-devel json-glib-devel \\",
+        "hiredis-devel spandsp-devel mariadb-devel dnsutils speex libedit-devel \\",
+        "opus-devel lsof redis yasm perl-ExtUtils-Embed libmpg123-devel libshout-devel \\",
+        "systemd-devel speex-devel speexdsp-devel re2-devel opusfile-devel libtiff-devel \\",
+        "snapd libjpeg-devel libsndfile-devel lua-devel sqlite-devel libuuid-devel \\",
+        "lame-devel libyuv-devel protobuf-compiler tcpdump kernel-devel-4.18.0-513.9.1.el8_9",
         "sudo dnf debuginfo-install -y binutils",
         "sudo chmod a+w /usr/local/src",
         "ssh-keyscan github.com >> ~/.ssh/known_hosts",
@@ -112,6 +106,11 @@
     },
     {
       "type": "shell",
+      "execute_command": "chmod +x {{ .Path }}; sudo '{{ .Path }}'  {{user `distro`}} {{user `rtp_engine_version`}}",
+      "script": "scripts/install_rtpengine.sh"
+    },
+    {
+      "type": "shell",
       "execute_command": "chmod +x {{ .Path }}; sudo '{{ .Path }}' {{build `ID`}}",
       "script": "scripts/install_apiban.sh"
     },
@@ -124,11 +123,6 @@
       "type": "shell",
       "execute_command": "chmod +x {{ .Path }}; sudo '{{ .Path }}' {{user `distro`}}",
       "script": "scripts/install_nodejs.sh"
-    },
-    {
-      "type": "shell",
-      "execute_command": "chmod +x {{ .Path }}; sudo '{{ .Path }}'  {{user `distro`}} {{user `rtp_engine_version`}}",
-      "script": "scripts/install_rtpengine.sh"
     },
     {
       "type": "shell",

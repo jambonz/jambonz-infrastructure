@@ -5,7 +5,7 @@
     "ami_description": "jambonz all-in-one AMI", 
     "instance_type": "c6in.2xlarge",
     "drachtio_version": "v0.8.24",
-    "jambonz_version": "v0.8.5-5",
+    "jambonz_version": "v0.8.5-6",
     "jambonz_user": "admin",
     "jambonz_password": "JambonzR0ck$",
     "ami_base_image_owner": "309956199498",
@@ -195,7 +195,8 @@
       "environment_vars": [
         "ARCH=amd64",
         "MEDIA_SERVER_NAME={{user `mediaserver_name`}}",
-        "PREFERRED_CODEC_LIST={{user `preferred_codec_list`}}"
+        "PREFERRED_CODEC_LIST={{user `preferred_codec_list`}}",
+        "DISTRO={{user `distro`}}"
       ],
       "execute_command": "chmod +x {{ .Path }}; sudo '{{ .Path }}' {{user `distro`}}",
       "script": "scripts/install_freeswitch.sh"
